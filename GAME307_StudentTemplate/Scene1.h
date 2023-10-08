@@ -22,6 +22,7 @@ private:
 
 	StaticBody* myNPC;
 	
+	
 
 public:
 	Scene1(SDL_Window* sdlWindow, GameManager* game_);
@@ -31,6 +32,8 @@ public:
 	void Update(const float time);
 	void Render();
     void HandleEvents(const SDL_Event &event);
+	void DrawRect(SDL_Rect &rect);
+
 	float getxAxis() { return xAxis; }
 	float getyAxis() { return yAxis; }
 	SDL_Window* getWindow() { return window; }

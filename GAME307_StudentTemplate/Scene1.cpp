@@ -112,11 +112,18 @@ void Scene1::Update(const float deltaTime) {
 }
 
 void Scene1::Render() {
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	SDL_SetRenderDrawColor(renderer, 210, 180, 140, 0);
 	SDL_RenderClear(renderer);
+
+	// green: 0, 128, 0
+	// tan: 210, 180, 140
+
 
 	// render any npc's
 	blinky->render(0.15f);
+
+
+
 
 	SDL_Rect rect;
 	Vec3 screenCoords;
@@ -135,6 +142,26 @@ void Scene1::Render() {
 	float orientationDeg = orientation * 180.0f / M_PI;
 	//SDL_RenderCopyEx(renderer, myNPC->getTexture(), nullptr, &rect, orientationDeg, nullptr, SDL_FLIP_NONE);
 
+	SDL_RenderDrawRect(renderer, &rect);
+
+	//  P G T G
+	//  G P G G
+	//  P P G G
+	//  G G G G 
+	//  check dimensions of 2d list, divide screensize w & h by dimensions
+	//  offset each rectangle x and y by results ^
+
+
+
+	SDL_Rect newRect{20, 20, 50, 50};
+	
+	
+	// reset render colour
+	SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+	// 
+	SDL_RenderFillRect(renderer, &newRect);
+
+
 
 	// render the player
 	game->RenderPlayer(0.10f);
@@ -148,4 +175,8 @@ void Scene1::HandleEvents(const SDL_Event& event)
 
 	// send events to player as needed
 	game->getPlayer()->HandleEvents(event);
+}
+
+void Scene1::DrawRect(SDL_Rect& rect)
+{
 }

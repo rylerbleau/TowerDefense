@@ -1,6 +1,7 @@
 #include "GameManager.h"
 #include "Scene1.h"
 #include "Scene2.h"
+#include "Scene3.h"
 //#include "MemoryMonitor.h"
 
 GameManager::GameManager() {
@@ -216,6 +217,9 @@ void GameManager::LoadScene( int i )
             break;
         case 2:
             currentScene = new Scene2(windowPtr->GetSDL_Window(), this);
+            break;
+        case 3:
+            currentScene = new Scene3(windowPtr->GetSDL_Window(), this);
             break;
         default:
             currentScene = new Scene1( windowPtr->GetSDL_Window(), this );
