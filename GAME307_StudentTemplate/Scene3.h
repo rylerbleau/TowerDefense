@@ -21,7 +21,7 @@ private:
 	Character* blinky;
 
 	StaticBody* myNPC;
-
+	std::vector<StaticBody*> NPCs;
 
 
 public:

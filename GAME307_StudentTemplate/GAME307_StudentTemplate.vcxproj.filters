@@ -53,6 +53,9 @@
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Scene3.cpp" />
+    <ClCompile Include="KinematicSeperation.cpp">
+      <Filter>Source\Behaviours</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameManager.h">
@@ -110,6 +113,9 @@
     <ClInclude Include="Node.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="Scene3.h" />
+    <ClInclude Include="KinematicSeperation.h">
+      <Filter>Header\Behaviours</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header">
