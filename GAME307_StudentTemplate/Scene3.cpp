@@ -149,4 +149,4 @@ void Scene3::HandleEvents(const SDL_Event& event)
 	// send events to player as needed
 	game->getPlayer()->HandleEvents(event);
 }
-#include "Scene3.h"
+

@@ -53,6 +53,7 @@
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Scene3.cpp" />
+    <ClCompile Include="Level.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameManager.h">
@@ -110,6 +111,7 @@
     <ClInclude Include="Node.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="Scene3.h" />
+    <ClInclude Include="Level.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header">
