@@ -5,6 +5,7 @@
 #include "VMath.h"
 #include "Body.h"
 #include "KinematicSteeringOutput.h"
+#include "StaticBody.h"
 #include <vector>
 
 
@@ -15,11 +16,22 @@ class KinematicSeperation
 {
 private:
 	KinematicSteeringOutput* result;
+
+	Body* character;
+	std::vector<StaticBody*> bodies;
+	float threshold;
+	int myIndex;
+
+
 	
 
 	
 public:
-	KinematicSeperation(std::vector<Body*> group);
+	
+
+	// for some reason, can't use polymorphism to pass bodies into this constructor
+	KinematicSeperation(Body* character_, std::vector<StaticBody*> &bodies_, float threshold_, int myIndex_);
+
 	KinematicSteeringOutput* GetSteering();
 	
 	~KinematicSeperation();
