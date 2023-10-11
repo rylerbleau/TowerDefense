@@ -155,12 +155,12 @@ void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 	int height = 0;
 	SDL_GetWindowSize(window, &width, &height);
 
-	spriteSheet->init(renderer);
+	spriteSheet->init(renderer, 12, 11);
 	spriteSheet->LoadMapSurface("Sprites/tilemap.png");
 
 	SDL_Rect whiteColor{ 255,177,84,255 };
 	SDL_Rect blackColor{ 53,75,143,0 };
-	SDL_Rect rect = spriteSheet->GetUVTile(0, 0);
+	SDL_Rect rect = spriteSheet->GetUVTile(11, 10);
 	SDL_Rect source = spriteSheet->GetSourceRect();
 	
 
@@ -169,10 +169,10 @@ void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 			
 			char tile = m_levelData[y][x];
 
-			SDL_Rect destRect{ x * ceil((float)rect.w / (float)width),
-					  y * ceil((float)rect.h / (float)height),
-					  ceil((float)rect.w / (float)height),
-					  ceil((float)rect.h / (float)height) };
+			SDL_Rect destRect{ x * ceil((float)source.w / (float)width),
+					  y * ceil((float)source.h / (float)height),
+					  ceil((float)source.w / (float)height),
+					  ceil((float)source.h / (float)height) };
 			
 
 			switch (tile) {
@@ -186,7 +186,7 @@ void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 				/*draw(renderer,
 					destRect,
 					blackColor);*/
-				SDL_RenderCopy(renderer, spriteSheet->getTexture(), &rect, &destRect);
+				SDL_RenderCopy(renderer, spriteSheet->getTexture(), &rect, &source);
 
 				break;
 			default:

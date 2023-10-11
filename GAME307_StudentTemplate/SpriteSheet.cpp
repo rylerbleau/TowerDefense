@@ -1,15 +1,16 @@
 #include "SpriteSheet.h"
 #include <iostream>
 
-const size_t TILE_SIZE_X = 12;
-const size_t TILE_SIZE_Y = 11;
+
 
 SpriteSheet::SpriteSheet():
 	renderer(nullptr),
 	surface(nullptr),
 	texture(nullptr),
-	tilesX(TILE_SIZE_X),
-	tilesY(TILE_SIZE_Y)
+	tilesX(0),
+	tilesY(0),
+	w(0),
+	h(0)
 {
 }
 
@@ -18,8 +19,10 @@ SpriteSheet::~SpriteSheet()
 	SDL_FreeSurface(surface);
 }
 
-void SpriteSheet::init(SDL_Renderer* renderer_) {
+void SpriteSheet::init(SDL_Renderer* renderer_ , const int& tileSizeX, const int& tileSizeY) {
 	renderer = renderer_;
+	tilesX = tileSizeX;
+	tilesY = tileSizeY;
 }
 
 void SpriteSheet::LoadMapSurface(const char* filename)
@@ -37,16 +40,12 @@ void SpriteSheet::LoadMapSurface(const char* filename)
 
 SDL_Rect SpriteSheet::GetUVTile(int indexX, int indexY)
 {
-	int tileWidth = w / tilesX;
-	int tileHeight = h / tilesY;
-
 	return {
 	(int)(ceil(((float)(indexX) / (float)tilesX) * (float)w)),
-	(int)(ceil(((float)(indexY) / (float)tilesY) * (float)h)),
+	(int)(ceil(((float)(abs(indexY - tilesY) - 1) / (float)tilesY) * (float)h)),
 	(int)(ceil((((float)(indexX + 1) / (float)tilesX) * (float)w) -
 	((float)(indexX) / (float)tilesX) * (float)w)),
-	(int)(ceil((((float)(indexY + 1) / (float)tilesY) * (float)h) -
-	((float)(indexY) / (float)tilesY) * (float)h))
+	(int)(ceil((((float)(abs(indexY - tilesY) + 1) / (float)tilesY) * (float)h) -
+	((float)(abs(indexY - tilesY)) / (float)tilesY) * (float)h))
 	};
-	
 }

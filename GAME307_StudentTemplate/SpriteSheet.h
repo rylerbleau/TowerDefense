@@ -12,7 +12,7 @@ private:
 public:
 	SpriteSheet();
 	~SpriteSheet();
-	void init(SDL_Renderer* renderer_);
+	void init(SDL_Renderer* renderer_, const int& tileSizeX, const int& tileSizeY);
 	void LoadMapSurface(const char* filename);
 	SDL_Rect GetUVTile(int indexX, int indexY);
 	SDL_Rect GetSourceRect() {
