@@ -54,6 +54,7 @@
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Scene3.cpp" />
     <ClCompile Include="Level.cpp" />
+    <ClCompile Include="SpriteSheet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameManager.h">
@@ -112,6 +113,7 @@
     <ClInclude Include="Graph.h" />
     <ClInclude Include="Scene3.h" />
     <ClInclude Include="Level.h" />
+    <ClInclude Include="SpriteSheet.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header">

@@ -148,6 +148,7 @@
     <ClCompile Include="Scene2.cpp" />
     <ClCompile Include="Scene3.cpp" />
     <ClCompile Include="Seek.cpp" />
+    <ClCompile Include="SpriteSheet.cpp" />
     <ClCompile Include="StaticBody.cpp" />
     <ClCompile Include="SteeringBehaviour.cpp" />
     <ClCompile Include="Steering\KinematicBody.cpp" />
@@ -172,6 +173,7 @@
     <ClInclude Include="Scene2.h" />
     <ClInclude Include="Scene3.h" />
     <ClInclude Include="Seek.h" />
+    <ClInclude Include="SpriteSheet.h" />
     <ClInclude Include="StaticBody.h" />
     <ClInclude Include="SteeringBehaviour.h" />
     <ClInclude Include="Steering\KinematicBody.h" />

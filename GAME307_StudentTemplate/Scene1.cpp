@@ -176,6 +176,4 @@ void Scene1::HandleEvents(const SDL_Event& event)
 	game->getPlayer()->HandleEvents(event);
 }
 
-void Scene1::DrawRect(SDL_Rect& rect)
-{
-}
+
