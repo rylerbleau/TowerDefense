@@ -2,6 +2,8 @@
 #include "KinematicSeek.h"
 #include "KinematicSeperation.h"
 
+#include "imgui.h"
+
 
 
 Scene3::Scene3(SDL_Window* sdlWindow_, GameManager* game_) {
@@ -94,6 +96,8 @@ void Scene3::OnDestroy() {
 }
 
 void Scene3::Update(const float deltaTime) {
+
+	HandleTheGUI();
 	// Calculate and apply any steering for npc's
 
 
@@ -185,7 +189,7 @@ void Scene3::Render() {
 	// render the player
 	game->RenderPlayer(0.10f);
 
-	SDL_RenderPresent(renderer);
+	//SDL_RenderPresent(renderer);
 }
 
 void Scene3::HandleEvents(const SDL_Event& event)
@@ -195,4 +199,12 @@ void Scene3::HandleEvents(const SDL_Event& event)
 	// send events to player as needed
 	game->getPlayer()->HandleEvents(event);
 }
-#include "Scene3.h"
+
+void Scene3::HandleTheGUI() {
+	ImGui::Begin("Clickable");
+	ImGui::Text("Clickable");
+	ImGui::End();
+
+
+}
+

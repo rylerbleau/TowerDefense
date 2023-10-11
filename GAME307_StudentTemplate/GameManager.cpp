@@ -2,6 +2,11 @@
 #include "Scene1.h"
 #include "Scene2.h"
 #include "Scene3.h"
+
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_sdlrenderer2.h"
+//#include "imgui_impl_opengl3.h"
 //#include "MemoryMonitor.h"
 
 GameManager::GameManager() {
@@ -10,6 +15,7 @@ GameManager::GameManager() {
 	isRunning = true;
 	currentScene = nullptr;
     player = nullptr;
+    show_ui = true;
     changeSceneEventType = 0;
 }
 
@@ -92,6 +98,21 @@ bool GameManager::OnCreate() {
         return false;
     }
        
+
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::StyleColorsDark();
+    
+    //ImGui_ImplSDL2_InitForOpenGL(windowPtr->getWindow(), window->getContext());
+    //ImGui_ImplOpenGL3_Init("#version 450");
+    io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\Arial.ttf", 18.0f);
+    ImGui_ImplSDL2_InitForSDLRenderer(getWindow(), getRenderer());
+    ImGui_ImplSDLRenderer2_Init(getRenderer());
+ 
+
+
 	return true;
 }
 
@@ -104,19 +125,33 @@ void GameManager::Run() {
     
 	while (isRunning)
 	{
-            
+
 		handleEvents();
-        
+
+        ImGui_ImplSDLRenderer2_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
+
+     
+
 		timer->UpdateFrameTicks();
 		if ( launched )
 		{
 		    currentScene->Update(timer->GetDeltaTime());
 		    // launched boolean just helps user stop and start action
 		    // and useful for debugging and teaching
-     
-
 		}
+
 		currentScene->Render();
+
+        if (show_ui) {
+            ImGui::Render();
+            ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());
+        }
+        
+        SDL_RenderPresent(getRenderer());
+
+
 
 		/// Keep the event loop running at a proper rate
 		SDL_Delay(timer->GetSleepTime(60)); ///60 frames per sec
@@ -140,6 +175,8 @@ void GameManager::handleEvents()
         //https://www.youtube.com/watch?v=SYrRMr4BaD4&list=PLM7LHX-clszBIGsrh7_3B2Pi74AhMpKhj&index=3
         while( SDL_PollEvent(&event) )
         {
+
+            ImGui_ImplSDL2_ProcessEvent(&event);
             if( event.type == SDL_QUIT )
             {
                 isRunning = false;
@@ -177,7 +214,31 @@ void GameManager::handleEvents()
         }
 }
 
-GameManager::~GameManager() {}
+GameManager::~GameManager() {
+
+    if (currentScene) {
+        currentScene->OnDestroy();
+        delete currentScene;
+        currentScene = nullptr;
+    }
+
+    if (timer) {
+        delete timer;
+        timer = nullptr;
+    }
+
+    if (windowPtr) {
+        delete windowPtr;
+        windowPtr = nullptr;
+    }
+
+    
+
+    ImGui_ImplSDLRenderer2_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+
+}
 
 void GameManager::OnDestroy(){
 	if (windowPtr) delete windowPtr;
@@ -200,6 +261,12 @@ SDL_Renderer* GameManager::getRenderer()
     SDL_Window* window = currentScene->getWindow();
     SDL_Renderer* renderer = SDL_GetRenderer(window);
     return renderer;
+}
+
+SDL_Window* GameManager::getWindow() {
+
+    SDL_Window* window = currentScene->getWindow();
+    return window;
 }
 
 void GameManager::RenderPlayer(float scale)
