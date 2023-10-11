@@ -41,11 +41,11 @@ void SpriteSheet::LoadMapSurface(const char* filename)
 SDL_Rect SpriteSheet::GetUVTile(int indexX, int indexY)
 {
 	return {
-	(int)(ceil(((float)(indexX) / (float)tilesX) * (float)w)),
+	(int)(floor(((float)(indexX) / (float)tilesX) * (float)w)),
 	(int)(ceil(((float)(abs(indexY - tilesY) - 1) / (float)tilesY) * (float)h)),
-	(int)(ceil((((float)(indexX + 1) / (float)tilesX) * (float)w) -
+	(int)(floor((((float)(indexX + 1) / (float)tilesX) * (float)w) -
 	((float)(indexX) / (float)tilesX) * (float)w)),
-	(int)(ceil((((float)(abs(indexY - tilesY) + 1) / (float)tilesY) * (float)h) -
+	(int)(floor ((((float)(abs(indexY - tilesY) + 1) / (float)tilesY) * (float)h) -
 	((float)(abs(indexY - tilesY)) / (float)tilesY) * (float)h))
 	};
 }

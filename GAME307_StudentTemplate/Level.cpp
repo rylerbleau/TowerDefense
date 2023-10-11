@@ -160,7 +160,7 @@ void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 
 	SDL_Rect whiteColor{ 255,177,84,255 };
 	SDL_Rect blackColor{ 53,75,143,0 };
-	SDL_Rect rect = spriteSheet->GetUVTile(0, 10);
+	SDL_Rect rect = spriteSheet->GetUVTile(0, 3);
 	SDL_Rect source = spriteSheet->GetSourceRect();
 	
 
