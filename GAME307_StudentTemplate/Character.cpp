@@ -65,8 +65,8 @@ void Character::Update(float deltaTime)
 
 
 	// this is just one of the possible behaviours based on state machine
-	//SteerToSeekPlayer(*steering);
-	SteerToFleePlayer(*steering);
+	SteerToSeekPlayer(*steering);
+	//SteerToFleePlayer(*steering);
 
 	// set the target for steering; target is used by the steerTo... functions
 	// (often the target is the Player)

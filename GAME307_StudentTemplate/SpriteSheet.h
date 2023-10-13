@@ -15,9 +15,9 @@ public:
 	void init(SDL_Renderer* renderer_, const int& tileSizeX, const int& tileSizeY);
 	void LoadMapSurface(const char* filename);
 	SDL_Rect GetUVTile(int indexX, int indexY);
-	SDL_Rect GetSourceRect() {
-		return SDL_Rect{ 0, 0, w, h };
-	}
+
+	SDL_Rect GetSizedUVTile(int indexX, int indexY, int indexSizeX, int indexSizeY);
+
 	SDL_Texture* getTexture() const { return texture; };
 };
 

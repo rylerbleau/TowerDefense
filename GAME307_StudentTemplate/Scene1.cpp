@@ -74,8 +74,7 @@ bool Scene1::OnCreate() {
 	myNPC->setTexture(texture);
 	SDL_FreeSurface(image);
 
-	level = Level("Levels/Level2.txt");
-
+	level = Level("Levels/Level2.txt", renderer);
 	// end of character set ups
 
 	return true;
@@ -141,27 +140,15 @@ void Scene1::Render() {
 
 	float orientation = myNPC->getOrientation();
 	float orientationDeg = orientation * 180.0f / M_PI;
-	//SDL_RenderCopyEx(renderer, myNPC->getTexture(), nullptr, &rect, orientationDeg, nullptr, SDL_FLIP_NONE);
-
-	//ssSDL_RenderDrawRect(renderer, &rect);
-
-	//  P G T G
-	//  G P G G
-	//  P P G G
-	//  G G G G 
-	//  check dimensions of 2d list, divide screensize w & h by dimensions
-	//  offset each rectangle x and y by results ^
-
-
 
 	SDL_Rect newRect{0, 0, 50, 50};
 	
 	
-	level.drawTiles(renderer, window);
+	
 	// reset render colour
+	level.drawTiles(renderer, window);
 	blinky->render(0.15f);
 	game->RenderPlayer(0.10f);
-	
 
 	// render the player
 
