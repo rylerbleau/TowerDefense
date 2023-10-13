@@ -26,6 +26,8 @@ private:
     class PlayerBody *player;
     Uint32 changeSceneEventType; // event type number for user defined events
     bool launched = true;
+	bool show_ui;
+	
 
 public:
 	GameManager();
@@ -39,6 +41,7 @@ public:
 	Uint32 getChangeScene() { return changeSceneEventType; }
 
 	SDL_Renderer* getRenderer();
+	SDL_Window* getWindow();
 	void RenderPlayer(float scale = 1.0f);
 	void Run();
     void LoadScene( int i );

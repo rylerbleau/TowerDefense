@@ -1,5 +1,8 @@
 #include "Scene3.h"
 #include "KinematicSeek.h"
+#include "KinematicSeperation.h"
+
+#include "imgui.h"
 
 
 
@@ -16,15 +19,19 @@ Scene3::Scene3(SDL_Window* sdlWindow_, GameManager* game_) {
 }
 
 Scene3::~Scene3() {
-	if (blinky)
-	{
-		blinky->OnDestroy();
-		delete blinky;
+	for (StaticBody* body : NPCs) {
+		delete(body);
 	}
 
 }
 
 bool Scene3::OnCreate() {
+
+	NPCs.push_back(new StaticBody(Vec3(5.0f, 5.0f, 0.0f), 0.0f, 5.0f, 1.0f));
+	NPCs.push_back(new StaticBody(Vec3(10.0f, 10.0f, 0.0f), 0.0f, 5.0f, 1.0f));
+	NPCs.push_back(new StaticBody(Vec3(10.0f, 5.0f, 0.0f), 0.0f, 5.0f, 1.0f));
+	NPCs.push_back(new StaticBody(Vec3(5.0f, 10.0f, 0.0f), 0.0f, 5.0f, 1.0f));
+
 	int w, h;
 	SDL_GetWindowSize(window, &w, &h);
 
@@ -57,7 +64,7 @@ bool Scene3::OnCreate() {
 	float maxSpeed_ = 5.0f;
 	float maxRotation_ = 1.0f;
 	Vec3 position_(5.0f, 5.0f, 0.0f);
-	myNPC = new StaticBody(position_, orientation_, maxSpeed_, maxRotation_);
+	//myNPC = new StaticBody(position_, orientation_, maxSpeed_, maxRotation_);
 
 	image = IMG_Load("Clyde.png");
 	texture = SDL_CreateTextureFromSurface(renderer, image);
@@ -71,7 +78,11 @@ bool Scene3::OnCreate() {
 		return false;
 	}
 
-	myNPC->setTexture(texture);
+	for (StaticBody* body : NPCs) {
+		body->setTexture(texture);
+
+	}
+	//myNPC->setTexture(texture);
 	SDL_FreeSurface(image);
 
 
@@ -85,28 +96,47 @@ void Scene3::OnDestroy() {
 }
 
 void Scene3::Update(const float deltaTime) {
+
+	HandleTheGUI();
 	// Calculate and apply any steering for npc's
 
-	// access violation here MEET WITH GAIL
-	blinky->Update(deltaTime);
 
-	/*KinematicSeek* steeringAlgorithm;
-	KinematicSteeringOutput* steering;*/
+	//blinky->Update(deltaTime);
 
-	/*Body* target;
+	
+
+	KinematicSeperation* steeringAlgorithm = nullptr;
+	KinematicSteeringOutput* steering;
+
+	Body* target;
 	target = game->getPlayer();
-	steeringAlgorithm = new KinematicSeek(myNPC, target);
+	
+	std::vector<Vec3> positions;
 
-	steering = steeringAlgorithm->GetSteering();*/
+	positions.resize(NPCs.size());
+
+	float threshold = 10.0f;
+
+	for (int i = 0; i < NPCs.size();  i++) {
+
+		steeringAlgorithm = new KinematicSeperation(NPCs[i], NPCs, threshold, i);
+		steering = steeringAlgorithm->GetSteering();
+	
+
+		NPCs[i]->Update(deltaTime, steering);
+		steeringAlgorithm = nullptr;
+		steering = nullptr;
+	}
+
 
 	//myNPC->Update(deltaTime, steering);
 
 	game->getPlayer()->Update(deltaTime);
 
 
-	/*if (steeringAlgorithm) {
+	if (steeringAlgorithm) {
 		delete steeringAlgorithm;
-	}*/
+	}
 
 	// Update player
 }
@@ -115,31 +145,51 @@ void Scene3::Render() {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
 
-	// render any npc's
-	blinky->render(0.15f);
+	//// render any npc's
+	//blinky->render(0.15f);
 
-	SDL_Rect rect;
-	Vec3 screenCoords;
-	int w, h;
+	//SDL_Rect rect;
+	//Vec3 screenCoords;
+	//int w, h;
 
-	screenCoords = projectionMatrix * myNPC->getPos();
-	float scale = 0.15f;
-	SDL_QueryTexture(myNPC->getTexture(), nullptr, nullptr, &w, &h);
+	//screenCoords = projectionMatrix * myNPC->getPos();
+	////float scale = 0.15f;
+	//SDL_QueryTexture(myNPC->getTexture(), nullptr, nullptr, &w, &h);
 
-	rect.w = static_cast<int>(w * scale);
-	rect.h = static_cast<int>(h * scale);
-	rect.x = static_cast<int>(screenCoords.x - (0.5f * rect.w));
-	rect.y = static_cast<int>(screenCoords.y - (0.5f * rect.h));
+	//rect.w = static_cast<int>(w * scale);
+	//rect.h = static_cast<int>(h * scale);
+	//rect.x = static_cast<int>(screenCoords.x - (0.5f * rect.w));
+	//rect.y = static_cast<int>(screenCoords.y - (0.5f * rect.h));
 
-	float orientation = myNPC->getOrientation();
-	float orientationDeg = orientation * 180.0f / M_PI;
+	//float orientation = myNPC->getOrientation();
+	//float orientationDeg = orientation * 180.0f / M_PI;
 	//SDL_RenderCopyEx(renderer, myNPC->getTexture(), nullptr, &rect, orientationDeg, nullptr, SDL_FLIP_NONE);
 
+	for (StaticBody* body : NPCs) {
+		SDL_Rect bodyRect;
+		Vec3 screenCoords;
+		int w, h;
+		screenCoords = projectionMatrix * body->getPos();
+		float scale = 0.15f;
+
+		SDL_QueryTexture(body->getTexture(), nullptr, nullptr, &w, &h);
+
+		bodyRect.w = static_cast<int>(w * scale);
+		bodyRect.h = static_cast<int>(h * scale);
+		bodyRect.x = static_cast<int>(screenCoords.x - (0.5f * bodyRect.w));
+		bodyRect.y = static_cast<int>(screenCoords.y - (0.5f * bodyRect.h));
+
+		float orientation = body->getOrientation();
+		float orientationDeg = orientation * 180.0f / M_PI;
+		SDL_RenderCopyEx(renderer, body->getTexture(), nullptr, &bodyRect, orientationDeg, nullptr, SDL_FLIP_NONE);
+
+
+	}
 
 	// render the player
 	game->RenderPlayer(0.10f);
 
-	SDL_RenderPresent(renderer);
+	//SDL_RenderPresent(renderer);
 }
 
 void Scene3::HandleEvents(const SDL_Event& event)
@@ -148,5 +198,13 @@ void Scene3::HandleEvents(const SDL_Event& event)
 
 	// send events to player as needed
 	game->getPlayer()->HandleEvents(event);
+}
+
+void Scene3::HandleTheGUI() {
+	ImGui::Begin("Clickable");
+	ImGui::Text("Clickable");
+	ImGui::End();
+
+
 }
 

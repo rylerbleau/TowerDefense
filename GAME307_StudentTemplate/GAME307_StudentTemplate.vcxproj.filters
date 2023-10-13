@@ -46,15 +46,48 @@
     <ClCompile Include="Steering\SteeringOutput.cpp">
       <Filter>Source\Behaviours</Filter>
     </ClCompile>
-    <ClCompile Include="Flee.cpp" />
     <ClCompile Include="Scene2.cpp">
       <Filter>Source\Game</Filter>
     </ClCompile>
-    <ClCompile Include="Node.cpp" />
-    <ClCompile Include="Graph.cpp" />
-    <ClCompile Include="Scene3.cpp" />
-    <ClCompile Include="Level.cpp" />
-    <ClCompile Include="SpriteSheet.cpp" />
+    <ClCompile Include="KinematicSeperation.cpp">
+      <Filter>Source\Behaviours</Filter>
+    </ClCompile>
+    <ClCompile Include="Flee.cpp">
+      <Filter>Source\Behaviours</Filter>
+    </ClCompile>
+    <ClCompile Include="Graph.cpp">
+      <Filter>Source\Behaviours</Filter>
+    </ClCompile>
+    <ClCompile Include="Node.cpp">
+      <Filter>Source\Behaviours</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene3.cpp">
+      <Filter>Source\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui.cpp">
+      <Filter>Source\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_demo.cpp">
+      <Filter>Source\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_draw.cpp">
+      <Filter>Source\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_impl_opengl3.cpp">
+      <Filter>Source\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_impl_sdl.cpp">
+      <Filter>Source\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_tables.cpp">
+      <Filter>Source\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_widgets.cpp">
+      <Filter>Source\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_impl_sdlrenderer2.cpp">
+      <Filter>Source\ImGui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameManager.h">
@@ -105,15 +138,54 @@
     <ClInclude Include="SteeringBehaviour.h">
       <Filter>Header\Behaviours</Filter>
     </ClInclude>
-    <ClInclude Include="Flee.h" />
     <ClInclude Include="Scene2.h">
       <Filter>Header\Game</Filter>
     </ClInclude>
-    <ClInclude Include="Node.h" />
-    <ClInclude Include="Graph.h" />
-    <ClInclude Include="Scene3.h" />
-    <ClInclude Include="Level.h" />
-    <ClInclude Include="SpriteSheet.h" />
+    <ClInclude Include="KinematicSeperation.h">
+      <Filter>Header\Behaviours</Filter>
+    </ClInclude>
+    <ClInclude Include="imconfig.h">
+      <Filter>Header\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui.h">
+      <Filter>Header\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_opengl3.h">
+      <Filter>Header\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_opengl3_loader.h">
+      <Filter>Header\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_sdl.h">
+      <Filter>Header\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_internal.h">
+      <Filter>Header\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imstb_rectpack.h">
+      <Filter>Header\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imstb_textedit.h">
+      <Filter>Header\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imstb_truetype.h">
+      <Filter>Header\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Flee.h">
+      <Filter>Header\Behaviours</Filter>
+    </ClInclude>
+    <ClInclude Include="Graph.h">
+      <Filter>Header\Behaviours</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
+      <Filter>Header\Behaviours</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene3.h">
+      <Filter>Header\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_sdlrenderer2.h">
+      <Filter>Header\ImGui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header">
@@ -139,6 +211,12 @@
     </Filter>
     <Filter Include="Source\Behaviours">
       <UniqueIdentifier>{66eebd98-bf63-432a-a768-6b60bd0e087d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\ImGui">
+      <UniqueIdentifier>{8760f59a-2ffe-4bc3-a7ec-423ee0fa72d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\ImGui">
+      <UniqueIdentifier>{89a8522d-08e6-4739-83ad-bc192d5b5d49}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
