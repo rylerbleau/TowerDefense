@@ -74,7 +74,7 @@ bool Scene1::OnCreate() {
 	myNPC->setTexture(texture);
 	SDL_FreeSurface(image);
 
-
+	level = Level("Levels/Level2.txt", renderer);
 	// end of character set ups
 
 	return true;
@@ -103,7 +103,7 @@ void Scene1::Update(const float deltaTime) {
 
 	game->getPlayer()->Update(deltaTime);
 
-
+		
 	/*if (steeringAlgorithm) {
 		delete steeringAlgorithm;
 	}*/
@@ -120,7 +120,7 @@ void Scene1::Render() {
 
 
 	// render any npc's
-	blinky->render(0.15f);
+	
 
 
 
@@ -140,31 +140,17 @@ void Scene1::Render() {
 
 	float orientation = myNPC->getOrientation();
 	float orientationDeg = orientation * 180.0f / M_PI;
-	//SDL_RenderCopyEx(renderer, myNPC->getTexture(), nullptr, &rect, orientationDeg, nullptr, SDL_FLIP_NONE);
 
-	SDL_RenderDrawRect(renderer, &rect);
-
-	//  P G T G
-	//  G P G G
-	//  P P G G
-	//  G G G G 
-	//  check dimensions of 2d list, divide screensize w & h by dimensions
-	//  offset each rectangle x and y by results ^
-
-
-
-	SDL_Rect newRect{20, 20, 50, 50};
+	SDL_Rect newRect{0, 0, 50, 50};
+	
 	
 	
 	// reset render colour
-	SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-	// 
-	SDL_RenderFillRect(renderer, &newRect);
-
-
+	level.drawTiles(renderer, window);
+	blinky->render(0.15f);
+	game->RenderPlayer(0.10f);
 
 	// render the player
-	game->RenderPlayer(0.10f);
 
 	SDL_RenderPresent(renderer);
 }
@@ -177,6 +163,4 @@ void Scene1::HandleEvents(const SDL_Event& event)
 	game->getPlayer()->HandleEvents(event);
 }
 
-void Scene1::DrawRect(SDL_Rect& rect)
-{
-}
+

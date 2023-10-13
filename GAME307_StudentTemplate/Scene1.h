@@ -6,7 +6,7 @@
 #include "Scene.h"
 #include "Character.h"
 #include "StaticBody.h"
-
+#include "Level.h"
 
 using namespace MATH;
 class Scene1 : public Scene {
@@ -22,6 +22,7 @@ private:
 
 	StaticBody* myNPC;
 	
+	Level level;
 	
 
 public:

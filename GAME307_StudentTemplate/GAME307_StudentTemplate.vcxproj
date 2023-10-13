@@ -149,6 +149,7 @@
     <ClCompile Include="KinematicSeek.cpp" />
     <ClCompile Include="KinematicSeperation.cpp" />
     <ClCompile Include="KinematicSteeringOutput.cpp" />
+    <ClCompile Include="Level.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="PlayerBody.cpp" />
@@ -156,6 +157,7 @@
     <ClCompile Include="Scene2.cpp" />
     <ClCompile Include="Scene3.cpp" />
     <ClCompile Include="Seek.cpp" />
+    <ClCompile Include="SpriteSheet.cpp" />
     <ClCompile Include="StaticBody.cpp" />
     <ClCompile Include="SteeringBehaviour.cpp" />
     <ClCompile Include="Steering\KinematicBody.cpp" />
@@ -182,6 +184,7 @@
     <ClInclude Include="KinematicSeek.h" />
     <ClInclude Include="KinematicSeperation.h" />
     <ClInclude Include="KinematicSteeringOutput.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="MemoryMonitor.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="PlayerBody.h" />
@@ -190,6 +193,7 @@
     <ClInclude Include="Scene2.h" />
     <ClInclude Include="Scene3.h" />
     <ClInclude Include="Seek.h" />
+    <ClInclude Include="SpriteSheet.h" />
     <ClInclude Include="StaticBody.h" />
     <ClInclude Include="SteeringBehaviour.h" />
     <ClInclude Include="Steering\KinematicBody.h" />
