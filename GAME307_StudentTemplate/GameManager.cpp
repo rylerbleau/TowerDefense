@@ -133,11 +133,15 @@ void GameManager::Run() {
         ImGui::NewFrame();
 
      
-
 		timer->UpdateFrameTicks();
+
 		if ( launched )
 		{
-		    currentScene->Update(timer->GetDeltaTime());
+            
+            if (!gamePaused) {
+
+		        currentScene->Update(timer->GetDeltaTime());
+            }
 		    // launched boolean just helps user stop and start action
 		    // and useful for debugging and teaching
 		}
@@ -206,6 +210,10 @@ void GameManager::handleEvents()
                         break;
                     case SDL_SCANCODE_3:
                         LoadScene(3);
+                        break;
+                    case SDL_SCANCODE_SPACE:
+                        TogglePauseGame();
+                        break;
                     default:
                         break;
                 }
@@ -254,6 +262,12 @@ float GameManager::getSceneWidth()
 
 Matrix4 GameManager::getProjectionMatrix() 
 { return currentScene->getProjectionMatrix(); }
+
+void GameManager::TogglePauseGame()
+{
+    gamePaused = !gamePaused;
+
+}
 
 SDL_Renderer* GameManager::getRenderer()
 {
