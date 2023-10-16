@@ -7,6 +7,7 @@
 #include "Character.h"
 #include "StaticBody.h"
 #include "Level.h"
+#include "SpriteSheet.h"
 
 using namespace MATH;
 class Scene1 : public Scene {
@@ -14,16 +15,15 @@ private:
 	SDL_Window *window;
 	float xAxis = 25.0f;
 	float yAxis = 15.0f;
+
 	SDL_Renderer* renderer;
 	Matrix4 projectionMatrix;
-    Matrix4     inverseProjection;
-
+    Matrix4 inverseProjection;
 	Character* blinky;
-
 	StaticBody* myNPC;
-	
+
+
 	Level level;
-	
 
 public:
 	Scene1(SDL_Window* sdlWindow, GameManager* game_);

@@ -10,13 +10,20 @@
 
 
 using namespace std;
-
+enum class Direction {
+	RIGHT,
+	LEFT,
+	FORWARD,
+	BACKWARD,
+	IDLE
+};
 class Character
 {
 private:
 	class KinematicBody* body;
 	class Scene* scene;
-
+	SDL_Rect sourceRect;
+	Direction direction = Direction::IDLE;
 public:
 	Character()
 	{

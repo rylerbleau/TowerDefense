@@ -14,6 +14,7 @@
 
 class PlayerBody : public Body
 {
+
 protected:
     class GameManager* game;
 

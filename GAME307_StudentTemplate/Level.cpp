@@ -2,15 +2,11 @@
 #include "fstream"
 #include <iostream>
 #include <random>
+#include "SDL_image.h"
 
 
-Level::Level(const std::string& fileName, SDL_Renderer* renderer_)
+Level::Level(const std::string& fileName)
 {
-	spriteSheet = new SpriteSheet();
-
-	spriteSheet->init(renderer_, 12, 11);
-	spriteSheet->LoadMapSurface("Sprites/tilemap.png");
-	
 	std::ifstream file;
 	file.open(fileName);
 
@@ -28,9 +24,29 @@ Level::Level(const std::string& fileName, SDL_Renderer* renderer_)
 
 Level::~Level() {}
 
+void Level::LoadMap(SDL_Renderer* renderer_, const int& tileSizeX, const int& tileSizeY, const char* filename)
+{
+	renderer = renderer_;
+
+	this->tileSizeX = tileSizeX;
+	this->tileSizeY = tileSizeY;
+
+	surface = IMG_Load(filename);
+	if (surface == nullptr) {
+		throw std::runtime_error("Incorrect filepath");
+	}
+
+	if (texture == nullptr) {
+		texture = SDL_CreateTextureFromSurface(renderer, surface);
+	}
+
+	SDL_FreeSurface(surface);
+}
+
 void Level::draw(SDL_Renderer* renderer, const SDL_Rect& uvRect, SDL_Rect destRect, float scale /*= 1.0f*/, bool needsResizing /*= false*/)
 {
-	if(needsResizing)
+
+	if (needsResizing)
 	{
 		int originalWidth = destRect.w;
 		int originalHeight = destRect.h;
@@ -43,44 +59,47 @@ void Level::draw(SDL_Renderer* renderer, const SDL_Rect& uvRect, SDL_Rect destRe
 		// Adjust y-position to make the texture scale upwards
 		destRect.y -= (destRect.h - originalHeight);
 
-		SDL_RenderCopy(renderer, spriteSheet->getTexture(), &uvRect, &destRect);
+		SDL_RenderCopy(renderer, texture, &uvRect, &destRect);
 	}
 	else {
 		destRect.w *= scale;
 		destRect.h *= scale;
-		SDL_RenderCopy(renderer, spriteSheet->getTexture(), &uvRect, &destRect);
+
+		SDL_RenderCopy(renderer, texture, &uvRect, &destRect);
 	}
 }
 
 
 void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 {
+	SpriteSheet::QuerySpriteSheet(tileSizeX, tileSizeY, texture);
+
 	int width = 0;
 	int height = 0;
 	SDL_GetWindowSize(window, &width, &height);
 
-	SDL_Rect pathRect = spriteSheet->GetUVTile(1, 8);
-	SDL_Rect grassRect = spriteSheet->GetUVTile(1, 10);
-	SDL_Rect leftGrassRect = spriteSheet->GetUVTile(0, 8);
-	SDL_Rect bottomLeftGrassCorner = spriteSheet->GetUVTile(0, 7);
-	SDL_Rect topLeftGrassCorner = spriteSheet->GetUVTile(0, 9);
-	SDL_Rect rightGrassRect = spriteSheet->GetUVTile(2, 8);
-	SDL_Rect bottomRightGrassRect = spriteSheet->GetUVTile(2, 7);
-	SDL_Rect topRightGrassCorner = spriteSheet->GetUVTile(2, 9);
-	SDL_Rect bottomRect = spriteSheet->GetUVTile(1, 7);
-	SDL_Rect topRect = spriteSheet->GetUVTile(1, 9);
+	static SDL_Rect pathRect = SpriteSheet::GetUVTile(1, 8);
+	static SDL_Rect grassRect = SpriteSheet::GetUVTile(1, 10);
+	static SDL_Rect leftGrassRect = SpriteSheet::GetUVTile(0, 8);
+	static SDL_Rect bottomLeftGrassCorner = SpriteSheet::GetUVTile(0, 7);
+	static SDL_Rect topLeftGrassCorner = SpriteSheet::GetUVTile(0, 9);
+	static SDL_Rect rightGrassRect = SpriteSheet::GetUVTile(2, 8);
+	static SDL_Rect bottomRightGrassRect = SpriteSheet::GetUVTile(2, 7);
+	static SDL_Rect topRightGrassCorner = SpriteSheet::GetUVTile(2, 9);
+	static SDL_Rect bottomRect = SpriteSheet::GetUVTile(1, 7);
+	static SDL_Rect topRect = SpriteSheet::GetUVTile(1, 9);
 
-	SDL_Rect flowerRect = spriteSheet->GetUVTile(2, 10);
-	SDL_Rect greenTreeRect = spriteSheet->GetUVTile(4, 8);
-	SDL_Rect orangeTreeRect = spriteSheet->GetSizedUVTile(3, 9, 1, 2);
-	SDL_Rect buildingRect = spriteSheet->GetSizedUVTile(0, 4, 4, 3);
-	SDL_Rect doorRect = spriteSheet->GetUVTile(1, 3);
-	SDL_Rect rockRect = spriteSheet->GetUVTile(7, 7);
-	SDL_Rect wellRect = spriteSheet->GetSizedUVTile(8, 2, 1, 2);
-	SDL_Rect stockRect = spriteSheet->GetSizedUVTile(8, 5, 3, 3);
-	SDL_Rect boardRect = spriteSheet->GetUVTile(11, 4);
+	static SDL_Rect flowerRect = SpriteSheet::GetUVTile(2, 10);
+	static SDL_Rect greenTreeRect = SpriteSheet::GetUVTile(4, 8);
+	static SDL_Rect orangeTreeRect = SpriteSheet::GetSizedUVTile(3, 9, 1, 2);
+	static SDL_Rect buildingRect = SpriteSheet::GetSizedUVTile(0, 4, 4, 3);
+	static SDL_Rect doorRect = SpriteSheet::GetUVTile(1, 3);
+	static SDL_Rect rockRect = SpriteSheet::GetUVTile(7, 7);
+	static SDL_Rect wellRect = SpriteSheet::GetSizedUVTile(8, 2, 1, 2);
+	static SDL_Rect stockRect = SpriteSheet::GetSizedUVTile(8, 5, 3, 3);
+	static SDL_Rect boardRect = SpriteSheet::GetUVTile(11, 4);
 
-	SDL_Rect worldTileCoords{ ceil((float)width / (float)getWidth()),
+	static const SDL_Rect worldTileCoords{ ceil((float)width / (float)getWidth()),
 							  ceil((float)height / (float)getHeight()),
 							  ceil((float)width / (float)getWidth()),
 							  ceil((float)height / (float)getHeight()) };

@@ -6,7 +6,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include "KinematicSteeringOutput.h"
-
+#include "SpriteSheet.h"
 using namespace MATH;
 
 class Body {

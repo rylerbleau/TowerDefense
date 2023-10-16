@@ -1,42 +1,15 @@
 #include "SpriteSheet.h"
-#include <iostream>
 
+int SpriteSheet::w = 0;
+int SpriteSheet::h = 0;
+int SpriteSheet::tilesX = 0;
+int SpriteSheet::tilesY = 0;
 
-
-SpriteSheet::SpriteSheet():
-	renderer(nullptr),
-	surface(nullptr),
-	texture(nullptr),
-	tilesX(0),
-	tilesY(0),
-	w(0),
-	h(0)
+void SpriteSheet::QuerySpriteSheet(const int& tileSizeX_, const int& tileSizeY_, SDL_Texture* _texture)
 {
-}
-
-SpriteSheet::~SpriteSheet()
-{
-	
-}
-
-void SpriteSheet::init(SDL_Renderer* renderer_ , const int& tileSizeX, const int& tileSizeY) {
-	renderer = renderer_;
-	tilesX = tileSizeX;
-	tilesY = tileSizeY;
-}
-
-void SpriteSheet::LoadMapSurface(const char* filename)
-{
-	surface = IMG_Load(filename);
-	if (surface == nullptr) {
-		throw std::runtime_error("Incorrect filepath");
-	}
-
-	if(texture == nullptr){
-		texture = SDL_CreateTextureFromSurface(renderer, surface);
-		SDL_QueryTexture(texture, NULL, NULL, &w, &h);
-	}
-	SDL_FreeSurface(surface);
+	SpriteSheet::tilesX = tileSizeX_;
+	SpriteSheet::tilesY = tileSizeY_;
+	SDL_QueryTexture(_texture, NULL, NULL, &w, &h);
 }
 
 SDL_Rect SpriteSheet::GetUVTile(int indexX, int indexY)

@@ -1,4 +1,6 @@
 #include "Character.h"
+#include "SpriteSheet.h"
+
 
 
 bool Character::OnCreate(Scene* scene_)
@@ -12,7 +14,7 @@ bool Character::OnCreate(Scene* scene_)
 		float orientation = 0.0f;
 		float rotation = 0.0f;
 		float angular = 0.0f;
-		float maxSpeed = 4.0f;
+		float maxSpeed = 1.0f;
 		float maxAcceleration = 10.0f;
 		float maxRotation = 2.0f;
 		float maxAngular = 10.0f;
@@ -157,7 +159,62 @@ void Character::render(float scale)
 	// Convert character orientation from radians to degrees.
 	float orientation = body->getOrientation() * 180.0f / M_PI;
 
-	SDL_RenderCopyEx(renderer, body->getTexture(), nullptr, &square,
+	int numFrames = 0;
+	int FRAME_SPEED = 50;
+
+	SpriteSheet::QuerySpriteSheet(8, 3, body->getTexture());
+	
+	if (body->getVel().x > 0.0f && abs(body->getVel().x) > abs(body->getVel().y)) {
+		direction = Direction::RIGHT;
+	}
+	else if (body->getVel().x < 0.0f && abs(body->getVel().x) > abs(body->getVel().y)) {
+		direction = Direction::LEFT;
+	}
+	else if (body->getVel().y > 0.0f && abs(body->getVel().y) > abs(body->getVel().x)) {
+		direction = Direction::FORWARD;
+	}
+	else if (body->getVel().y < 0.0f && abs(body->getVel().y) > abs(body->getVel().x)) {
+		direction = Direction::BACKWARD;
+	}
+	int startPosX = 0;
+	int tileIndexY = 0;
+	int tileIndexX = 0;
+
+	SpriteSheet::QuerySpriteSheet(8, 3, body->getTexture());
+	switch (direction) {
+	case Direction::RIGHT:
+		numFrames = 4;
+		startPosX = 4;
+		tileIndexY = 1;
+		tileIndexX = startPosX + ((SDL_GetTicks() / FRAME_SPEED) % numFrames);
+		sourceRect = SpriteSheet::GetUVTile(tileIndexX, tileIndexY);
+		break;
+
+	case Direction::LEFT:
+		numFrames = 4;
+		startPosX = 0;
+		tileIndexY = 1;
+		tileIndexX = startPosX + ((SDL_GetTicks() / FRAME_SPEED) % numFrames);
+		sourceRect = SpriteSheet::GetUVTile(tileIndexX, tileIndexY);
+		break;
+
+	case Direction::BACKWARD:
+		numFrames = 4;
+		startPosX = 4;
+		tileIndexY = 2;
+		tileIndexX = startPosX + ((SDL_GetTicks() / FRAME_SPEED) % numFrames);
+		sourceRect = SpriteSheet::GetUVTile(tileIndexX, tileIndexY);
+		break;
+
+	case Direction::FORWARD:
+		numFrames = 4;
+		startPosX = 0;
+		tileIndexY = 2;
+		tileIndexX = startPosX + ((SDL_GetTicks() / FRAME_SPEED) % numFrames);
+		sourceRect = SpriteSheet::GetUVTile(tileIndexX, tileIndexY);
+		break;
+	}
+	SDL_RenderCopyEx(renderer, body->getTexture(), &sourceRect, &square,
 		orientation, nullptr, SDL_FLIP_NONE);
 }
 

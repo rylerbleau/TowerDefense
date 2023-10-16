@@ -40,7 +40,7 @@ bool Scene1::OnCreate() {
 	SDL_Surface* image;
 	SDL_Texture* texture;
 
-	image = IMG_Load("pacman.png");
+	image = IMG_Load("Pacman.png");
 	texture = SDL_CreateTextureFromSurface(renderer, image);
 	game->getPlayer()->setImage(image);
 	game->getPlayer()->setTexture(texture);
@@ -48,7 +48,7 @@ bool Scene1::OnCreate() {
 	// Set up characters, choose good values for the constructor
 	// or use the defaults, like this
 	blinky = new Character();
-	if (!blinky->OnCreate(this) || !blinky->setTextureWith("Blinky.png") )
+	if (!blinky->OnCreate(this) || !blinky->setTextureWith("Sprites/hero.png") )
 	{
 		return false;
 	}
@@ -61,7 +61,6 @@ bool Scene1::OnCreate() {
 
 	image = IMG_Load("Clyde.png");
 	texture = SDL_CreateTextureFromSurface(renderer, image);
-
 	if (image == nullptr){
 		std::cerr << "Can't open Clyde.png" << endl;
 		return false;
@@ -70,12 +69,15 @@ bool Scene1::OnCreate() {
 		std::cerr << "Can't create Clyde texture" << endl;
 		return false;
 	}
-
 	myNPC->setTexture(texture);
 	SDL_FreeSurface(image);
 
-	level = Level("Levels/Level2.txt", renderer);
-	// end of character set ups
+	/// end of character set ups
+
+	/// Map set up begins here
+
+	level = Level("Levels/Level2.txt");
+	level.LoadMap(renderer, 12, 11, "Sprites/tilemap.png");
 
 	return true;
 }
@@ -115,16 +117,6 @@ void Scene1::Render() {
 	SDL_SetRenderDrawColor(renderer, 210, 180, 140, 0);
 	SDL_RenderClear(renderer);
 
-	// green: 0, 128, 0
-	// tan: 210, 180, 140
-
-
-	// render any npc's
-	
-
-
-
-
 	SDL_Rect rect;
 	Vec3 screenCoords;
 	int w, h;
@@ -143,23 +135,17 @@ void Scene1::Render() {
 
 	SDL_Rect newRect{0, 0, 50, 50};
 	
-	
-	
 	// reset render colour
 	level.drawTiles(renderer, window);
-	blinky->render(0.15f);
+	blinky->render(1.0f);
 	game->RenderPlayer(0.10f);
 
 	// render the player
-
 	SDL_RenderPresent(renderer);
 }
 
 void Scene1::HandleEvents(const SDL_Event& event)
 {
-	// send events to npc's as needed
-
-	// send events to player as needed
 	game->getPlayer()->HandleEvents(event);
 }
 
