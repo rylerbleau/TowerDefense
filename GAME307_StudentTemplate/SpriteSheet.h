@@ -13,5 +13,7 @@ public:
 	static void QuerySpriteSheet(const int& tileSizeX, const int& tileSizeY, SDL_Texture* _texture);
 	static SDL_Rect GetUVTile(int indexX, int indexY);
 	static SDL_Rect GetSizedUVTile(int indexX, int indexY, int indexSizeX, int indexSizeY);
+	static void draw(SDL_Renderer* renderer, SDL_Texture* texture, const SDL_Rect& uvRect, SDL_Rect destRect, float scale /*= 1.0f*/, bool needsResizing /*= false*/);
+	
 };
 

@@ -108,7 +108,7 @@ void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 		for (int x = 0; x < m_levelData[y].size(); x++) {
 			
 			char tile = m_levelData[y][x];
-
+			SDL_Rect rect{ 50,50,50,50 };
 			SDL_Rect gridRect = worldTileCoords;
 			gridRect.x *= x;
 			gridRect.y *= y;
@@ -143,6 +143,8 @@ void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 				break;
 			case 'N':
 				draw(renderer, topRect, gridRect, 1);
+				
+				SDL_RenderDrawRect(renderer, &rect);
 				break;
 			case '1':
 				draw(renderer, bottomLeftGrassCorner, gridRect, 1);

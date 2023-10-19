@@ -163,7 +163,7 @@ void Character::render(float scale)
 	int FRAME_SPEED = 50;
 
 	SpriteSheet::QuerySpriteSheet(8, 3, body->getTexture());
-	
+
 	if (body->getVel().x > 0.0f && abs(body->getVel().x) > abs(body->getVel().y)) {
 		direction = Direction::RIGHT;
 	}
@@ -214,7 +214,8 @@ void Character::render(float scale)
 		sourceRect = SpriteSheet::GetUVTile(tileIndexX, tileIndexY);
 		break;
 	}
-	SDL_RenderCopyEx(renderer, body->getTexture(), &sourceRect, &square,
-		orientation, nullptr, SDL_FLIP_NONE);
+	
+	SpriteSheet::draw(renderer, body->getTexture(), sourceRect, square, 1.0f, true);
+
 }
 
