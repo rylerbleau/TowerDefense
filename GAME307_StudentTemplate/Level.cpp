@@ -104,7 +104,7 @@ void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 							  ceil((float)width / (float)getWidth()),
 							  ceil((float)height / (float)getHeight()) };
 
-	//m_tiles.resize(m_levelData.size() * m_levelData[0].size());
+	m_tiles.resize(m_levelData.size() * m_levelData[0].size());
 	for (int y = 0; y < m_levelData.size(); y++) {
 		for (int x = 0; x < m_levelData[y].size(); x++) {
 			
@@ -113,45 +113,44 @@ void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 			SDL_Rect gridRect = worldTileCoords;
 			gridRect.x *= x;
 			gridRect.y *= y;
-
+			
 			switch (tile) {
 			case 'P':
 				//SpriteSheet::draw(renderer, texture, pathRect, gridRect);
-				m_tiles.push_back(new Tile{ pathRect , gridRect , 1.0 , false });
+				m_tiles[y * m_levelData[0].size() + x] = new Tile{ pathRect , gridRect , 1.0 , false };
 				break;
 			case 'G':
-				SpriteSheet::draw(renderer, texture, grassRect, gridRect);
-				break;
+				m_tiles[y * m_levelData[0].size() + x] = new Tile{ grassRect , gridRect , 1.0 , false };
 				break;
 			case 'F':
 				SpriteSheet::draw(renderer, texture, grassRect, gridRect);
-				SpriteSheet::draw(renderer, texture, flowerRect, gridRect);
+				m_tiles[y * m_levelData[0].size() + x] = new Tile{ flowerRect , gridRect , 1.0 , false };
 				break;
 			case 'T':
 				SpriteSheet::draw(renderer, texture, grassRect, gridRect);
-				SpriteSheet::draw(renderer, texture, greenTreeRect, gridRect, 1, true);
+				m_tiles[y * m_levelData[0].size() + x] = new Tile{ greenTreeRect , gridRect , 1.0 , true };
 				break;
 			case 'O':
 				SpriteSheet::draw(renderer, texture, grassRect, gridRect);
-				SpriteSheet::draw(renderer, texture, orangeTreeRect, gridRect, 2 , true);
+				m_tiles[y * m_levelData[0].size() + x] = new Tile{ orangeTreeRect , gridRect , 2.0 , true };
 				break;
 			case 'R':
-				draw(renderer, rightGrassRect, gridRect, 1);
+				m_tiles[y * m_levelData[0].size() + x] = new Tile{ rightGrassRect , gridRect , 1.0 , false };
 				break;
 			case 'L':
-				draw(renderer, leftGrassRect, gridRect, 1);
+				m_tiles[y * m_levelData[0].size() + x] = new Tile{ leftGrassRect , gridRect , 1.0 , false };
 				break;
 			case 'B':
-				draw(renderer, bottomRect, gridRect, 1);
+				m_tiles[y * m_levelData[0].size() + x] = new Tile{ bottomRect , gridRect , 1.0 , false };
 				break;
 			case 'N':
-				draw(renderer, topRect, gridRect, 1);
+				m_tiles[y * m_levelData[0].size() + x] = new Tile{ topRect , gridRect , 1.0 , false };
 				break;
 			case '1':
-				draw(renderer, bottomLeftGrassCorner, gridRect, 1);
+				m_tiles[y * m_levelData[0].size() + x] = new Tile{ bottomLeftGrassCorner , gridRect , 1.0 , false };
 				break;
 			case '2':
-				draw(renderer, topRightGrassCorner, gridRect, 1);
+				m_tiles[y * m_levelData[0].size() + x] = new Tile{ topRightGrassCorner , gridRect , 1.0 , false };
 				break;
 			default:
 				break;
@@ -169,22 +168,22 @@ void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 			case 'C':
 				draw(renderer, buildingRect, gridRect, 6, true);
 				gridRect.x += 210;
-				draw(renderer, doorRect, gridRect, 2, true);
+				m_tiles[y * m_levelData[0].size() + x] = new Tile{ doorRect , gridRect , 2.0 , true };
 				break;
 			case 'S':
-				draw(renderer, rockRect, gridRect, 1);
+				m_tiles[y * m_levelData[0].size() + x] = new Tile{ rockRect , gridRect , 1.0 , false };
 				break;
 			case 'W':
-				draw(renderer, rockRect, gridRect, 1);	
-				draw(renderer, wellRect, gridRect, 3, true);
+				SpriteSheet::draw(renderer, texture, rockRect, gridRect);
+				m_tiles[y * m_levelData[0].size() + x] = new Tile{ wellRect , gridRect , 3.0 , true };
 				break;
 			case 'J':
-				draw(renderer, rockRect, gridRect, 1);
-				draw(renderer, stockRect, gridRect, 3, true);
+				SpriteSheet::draw(renderer, texture, rockRect, gridRect);
+				m_tiles[y * m_levelData[0].size() + x] = new Tile{ stockRect , gridRect , 3.0 , true };
 				break;
 			case 'V':
-				draw(renderer, rockRect, gridRect, 1);
-				draw(renderer, boardRect, gridRect);
+				SpriteSheet::draw(renderer, texture, rockRect, gridRect);
+				m_tiles[y * m_levelData[0].size() + x] = new Tile{ boardRect , gridRect , 1.0 , false };
 				break;
 			default:
 				//printf("Unexpected symbol %c at (%d, %d)", tile, x, y);
@@ -192,12 +191,15 @@ void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 			}
 		}
 	}
+	std::sort(m_tiles.begin(), m_tiles.end(), [](const Tile* tile1, const Tile* tile2) {
+		return tile1->scale < tile2->scale;
+	});
 
 	for (auto& tile : m_tiles) {
 		SpriteSheet::draw(renderer, texture, tile->uvCoords, tile->destCoords, tile->scale, tile->needsResizing);
+		delete tile;
 	}
 	m_tiles.clear();
-	printf("%d", m_tiles.size());
 }
 
 char Level::getTile(int x, int y)
