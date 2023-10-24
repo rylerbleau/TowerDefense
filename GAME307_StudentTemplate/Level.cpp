@@ -10,7 +10,7 @@ Level::Level(const std::string& fileName)
 	std::ifstream file;
 	file.open(fileName);
 
-	//error checking
+	/// error checking
 	if (file.fail()) {
 		std::cerr << ("failed to open " + fileName) << std::endl;
 	}
@@ -52,7 +52,7 @@ void Level::draw(SDL_Renderer* renderer, const SDL_Rect& uvRect, SDL_Rect destRe
 		int originalHeight = destRect.h;
 
 		float aspectRatio = static_cast<float>(uvRect.w) / uvRect.h;
-
+	
 		destRect.w = static_cast<int>(originalHeight * aspectRatio * scale);
 		destRect.h = static_cast<int>(originalHeight * scale);
 
@@ -69,9 +69,17 @@ void Level::draw(SDL_Renderer* renderer, const SDL_Rect& uvRect, SDL_Rect destRe
 	}
 }
 
+void Level::clear() {
+	for (auto tile : m_tiles) {
+		delete tile;
+	}
+	m_tiles.clear();
+}
 
 void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 {
+	clear();
+
 	SpriteSheet::QuerySpriteSheet(tileSizeX, tileSizeY, texture);
 
 	int width = 0;
@@ -103,103 +111,93 @@ void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 							  ceil((float)height / (float)getHeight()),
 							  ceil((float)width / (float)getWidth()),
 							  ceil((float)height / (float)getHeight()) };
+	/// <summary>
+	/// Tile drawing happens here. When it detectsa character ir is going to scan through switch statement
+	/// to determine the attributes for that tile that is going to be rendered at that grid location
+	/// than it is pushed in the vector of Tile pointers after what i am going to sort the vector by its scale 
+	/// so that sprites won't be overdrawn
+	/// </summary>
 
-	m_tiles.resize(m_levelData.size() * m_levelData[0].size());
 	for (int y = 0; y < m_levelData.size(); y++) {
 		for (int x = 0; x < m_levelData[y].size(); x++) {
-			
+
 			char tile = m_levelData[y][x];
 
 			SDL_Rect gridRect = worldTileCoords;
 			gridRect.x *= x;
 			gridRect.y *= y;
-			
+
 			switch (tile) {
 			case 'P':
-				//SpriteSheet::draw(renderer, texture, pathRect, gridRect);
-				m_tiles[y * m_levelData[0].size() + x] = new Tile{ pathRect , gridRect , 1.0 , false };
+				m_tiles.push_back(new Tile{ pathRect , gridRect , 1.0 , false });
 				break;
 			case 'G':
-				m_tiles[y * m_levelData[0].size() + x] = new Tile{ grassRect , gridRect , 1.0 , false };
+				m_tiles.push_back(new Tile{ grassRect , gridRect , 1.0 , false });
 				break;
 			case 'F':
-				SpriteSheet::draw(renderer, texture, grassRect, gridRect);
-				m_tiles[y * m_levelData[0].size() + x] = new Tile{ flowerRect , gridRect , 1.0 , false };
+				m_tiles.push_back(new Tile{ grassRect , gridRect , 1.0 , false });
+				m_tiles.push_back(new Tile{ flowerRect , gridRect , 1.0 , false });
 				break;
 			case 'T':
-				SpriteSheet::draw(renderer, texture, grassRect, gridRect);
-				m_tiles[y * m_levelData[0].size() + x] = new Tile{ greenTreeRect , gridRect , 1.0 , true };
+				m_tiles.push_back(new Tile{ grassRect , gridRect , 1.0 , false });
+				m_tiles.push_back(new Tile{ greenTreeRect , gridRect , 1.0 , true });
 				break;
 			case 'O':
-				SpriteSheet::draw(renderer, texture, grassRect, gridRect);
-				m_tiles[y * m_levelData[0].size() + x] = new Tile{ orangeTreeRect , gridRect , 2.0 , true };
+				m_tiles.push_back(new Tile{ grassRect , gridRect , 1.0 , false });
+				m_tiles.push_back(new Tile{ orangeTreeRect , gridRect , 2.0 , true });
 				break;
 			case 'R':
-				m_tiles[y * m_levelData[0].size() + x] = new Tile{ rightGrassRect , gridRect , 1.0 , false };
+				m_tiles.push_back(new Tile{ rightGrassRect , gridRect , 1.0 , false });
 				break;
 			case 'L':
-				m_tiles[y * m_levelData[0].size() + x] = new Tile{ leftGrassRect , gridRect , 1.0 , false };
+				m_tiles.push_back(new Tile{ leftGrassRect , gridRect , 1.0 , false });
 				break;
 			case 'B':
-				m_tiles[y * m_levelData[0].size() + x] = new Tile{ bottomRect , gridRect , 1.0 , false };
+				m_tiles.push_back(new Tile{ bottomRect , gridRect , 1.0 , false });
 				break;
 			case 'N':
-				m_tiles[y * m_levelData[0].size() + x] = new Tile{ topRect , gridRect , 1.0 , false };
+				m_tiles.push_back(new Tile{ topRect , gridRect , 1.0 , false });
 				break;
 			case '1':
-				m_tiles[y * m_levelData[0].size() + x] = new Tile{ bottomLeftGrassCorner , gridRect , 1.0 , false };
+				m_tiles.push_back(new Tile{ bottomLeftGrassCorner , gridRect , 1.0 , false });
 				break;
 			case '2':
-				m_tiles[y * m_levelData[0].size() + x] = new Tile{ topRightGrassCorner , gridRect , 1.0 , false };
+				m_tiles.push_back(new Tile{ topRightGrassCorner , gridRect , 1.0 , false });
 				break;
-			default:
-				break;
-			}
-		}
-		for (int x = 0; x < m_levelData[y].size(); x++) {
-
-			char tile = m_levelData[y][x];
-
-			SDL_Rect gridRect = worldTileCoords;
-			gridRect.x *= x;
-			gridRect.y *= y;
-
-			switch (tile) {
 			case 'C':
-				draw(renderer, buildingRect, gridRect, 6, true);
+				m_tiles.push_back(new Tile{ buildingRect , gridRect , 6.0 , true });
 				gridRect.x += 210;
-				m_tiles[y * m_levelData[0].size() + x] = new Tile{ doorRect , gridRect , 2.0 , true };
+				m_tiles.push_back(new Tile{ doorRect , gridRect , 2.0 , true });
 				break;
 			case 'S':
-				m_tiles[y * m_levelData[0].size() + x] = new Tile{ rockRect , gridRect , 1.0 , false };
+				m_tiles.push_back(new Tile{ rockRect , gridRect , 1.0 , false });
 				break;
 			case 'W':
-				SpriteSheet::draw(renderer, texture, rockRect, gridRect);
-				m_tiles[y * m_levelData[0].size() + x] = new Tile{ wellRect , gridRect , 3.0 , true };
+				m_tiles.push_back(new Tile{ rockRect, gridRect, 1.0, false });
+				m_tiles.push_back(new Tile{ wellRect, gridRect, 3.0, true });
 				break;
 			case 'J':
-				SpriteSheet::draw(renderer, texture, rockRect, gridRect);
-				m_tiles[y * m_levelData[0].size() + x] = new Tile{ stockRect , gridRect , 3.0 , true };
+				m_tiles.push_back(new Tile{ rockRect , gridRect , 1.0 , false });
+				m_tiles.push_back(new Tile{ stockRect , gridRect , 3.0 , true });
 				break;
 			case 'V':
-				SpriteSheet::draw(renderer, texture, rockRect, gridRect);
-				m_tiles[y * m_levelData[0].size() + x] = new Tile{ boardRect , gridRect , 1.0 , false };
+				m_tiles.push_back(new Tile{ rockRect , gridRect , 1.0 , false });
+				m_tiles.push_back(new Tile{ boardRect , gridRect , 1.0 , false });
 				break;
 			default:
-				//printf("Unexpected symbol %c at (%d, %d)", tile, x, y);
+				printf("Unexpected symbol %c at (%d, %d)", tile, x, y);
 				break;
 			}
 		}
 	}
+
 	std::sort(m_tiles.begin(), m_tiles.end(), [](const Tile* tile1, const Tile* tile2) {
 		return tile1->scale < tile2->scale;
 	});
 
 	for (auto& tile : m_tiles) {
 		SpriteSheet::draw(renderer, texture, tile->uvCoords, tile->destCoords, tile->scale, tile->needsResizing);
-		delete tile;
 	}
-	m_tiles.clear();
 }
 
 char Level::getTile(int x, int y)
@@ -214,17 +212,21 @@ void Level::levelHandleEvents(const SDL_Event& event)
 		int mousePosX = event.motion.x;
 		int mousePosY = event.motion.y;
 
-		//for (auto tile : m_tiles) {
-		//	if (mousePosX >= tile->destCoords.x && mousePosX <= tile->destCoords.x + tile->destCoords.w &&
-		//		mousePosY >= tile->destCoords.y && mousePosY <= tile->destCoords.y + tile->destCoords.h) {
+		for (auto tile : m_tiles) {
+		/*	printf("%d %d\n", mousePosX, mousePosY);
+			printf("%d %d\n", tile->destCoords.x, tile->destCoords.y);*/
 
-		//		// Set color for the outline rectangle (for example white)
-		//		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+			if (mousePosX >= tile->destCoords.x && mousePosX <= tile->destCoords.x + tile->destCoords.w &&
+				mousePosY >= tile->destCoords.y && mousePosY <= tile->destCoords.y + tile->destCoords.h) {
 
-		//		// Draw the outline of the rectangle
-		//		SDL_RenderDrawRect(renderer, &tile->destCoords);
-		//	}
-		//}
+
+				// Set color for the outline rectangle (for example white)
+				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+				// Draw the outline of the rectangle
+				SDL_RenderDrawRect(renderer, &tile->destCoords);
+			}
+		}
 		break; // Don't forget to break after handling the case
 	}
 

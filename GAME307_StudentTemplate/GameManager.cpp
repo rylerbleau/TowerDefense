@@ -126,7 +126,6 @@ void GameManager::Run() {
 	while (isRunning)
 	{
 
-		handleEvents();
 
         ImGui_ImplSDLRenderer2_NewFrame();
         ImGui_ImplSDL2_NewFrame();
@@ -143,6 +142,7 @@ void GameManager::Run() {
 		}
 
 		currentScene->Render();
+		handleEvents();
 
         if (show_ui) {
             ImGui::Render();

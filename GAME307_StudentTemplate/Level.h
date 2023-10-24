@@ -20,6 +20,7 @@ private:
 	SDL_Renderer* renderer;
 	SDL_Texture* texture;
 	int tileSizeX, tileSizeY;
+	bool isHovered = false;
 
 public:
 	Level() = default;
@@ -27,6 +28,7 @@ public:
 	~Level();
 	void LoadMap(SDL_Renderer* renderer_, const int& tileSizeX, const int& tileSizeY, const char* filename);
 	void draw(SDL_Renderer* renderer, const SDL_Rect& uvRect, SDL_Rect destRect, float scale = 1.0f, bool needsResizing = false);
+	void clear();
 	void drawTiles(SDL_Renderer* renderer, SDL_Window* window);
 	char getTile(int x, int y);
 	void levelHandleEvents(const SDL_Event& event);
