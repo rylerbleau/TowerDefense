@@ -20,7 +20,7 @@ private:
 	Matrix4 projectionMatrix;
     Matrix4 inverseProjection;
 	Character* blinky;
-	StaticBody* myNPC;
+	
 
 
 	Level level;
