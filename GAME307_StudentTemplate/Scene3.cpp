@@ -27,10 +27,10 @@ Scene3::~Scene3() {
 
 bool Scene3::OnCreate() {
 
-	NPCs.push_back(new StaticBody(Vec3(5.0f, 5.0f, 0.0f), 0.0f, 5.0f, 1.0f));
-	NPCs.push_back(new StaticBody(Vec3(10.0f, 10.0f, 0.0f), 0.0f, 5.0f, 1.0f));
-	NPCs.push_back(new StaticBody(Vec3(10.0f, 5.0f, 0.0f), 0.0f, 5.0f, 1.0f));
-	NPCs.push_back(new StaticBody(Vec3(5.0f, 10.0f, 0.0f), 0.0f, 5.0f, 1.0f));
+	NPCs.push_back(new StaticBody(Vec3(5.0f, 5.0f, 0.0f), 0.0f, 2.0f, 1.0f));
+	NPCs.push_back(new StaticBody(Vec3(7.0f, 10.0f, 0.0f), 0.0f, 2.0f, 1.0f));
+	NPCs.push_back(new StaticBody(Vec3(10.0f, 5.0f, 0.0f), 0.0f, 2.0f, 1.0f));
+	NPCs.push_back(new StaticBody(Vec3(5.0f, 10.0f, 0.0f), 0.0f, 2.0f, 1.0f));
 
 	int w, h;
 	SDL_GetWindowSize(window, &w, &h);
@@ -106,7 +106,9 @@ void Scene3::Update(const float deltaTime) {
 	
 
 	KinematicSeperation* steeringAlgorithm = nullptr;
-	KinematicSteeringOutput* steering;
+	KinematicSeek* steeringAlgorithm2 = nullptr;
+	KinematicSteeringOutput steering ;
+	
 
 	Body* target;
 	target = game->getPlayer();
@@ -120,12 +122,11 @@ void Scene3::Update(const float deltaTime) {
 	for (int i = 0; i < NPCs.size();  i++) {
 
 		steeringAlgorithm = new KinematicSeperation(NPCs[i], NPCs, threshold, i);
-		steering = steeringAlgorithm->GetSteering();
-	
-
-		NPCs[i]->Update(deltaTime, steering);
+		steeringAlgorithm2 = new KinematicSeek(NPCs[i], game->getPlayer());
+		steering = *steeringAlgorithm->GetSteering() + *steeringAlgorithm2->GetSteering();
+		
+		NPCs[i]->Update(deltaTime, &steering);
 		steeringAlgorithm = nullptr;
-		steering = nullptr;
 	}
 
 
@@ -189,7 +190,7 @@ void Scene3::Render() {
 	// render the player
 	game->RenderPlayer(0.10f);
 
-	//SDL_RenderPresent(renderer);
+	SDL_RenderPresent(renderer);
 }
 
 void Scene3::HandleEvents(const SDL_Event& event)
@@ -198,6 +199,7 @@ void Scene3::HandleEvents(const SDL_Event& event)
 
 	// send events to player as needed
 	game->getPlayer()->HandleEvents(event);
+
 }
 
 void Scene3::HandleTheGUI() {

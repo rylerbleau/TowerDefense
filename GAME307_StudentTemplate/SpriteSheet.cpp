@@ -35,3 +35,28 @@ SDL_Rect SpriteSheet::GetSizedUVTile(int indexX, int indexY, int indexSizeX, int
 	((float)(abs(indexY - tilesY)) / (float)tilesY) * (float)h))
 	};
 }
+
+void SpriteSheet::draw(SDL_Renderer* renderer, SDL_Texture* texture, const SDL_Rect& uvRect, SDL_Rect destRect, float scale /*= 1.0f*/ , bool needsResizing /*= false*/)
+{
+		if (needsResizing)
+		{
+			int originalWidth = destRect.w;
+			int originalHeight = destRect.h;
+
+			float aspectRatio = static_cast<float>(uvRect.w) / uvRect.h;
+
+			destRect.w = static_cast<int>(originalHeight * aspectRatio * scale);
+			destRect.h = static_cast<int>(originalHeight * scale);
+
+			// Adjust y-position to make the texture scale upwards
+			destRect.y -= (destRect.h - originalHeight);
+
+			SDL_RenderCopy(renderer, texture, &uvRect, &destRect);
+		}
+		else {
+			destRect.w *= scale;
+			destRect.h *= scale;
+
+			SDL_RenderCopy(renderer, texture, &uvRect, &destRect);
+		}
+}

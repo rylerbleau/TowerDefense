@@ -160,7 +160,7 @@ void Character::render(float scale)
 	float orientation = body->getOrientation() * 180.0f / M_PI;
 
 	int numFrames = 0;
-	int FRAME_SPEED = 50;
+	int FRAME_SPEED = 100;
 
 	SpriteSheet::QuerySpriteSheet(8, 3, body->getTexture());
 	
@@ -214,7 +214,6 @@ void Character::render(float scale)
 		sourceRect = SpriteSheet::GetUVTile(tileIndexX, tileIndexY);
 		break;
 	}
-	SDL_RenderCopyEx(renderer, body->getTexture(), &sourceRect, &square,
-		orientation, nullptr, SDL_FLIP_NONE);
+	SpriteSheet::draw(renderer, body->getTexture(), sourceRect, square, 2.0f, true);
 }
 

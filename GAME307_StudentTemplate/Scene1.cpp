@@ -147,6 +147,7 @@ void Scene1::Render() {
 void Scene1::HandleEvents(const SDL_Event& event)
 {
 	game->getPlayer()->HandleEvents(event);
+	level.levelHandleEvents(event);
 }
 
 

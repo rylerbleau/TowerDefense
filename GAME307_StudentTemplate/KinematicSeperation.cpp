@@ -2,18 +2,11 @@
 
 KinematicSeperation::KinematicSeperation(Body* character_, std::vector<StaticBody*> &bodies_, float threshold_, int myIndex_)
 {
-
 	character = character_;
 	bodies = bodies_;
 	threshold = threshold_;
 	myIndex = myIndex_;
-
-	
-
 	result = new KinematicSteeringOutput();
-
-
-
 }
 
 KinematicSteeringOutput* KinematicSeperation::GetSteering()
@@ -31,20 +24,15 @@ KinematicSteeringOutput* KinematicSeperation::GetSteering()
 
 		if (i != myIndex && abs(VMath::distance(theirPos, myPos)) <= threshold) {
 			// is within threshold distance
-
 			dir += myPos - theirPos;
 		}
-		
-
 	}
 	if (VMath::mag(dir) != 0.0f) {
 
 		result->velocity = VMath::normalize(dir);
 	}
-
 	return result;
 }
 
 KinematicSeperation::~KinematicSeperation()
-{
-}
+{}

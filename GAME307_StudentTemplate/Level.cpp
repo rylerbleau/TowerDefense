@@ -104,6 +104,7 @@ void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 							  ceil((float)width / (float)getWidth()),
 							  ceil((float)height / (float)getHeight()) };
 
+	//m_tiles.resize(m_levelData.size() * m_levelData[0].size());
 	for (int y = 0; y < m_levelData.size(); y++) {
 		for (int x = 0; x < m_levelData[y].size(); x++) {
 			
@@ -115,22 +116,24 @@ void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 
 			switch (tile) {
 			case 'P':
-				draw(renderer, pathRect, gridRect);
+				//SpriteSheet::draw(renderer, texture, pathRect, gridRect);
+				m_tiles.push_back(new Tile{ pathRect , gridRect , 1.0 , false });
 				break;
 			case 'G':
-				draw(renderer, grassRect, gridRect);
+				SpriteSheet::draw(renderer, texture, grassRect, gridRect);
+				break;
 				break;
 			case 'F':
-				draw(renderer, grassRect, gridRect);
-				draw(renderer, flowerRect, gridRect);
+				SpriteSheet::draw(renderer, texture, grassRect, gridRect);
+				SpriteSheet::draw(renderer, texture, flowerRect, gridRect);
 				break;
 			case 'T':
-				draw(renderer, grassRect, gridRect, 1);
-				draw(renderer, greenTreeRect, gridRect, 1, true);
+				SpriteSheet::draw(renderer, texture, grassRect, gridRect);
+				SpriteSheet::draw(renderer, texture, greenTreeRect, gridRect, 1, true);
 				break;
 			case 'O':
-				draw(renderer, grassRect, gridRect, 1);
-				draw(renderer, orangeTreeRect, gridRect, 2, true);
+				SpriteSheet::draw(renderer, texture, grassRect, gridRect);
+				SpriteSheet::draw(renderer, texture, orangeTreeRect, gridRect, 2 , true);
 				break;
 			case 'R':
 				draw(renderer, rightGrassRect, gridRect, 1);
@@ -189,9 +192,38 @@ void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 			}
 		}
 	}
+
+	for (auto& tile : m_tiles) {
+		SpriteSheet::draw(renderer, texture, tile->uvCoords, tile->destCoords, tile->scale, tile->needsResizing);
+	}
+	m_tiles.clear();
+	printf("%d", m_tiles.size());
 }
 
 char Level::getTile(int x, int y)
 {
 	return m_levelData[y][x];
+}
+
+void Level::levelHandleEvents(const SDL_Event& event)
+{
+	switch (event.type) {
+	case SDL_MOUSEMOTION:
+		int mousePosX = event.motion.x;
+		int mousePosY = event.motion.y;
+
+		//for (auto tile : m_tiles) {
+		//	if (mousePosX >= tile->destCoords.x && mousePosX <= tile->destCoords.x + tile->destCoords.w &&
+		//		mousePosY >= tile->destCoords.y && mousePosY <= tile->destCoords.y + tile->destCoords.h) {
+
+		//		// Set color for the outline rectangle (for example white)
+		//		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+		//		// Draw the outline of the rectangle
+		//		SDL_RenderDrawRect(renderer, &tile->destCoords);
+		//	}
+		//}
+		break; // Don't forget to break after handling the case
+	}
+
 }
