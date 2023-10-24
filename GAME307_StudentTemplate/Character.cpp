@@ -163,7 +163,7 @@ void Character::render(float scale)
 	int FRAME_SPEED = 100;
 
 	SpriteSheet::QuerySpriteSheet(8, 3, body->getTexture());
-	
+
 	if (body->getVel().x > 0.0f && abs(body->getVel().x) > abs(body->getVel().y)) {
 		direction = Direction::RIGHT;
 	}
