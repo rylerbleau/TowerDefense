@@ -3,7 +3,7 @@
 #include <iostream>
 #include <random>
 #include "SDL_image.h"
-
+#include "Character.h"
 
 Level::Level(const std::string& fileName)
 {
@@ -68,8 +68,7 @@ void Level::draw(SDL_Renderer* renderer, const SDL_Rect& uvRect, SDL_Rect destRe
 		SDL_RenderCopy(renderer, texture, &uvRect, &destRect);
 	}
 }
-static int mousePosX = 0;
-static int mousePosY = 0;
+
 void Level::clear() {
 	for (auto tile : m_tiles) {
 		delete tile;
@@ -218,13 +217,24 @@ char Level::getTile(int x, int y)
 	return m_levelData[y][x];
 }
 
-void Level::levelHandleEvents(const SDL_Event& event)
+void Level::levelHandleEvents(const SDL_Event& event, std::vector<Character*>& characters, Scene* scene)
 {
 	switch (event.type) {
 	case SDL_MOUSEMOTION:
 		 mousePosX = event.motion.x;
 		 mousePosY = event.motion.y;
 		break; 
+	case SDL_MOUSEBUTTONDOWN:
+		for (auto tile : m_tiles) {
+			if (mousePosX >= tile->destCoords.x && mousePosX <= tile->destCoords.x + tile->destCoords.w &&
+				mousePosY >= tile->destCoords.y && mousePosY <= tile->destCoords.y + tile->destCoords.h) {
+				
+				Character* character = new Character();
+				character->OnCreate(scene);
+				character->setTextureWith("Sprites/hero.png");
+				characters.push_back(character);
+			}
+		}
 	default:
 		break;
 	}

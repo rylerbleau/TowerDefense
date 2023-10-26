@@ -12,6 +12,7 @@ Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 
 	// create a NPC
 	blinky = nullptr;
+	
 }
 
 Scene1::~Scene1(){
@@ -50,23 +51,26 @@ bool Scene1::OnCreate() {
 		return false;
 	}
 
-	float orientation_ = 0.0f;
-	float maxSpeed_ = 5.0f;
-	float maxRotation_ = 1.0f;
-	Vec3 position_(5.0f, 5.0f, 0.0f);
+	characters.push_back(blinky);
 	
 	/// Map set up begins here
 	level = Level("Levels/Level2.txt");
 	level.LoadMap(renderer, 12, 11, "Sprites/tilemap.png");
 
 	return true;
+	float orientation_ = 0.0f;
+	float maxSpeed_ = 5.0f;
+	float maxRotation_ = 1.0f;
+	Vec3 position_(5.0f, 5.0f, 0.0f);
 }
 
 void Scene1::OnDestroy() {}
 
 void Scene1::Update(const float deltaTime) {
 	// Calculate and apply any steering for npc's
-	blinky->Update(deltaTime);
+	for (auto& character : characters) {
+		character->Update(deltaTime);
+	}
 	game->getPlayer()->Update(deltaTime);
 }
 
@@ -77,7 +81,9 @@ void Scene1::Render() {
 	
 	// Draw level and AI characters
 	level.drawTiles(renderer, window);
-	blinky->render(1.0f);
+	for (auto& character : characters) {
+		character->render(1.0f);
+	}
 
 	// render the player
 	game->RenderPlayer(0.10f);
@@ -87,7 +93,9 @@ void Scene1::Render() {
 void Scene1::HandleEvents(const SDL_Event& event)
 {
 	game->getPlayer()->HandleEvents(event);
-	level.levelHandleEvents(event);
+	level.levelHandleEvents(event, characters, this);
+
+	
 }
 
 
