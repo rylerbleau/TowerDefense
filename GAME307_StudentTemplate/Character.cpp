@@ -1,7 +1,8 @@
 #include "Character.h"
 #include "SpriteSheet.h"
-
-
+#include "StaticBody.h"
+#include "KinematicSeek.h"
+#include "KinematicSeperation.h"
 
 bool Character::OnCreate(Scene* scene_)
 {
@@ -18,17 +19,7 @@ bool Character::OnCreate(Scene* scene_)
 		float maxAcceleration = 10.0f;
 		float maxRotation = 2.0f;
 		float maxAngular = 10.0f;
-		body = new KinematicBody(
-			Vec3(10.0f, 5.0f, 0), Vec3(0, 0, 0), Vec3(0, 0, 0), 1.0f,
-			radius,
-			orientation,
-			rotation,
-			angular,
-			maxSpeed,
-			maxAcceleration,
-			maxRotation,
-			maxAngular
-		);
+		body = new StaticBody(Vec3(5.0f, 5.0f, 0.0f), orientation, maxSpeed, maxRotation);
 	}
 
 	if (!body)
@@ -59,50 +50,38 @@ bool Character::setTextureWith(string file)
 }
 
 
-void Character::Update(float deltaTime)
+void Character::Update(float deltaTime, std::vector<Character* > characters, int index)
 {
-	// create a new overall steering output
-	SteeringOutput* steering = new SteeringOutput();
-	//steering = NULL;
-
-
-	// this is just one of the possible behaviours based on state machine
-	SteerToSeekPlayer(*steering);
-	//SteerToFleePlayer(*steering);
-
-	// set the target for steering; target is used by the steerTo... functions
-	// (often the target is the Player)
-
-	// apply the steering to the equations of motion
-	body->Update(deltaTime, steering);
-
-	// clean up memory
-	// (delete only those objects created in this function)
-	if (steering) {
-		delete steering;
+	std::vector<StaticBody* > staticBodies;
+	staticBodies.resize(characters.size());
+	for (int i = 0; i < characters.size(); i++) {
+		staticBodies[i] = characters[i]->getBody();
 	}
+	// create a new overall steering output
+	KinematicSteeringOutput* steering = new KinematicSteeringOutput();
+	// This creates the separation plus seek behaviour(might switch to arrive) 
+	SeekAndSeparationSteering(*steering, staticBodies, 0.7f, index);
+	body->Update(deltaTime, steering);
+	delete steering;
 }
 
-void Character::SteerToSeekPlayer(SteeringOutput& steering)
+void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody* > staticBodies, float threshhold, int index)
 {
-
-	std::vector<SteeringOutput*> steering_outputs;
+	std::vector<KinematicSteeringOutput*> steering_outputs;
 	PlayerBody* target = scene->game->getPlayer();
 
 	// using the target, calculate and set values in the overall steering output
-	SteeringBehaviour* steering_algorithm = new Seek(body, target);
-
+	KinematicSeek* steering_algorithm = new KinematicSeek(body, target);
+	KinematicSeperation* separation = new KinematicSeperation(staticBodies, 0.7f, index);
 	steering_outputs.push_back(steering_algorithm->GetSteering());
-
+	steering_outputs.push_back(separation->GetSteering());
 	for (int i = 0; i < steering_outputs.size(); i++) {
-
 		if (steering_outputs[i]) {
 			steering += *steering_outputs[i];
 		}
 	}
-		
-
 	if (steering_algorithm) {
+		delete separation;
 		delete steering_algorithm;
 	}
 }
@@ -160,7 +139,7 @@ void Character::render(float scale)
 	float orientation = body->getOrientation() * 180.0f / M_PI;
 
 	int numFrames = 0;
-	int FRAME_SPEED = 100;
+	int FRAME_SPEED = 50;
 
 	SpriteSheet::QuerySpriteSheet(8, 3, body->getTexture());
 
@@ -214,6 +193,6 @@ void Character::render(float scale)
 		sourceRect = SpriteSheet::GetUVTile(tileIndexX, tileIndexY);
 		break;
 	}
-	SpriteSheet::draw(renderer, body->getTexture(), sourceRect, square, 2.0f, true);
+	SpriteSheet::draw(renderer, body->getTexture(), sourceRect, square, 1.0f, true);
 }
 

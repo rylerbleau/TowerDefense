@@ -20,7 +20,7 @@ enum class Direction {
 class Character
 {
 private:
-	class KinematicBody* body;
+	class StaticBody* body;
 	class Scene* scene;
 	SDL_Rect sourceRect;
 	Direction direction = Direction::IDLE;
@@ -39,14 +39,13 @@ public:
 	bool OnCreate(Scene* scene_);
 	void OnDestroy() {};
 	bool setTextureWith(string file);
-	void Update(float time);
+	void Update(float deltaTime, std::vector<Character*> characters, int index);
 	void HandleEvents(const SDL_Event& event);
 	void render(float scale = 1.0f);
 
-	void SteerToSeekPlayer(SteeringOutput& steering);
+	void SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody*> staticBodies, float threshhold, int index);
 	void SteerToFleePlayer(SteeringOutput& steering);
-
-
+	StaticBody* getBody() { return body; }
 };
 
 #endif

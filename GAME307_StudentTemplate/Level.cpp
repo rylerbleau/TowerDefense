@@ -201,7 +201,6 @@ void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 		if (mousePosX >= tile->destCoords.x && mousePosX <= tile->destCoords.x + tile->destCoords.w &&
 			mousePosY >= tile->destCoords.y && mousePosY <= tile->destCoords.y + tile->destCoords.h) {
 
-
 			// Set color for the outline rectangle (for example white)
 			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 

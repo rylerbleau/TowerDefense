@@ -30,7 +30,7 @@ public:
 	
 
 	// for some reason, can't use polymorphism to pass bodies into this constructor
-	KinematicSeperation(Body* character_, std::vector<StaticBody*> &bodies_, float threshold_, int myIndex_);
+	KinematicSeperation(std::vector<StaticBody*>& bodies_, float threshold_, float index);
 
 	KinematicSteeringOutput* GetSteering();
 	

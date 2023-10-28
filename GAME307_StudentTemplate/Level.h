@@ -22,7 +22,6 @@ private:
 	SDL_Renderer* renderer;
 	SDL_Texture* texture;
 	int tileSizeX, tileSizeY;
-	bool isHovered = false;
 	int mousePosX = 0;
 	int mousePosY = 0;
 	std::vector<Tile*> m_tiles;

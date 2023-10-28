@@ -68,8 +68,8 @@ void Scene1::OnDestroy() {}
 
 void Scene1::Update(const float deltaTime) {
 	// Calculate and apply any steering for npc's
-	for (auto& character : characters) {
-		character->Update(deltaTime);
+	for (int i = 0; i < characters.size(); i++) {
+		characters[i]->Update(deltaTime, characters, i);
 	}
 	game->getPlayer()->Update(deltaTime);
 }
