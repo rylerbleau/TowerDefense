@@ -25,7 +25,7 @@ private:
 	SDL_Rect sourceRect;
 	Direction direction = Direction::IDLE;
 public:
-	Character()
+	Character() :sourceRect{}
 	{
 		body = NULL;
 		scene = NULL;

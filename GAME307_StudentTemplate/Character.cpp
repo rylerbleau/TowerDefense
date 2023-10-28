@@ -11,7 +11,7 @@ bool Character::OnCreate(Scene* scene_)
 	// Configure and instantiate the body to use for the demo
 	if (!body)
 	{
-		float radius = 0.2;
+		float radius = 0.2f;
 		float orientation = 0.0f;
 		float rotation = 0.0f;
 		float angular = 0.0f;
@@ -54,7 +54,7 @@ void Character::Update(float deltaTime, std::vector<Character* > characters, int
 {
 	std::vector<StaticBody* > staticBodies;
 	staticBodies.resize(characters.size());
-	for (int i = 0; i < characters.size(); i++) {
+	for (uint32_t i = 0; i < characters.size(); i++) {
 		staticBodies[i] = characters[i]->getBody();
 	}
 	// create a new overall steering output

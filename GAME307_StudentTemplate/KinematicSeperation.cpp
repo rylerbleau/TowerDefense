@@ -1,6 +1,6 @@
 #include "KinematicSeperation.h"
 
-KinematicSeperation::KinematicSeperation(std::vector<StaticBody*> &bodies_, float threshold_, float index)
+KinematicSeperation::KinematicSeperation(std::vector<StaticBody*> &bodies_, float threshold_, int index)
 {
 	myIndex = index;
 	bodies = bodies_;

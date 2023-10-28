@@ -104,7 +104,7 @@ void Scene3::Update(const float deltaTime) {
 
     float threshold = 10.0f;
 
-    for (int i = 0; i < NPCs.size(); i++) {
+    for (uint32_t i = 0; i < NPCs.size(); i++) {
         steeringAlgorithm = new KinematicSeperation(NPCs, threshold, i);
         steeringAlgorithm2 = new KinematicSeek(NPCs[i], game->getPlayer());
         steering = *steeringAlgorithm->GetSteering() + *steeringAlgorithm2->GetSteering();

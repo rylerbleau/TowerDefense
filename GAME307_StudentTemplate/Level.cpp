@@ -5,7 +5,7 @@
 #include "SDL_image.h"
 #include "Character.h"
 
-Level::Level(const std::string& fileName)
+Level::Level(const std::string& fileName) :renderer(nullptr), surface(nullptr), texture(nullptr), tileSizeX(0), tileSizeY(0)
 {
 	std::ifstream file;
 	file.open(fileName);
@@ -118,8 +118,8 @@ void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 	/// so that sprites won't be overdrawn
 	/// </summary>
 
-	for (int y = 0; y < m_levelData.size(); y++) {
-		for (int x = 0; x < m_levelData[y].size(); x++) {
+	for (size_t y = 0; y < m_levelData.size(); y++) {
+		for (size_t x = 0; x < m_levelData[y].size(); x++) {
 
 			char tile = m_levelData[y][x];
 

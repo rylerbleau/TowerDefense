@@ -21,7 +21,6 @@ Scene1::~Scene1(){
 		blinky->OnDestroy();
 		delete blinky;
 	}
-
 }
 
 bool Scene1::OnCreate() {
@@ -58,17 +57,14 @@ bool Scene1::OnCreate() {
 	level.LoadMap(renderer, 12, 11, "Sprites/tilemap.png");
 
 	return true;
-	float orientation_ = 0.0f;
-	float maxSpeed_ = 5.0f;
-	float maxRotation_ = 1.0f;
-	Vec3 position_(5.0f, 5.0f, 0.0f);
+	
 }
 
 void Scene1::OnDestroy() {}
 
 void Scene1::Update(const float deltaTime) {
 	// Calculate and apply any steering for npc's
-	for (int i = 0; i < characters.size(); i++) {
+	for (uint32_t i = 0; i < characters.size(); i++) {
 		characters[i]->Update(deltaTime, characters, i);
 	}
 	game->getPlayer()->Update(deltaTime);
@@ -94,8 +90,6 @@ void Scene1::HandleEvents(const SDL_Event& event)
 {
 	game->getPlayer()->HandleEvents(event);
 	level.levelHandleEvents(event, characters, this);
-
-	
 }
 
 

@@ -7,37 +7,21 @@
 #include "KinematicSteeringOutput.h"
 #include "StaticBody.h"
 #include <vector>
-
-
 using namespace MATH;
-
 
 class KinematicSeperation
 {
 private:
-	KinematicSteeringOutput* result;
-
+	int myIndex;
+	float threshold;
 	Body* character;
 	std::vector<StaticBody*> bodies;
-	float threshold;
-	int myIndex;
-
-
-	
-
-	
+	KinematicSteeringOutput* result;
 public:
-	
-
 	// for some reason, can't use polymorphism to pass bodies into this constructor
-	KinematicSeperation(std::vector<StaticBody*>& bodies_, float threshold_, float index);
-
+	KinematicSeperation(std::vector<StaticBody*>& bodies_, float threshold_, int index);
 	KinematicSteeringOutput* GetSteering();
-	
 	~KinematicSeperation();
-
-
 };
-
 
 #endif
