@@ -82,8 +82,7 @@ void Level::drawTiles(SDL_Renderer* renderer, SDL_Window* window)
 
 	SpriteSheet::QuerySpriteSheet(tileSizeX, tileSizeY, texture);
 
-	int width = 0;
-	int height = 0;
+	
 	SDL_GetWindowSize(window, &width, &height);
 
 	static SDL_Rect pathRect = SpriteSheet::GetUVTile(1, 8);
@@ -224,12 +223,18 @@ void Level::levelHandleEvents(const SDL_Event& event, std::vector<Character*>& c
 		 mousePosY = event.motion.y;
 		break; 
 	case SDL_MOUSEBUTTONDOWN:
-		for (auto tile : m_tiles) {
+		for (auto& tile : m_tiles) {
 			if (mousePosX >= tile->destCoords.x && mousePosX <= tile->destCoords.x + tile->destCoords.w &&
 				mousePosY >= tile->destCoords.y && mousePosY <= tile->destCoords.y + tile->destCoords.h) {
 				
 				Character* character = new Character();
-				character->OnCreate(scene);
+				Vec3 position = {
+					static_cast<float>((tile->destCoords.x + tile->destCoords.w) * scene->getxAxis()) / width,
+					scene->getyAxis() - (static_cast<float>((tile->destCoords.y + 0.5 * tile->destCoords.h) * scene->getyAxis()) / height),
+					0.0f
+				};
+
+				character->OnCreate(scene, position);
 				character->setTextureWith("Sprites/hero.png");
 				characters.push_back(character);
 			}

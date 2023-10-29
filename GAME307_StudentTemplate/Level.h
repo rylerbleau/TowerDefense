@@ -25,7 +25,8 @@ private:
 	int mousePosX = 0;
 	int mousePosY = 0;
 	std::vector<Tile*> m_tiles;
-
+	int width = 0;
+	int height = 0;
 public:
 	Level() = default;
 	Level(const std::string& fileName);

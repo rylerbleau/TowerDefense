@@ -36,7 +36,7 @@ public:
 		if (body) delete body;
 	};
 
-	bool OnCreate(Scene* scene_);
+	bool OnCreate(Scene* scene_, Vec3 pos = Vec3(5.0f, 5.0f, 0.0f));
 	void OnDestroy() {};
 	bool setTextureWith(string file);
 	void Update(float deltaTime, std::vector<Character*> characters, int index);

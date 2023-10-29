@@ -4,7 +4,7 @@
 #include "KinematicSeek.h"
 #include "KinematicSeperation.h"
 
-bool Character::OnCreate(Scene* scene_)
+bool Character::OnCreate(Scene* scene_, Vec3 pos /*= Vec3(5.0f, 5.0f, 0.0f)*/)
 {
 	scene = scene_;
 
@@ -19,7 +19,7 @@ bool Character::OnCreate(Scene* scene_)
 		float maxAcceleration = 10.0f;
 		float maxRotation = 2.0f;
 		float maxAngular = 10.0f;
-		body = new StaticBody(Vec3(5.0f, 5.0f, 0.0f), orientation, maxSpeed, maxRotation);
+		body = new StaticBody(pos, orientation, maxSpeed, maxRotation);
 	}
 
 	if (!body)
