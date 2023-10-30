@@ -16,11 +16,17 @@ Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 }
 
 Scene1::~Scene1(){
-	if (blinky) 
+	if (blinky)
 	{
 		blinky->OnDestroy();
 		delete blinky;
 	}
+	if (!characters.empty()) {
+		characters.clear();
+	}
+
+	level.clear();
+
 }
 
 bool Scene1::OnCreate() {
@@ -33,14 +39,6 @@ bool Scene1::OnCreate() {
 	
 	/// Turn on the SDL imaging subsystem
 	IMG_Init(IMG_INIT_PNG);
-	
-	// Set player image to PacMan
-	SDL_Surface* image;
-	SDL_Texture* texture;
-	image = IMG_Load("Pacman.png");
-	texture = SDL_CreateTextureFromSurface(renderer, image);
-	game->getPlayer()->setImage(image);
-	game->getPlayer()->setTexture(texture);
 
 	// Set up characters, choose good values for the constructor
 	// or use the defaults, like this
@@ -53,8 +51,8 @@ bool Scene1::OnCreate() {
 	characters.push_back(blinky);
 	
 	/// Map set up begins here
-	level = Level("Levels/Level2.txt");
-	level.LoadMap(renderer, 12, 11, "Sprites/tilemap.png");
+	level = Level("Levels/Level2.txt", this);
+	level.LoadMap(12, 11, "Sprites/tilemap.png");
 
 	return true;
 	
@@ -76,7 +74,7 @@ void Scene1::Render() {
 	SDL_RenderClear(renderer);
 	
 	// Draw level and AI characters
-	level.drawTiles(renderer, window);
+	level.drawTiles(window, characters);
 	for (auto& character : characters) {
 		character->render(1.0f);
 	}
@@ -89,7 +87,7 @@ void Scene1::Render() {
 void Scene1::HandleEvents(const SDL_Event& event)
 {
 	game->getPlayer()->HandleEvents(event);
-	level.levelHandleEvents(event, characters, this);
+	level.levelHandleEvents(event);
 }
 
 

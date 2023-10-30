@@ -24,6 +24,7 @@ private:
 	class Scene* scene;
 	SDL_Rect sourceRect;
 	Direction direction = Direction::IDLE;
+	float scale = 1.0f;
 public:
 	Character() :sourceRect{}
 	{
@@ -32,12 +33,10 @@ public:
 	};
 
 	~Character()
-	{
-		if (body) delete body;
-	};
+	{};
 
 	bool OnCreate(Scene* scene_, Vec3 pos = Vec3(5.0f, 5.0f, 0.0f));
-	void OnDestroy() {};
+	void OnDestroy() { delete body; };
 	bool setTextureWith(string file);
 	void Update(float deltaTime, std::vector<Character*> characters, int index);
 	void HandleEvents(const SDL_Event& event);

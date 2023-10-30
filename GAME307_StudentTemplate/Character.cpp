@@ -3,11 +3,16 @@
 #include "StaticBody.h"
 #include "KinematicSeek.h"
 #include "KinematicSeperation.h"
+#include <random>
+
+static std::mt19937 randomEngine(time(nullptr));
+static std::uniform_real_distribution<float> scaleGenerator(0.8f, 1.5f);
 
 bool Character::OnCreate(Scene* scene_, Vec3 pos /*= Vec3(5.0f, 5.0f, 0.0f)*/)
 {
 	scene = scene_;
-
+	scale = scaleGenerator(randomEngine);
+	
 	// Configure and instantiate the body to use for the demo
 	if (!body)
 	{
@@ -72,7 +77,7 @@ void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std
 
 	// using the target, calculate and set values in the overall steering output
 	KinematicSeek* steering_algorithm = new KinematicSeek(body, target);
-	KinematicSeperation* separation = new KinematicSeperation(staticBodies, 0.7f, index);
+	KinematicSeperation* separation = new KinematicSeperation(staticBodies, 1.5f, index);
 	steering_outputs.push_back(steering_algorithm->GetSteering());
 	steering_outputs.push_back(separation->GetSteering());
 	for (int i = 0; i < steering_outputs.size(); i++) {
@@ -193,6 +198,6 @@ void Character::render(float scale)
 		sourceRect = SpriteSheet::GetUVTile(tileIndexX, tileIndexY);
 		break;
 	}
-	SpriteSheet::draw(renderer, body->getTexture(), sourceRect, square, 1.0f, true);
+	SpriteSheet::draw(renderer, body->getTexture(), sourceRect, square, this->scale, true);
 }
 

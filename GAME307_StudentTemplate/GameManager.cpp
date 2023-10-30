@@ -79,6 +79,16 @@ bool GameManager::OnCreate() {
         maxAngular,
         this
     );
+    // Set player image to PacMan
+    SDL_Surface* image = nullptr;
+    SDL_Texture* texture = nullptr;
+    if (!image && !texture) {
+        image = IMG_Load("Pacman.png");
+        texture = SDL_CreateTextureFromSurface(getRenderer(), image);
+    }
+    player->setImage(image);
+    player->setTexture(texture);
+
     if ( player->OnCreate() == false ) {
         OnDestroy();
         return false;

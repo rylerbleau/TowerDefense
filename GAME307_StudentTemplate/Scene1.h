@@ -3,11 +3,13 @@
 
 #include <MMath.h>
 #include <VMath.h>
+#include <array>
 #include "Scene.h"
 #include "Character.h"
 #include "StaticBody.h"
 #include "Level.h"
 #include "SpriteSheet.h"
+#include "Turret.h"
 
 using namespace MATH;
 class Scene1 : public Scene {
@@ -21,7 +23,7 @@ private:
     Matrix4 inverseProjection;
 	Character* blinky;
 	std::vector<Character*> characters;
-
+	std::vector<Turret*> turrets;
 
 	Level level;
 
@@ -33,7 +35,6 @@ public:
 	void Update(const float time);
 	void Render();
     void HandleEvents(const SDL_Event &event);
-	void DrawRect(SDL_Rect &rect);
 
 	float getxAxis() { return xAxis; }
 	float getyAxis() { return yAxis; }
