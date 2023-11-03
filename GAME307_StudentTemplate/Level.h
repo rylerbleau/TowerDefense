@@ -15,6 +15,7 @@ struct Tile {
 	SDL_Rect destCoords;
 	float scale = 1.0f;
 	bool needsResizing = false;
+	char letter;
 };
 
 class Level
@@ -35,9 +36,10 @@ public:
 
 	void LoadMap(const int& tileSizeX, const int& tileSizeY, const char* filename);
 	void clear();
-	void drawTiles(SDL_Window* window, std::vector<Character*>& characters);
-	void placeTurret(SDL_Window* window, std::vector<Turret*>& characters);
+	void drawTiles(SDL_Window* window, std::vector<Character*>& characters, std::vector<Turret*>& turrets);
+	void placeTurret(SDL_Window* window, std::vector<Turret*>& turrets, Tile* tile);
 	char getTile(int x, int y);
+	bool compareTile(SDL_Rect r1, SDL_Rect r2);
 	void levelHandleEvents(const SDL_Event& event);
 
 	int getWidth() const { return m_levelData[0].size();}

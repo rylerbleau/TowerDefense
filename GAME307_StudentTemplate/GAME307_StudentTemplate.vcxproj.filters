@@ -192,10 +192,10 @@
       <Filter>Header\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="SpriteSheet.h" />
-    <ClInclude Include="Level.h">
-      <Filter>Source\Game</Filter>
-    </ClInclude>
     <ClInclude Include="Turret.h" />
+    <ClInclude Include="Level.h">
+      <Filter>Header\Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header">

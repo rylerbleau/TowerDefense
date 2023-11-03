@@ -8,6 +8,7 @@
 #include "Vector.h"
 
 class Scene;
+class Character;
 
 class Turret
 {
@@ -17,6 +18,8 @@ private:
 	SDL_Rect turretUV;
 	std::unique_ptr<Scene> scene;
 	MATH::Vec2 uvCoords;
+	float range;
+	float cooldown;
 public:
 	Turret(const char* filename, MATH::Vec2 _uvCoords, Scene* scene);
 	~Turret();

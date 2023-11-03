@@ -87,60 +87,60 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
 
             switch (tile) {
             case 'P':
-                m_tiles.push_back(new Tile{ mapTexture, pathRect , gridPosition , 1.0 , false});
+                m_tiles.push_back(new Tile{ mapTexture, pathRect , gridPosition , 1.0 , false, tile});
                 break;
             case 'G':
-                m_tiles.push_back(new Tile{ mapTexture, grassRect , gridPosition , 1.0 , false });
+                m_tiles.push_back(new Tile{ mapTexture, grassRect , gridPosition , 1.0 , false, tile });
                 break;
             case 'F':
-                m_tiles.push_back(new Tile{ mapTexture, grassRect , gridPosition , 1.0 , false });
-                m_tiles.push_back(new Tile{ mapTexture, flowerRect , gridPosition , 1.0 , false });
+                m_tiles.push_back(new Tile{ mapTexture, grassRect , gridPosition , 1.0 , false, tile });
+                m_tiles.push_back(new Tile{ mapTexture, flowerRect , gridPosition , 1.0 , false, tile });
                 break;
             case 'T':
-                m_tiles.push_back(new Tile{ mapTexture, grassRect , gridPosition , 1.0 , false });
-                m_tiles.push_back(new Tile{ mapTexture, greenTreeRect , gridPosition , 1.0 , true });
+                m_tiles.push_back(new Tile{ mapTexture, grassRect , gridPosition , 1.0 , false, tile });
+                m_tiles.push_back(new Tile{ mapTexture, greenTreeRect , gridPosition , 1.0 , true, tile });
                 break;
             case 'O':
-                m_tiles.push_back(new Tile{ mapTexture, grassRect , gridPosition , 1.0 , false });
-                m_tiles.push_back(new Tile{ mapTexture, orangeTreeRect , gridPosition , 2.0 , true });
+                m_tiles.push_back(new Tile{ mapTexture, grassRect , gridPosition , 1.0 , false, tile });
+                m_tiles.push_back(new Tile{ mapTexture, orangeTreeRect , gridPosition , 2.0 , true, tile });
                 break;
             case 'R':
-                m_tiles.push_back(new Tile{ mapTexture, rightGrassRect , gridPosition , 1.0 , false });
+                m_tiles.push_back(new Tile{ mapTexture, rightGrassRect , gridPosition , 1.0 , false, tile });
                 break;
             case 'L':
-                m_tiles.push_back(new Tile{ mapTexture, leftGrassRect , gridPosition , 1.0 , false });
+                m_tiles.push_back(new Tile{ mapTexture, leftGrassRect , gridPosition , 1.0 , false, tile });
                 break;
             case 'B':
-                m_tiles.push_back(new Tile{ mapTexture, bottomRect , gridPosition , 1.0 , false });
+                m_tiles.push_back(new Tile{ mapTexture, bottomRect , gridPosition , 1.0 , false, tile });
                 break;
             case 'N':
-                m_tiles.push_back(new Tile{ mapTexture, topRect , gridPosition , 1.0 , false });
+                m_tiles.push_back(new Tile{ mapTexture, topRect , gridPosition , 1.0 , false, tile });
                 break;
             case '1':
-                m_tiles.push_back(new Tile{ mapTexture, bottomLeftGrassCorner , gridPosition , 1.0 , false });
+                m_tiles.push_back(new Tile{ mapTexture, bottomLeftGrassCorner , gridPosition , 1.0 , false, tile });
                 break;
             case '2':
-                m_tiles.push_back(new Tile{ mapTexture, topRightGrassCorner , gridPosition , 1.0 , false });
+                m_tiles.push_back(new Tile{ mapTexture, topRightGrassCorner , gridPosition , 1.0 , false, tile });
                 break;
             case 'C':
-                m_tiles.push_back(new Tile{ mapTexture, buildingRect , gridPosition , 6.0 , true });
+                m_tiles.push_back(new Tile{ mapTexture, buildingRect , gridPosition , 6.0 , true, tile });
                 gridPosition.x += 210;
-                m_tiles.push_back(new Tile{ mapTexture, doorRect , gridPosition , 2.0 , true });
+                m_tiles.push_back(new Tile{ mapTexture, doorRect , gridPosition , 2.0 , true, tile });
                 break;
             case 'S':
-                m_tiles.push_back(new Tile{ mapTexture, rockRect , gridPosition , 1.0 , false });
+                m_tiles.push_back(new Tile{ mapTexture, rockRect , gridPosition , 1.0 , false, tile });
                 break;
             case 'W':
-                m_tiles.push_back(new Tile{ mapTexture, rockRect, gridPosition, 1.0, false });
-                m_tiles.push_back(new Tile{ mapTexture, wellRect, gridPosition, 3.0, true });
+                m_tiles.push_back(new Tile{ mapTexture, rockRect, gridPosition, 1.0, false, tile });
+                m_tiles.push_back(new Tile{ mapTexture, wellRect, gridPosition, 3.0, true, tile });
                 break;
             case 'J':
-                m_tiles.push_back(new Tile{ mapTexture, rockRect , gridPosition , 1.0 , false });
-                m_tiles.push_back(new Tile{ mapTexture, stockRect , gridPosition , 3.0 , true });
+                m_tiles.push_back(new Tile{ mapTexture, rockRect , gridPosition , 1.0 , false, tile });
+                m_tiles.push_back(new Tile{ mapTexture, stockRect , gridPosition , 3.0 , true, tile });
                 break;
             case 'V':
-                m_tiles.push_back(new Tile{ mapTexture, rockRect , gridPosition , 1.0 , false });
-                m_tiles.push_back(new Tile{ mapTexture, boardRect , gridPosition , 1.0 , false });
+                m_tiles.push_back(new Tile{ mapTexture, rockRect , gridPosition , 1.0 , false, tile });
+                m_tiles.push_back(new Tile{ mapTexture, boardRect , gridPosition , 1.0 , false, tile });
                 break;
             default:
                 printf("Unexpected symbol %c at (%d, %d)", tile, x, y);
@@ -161,7 +161,7 @@ void Level::clear() {
     m_tiles.clear();
 }
 
-void Level::drawTiles(SDL_Window* window, std::vector<Character*>& characters)
+void Level::drawTiles(SDL_Window* window, std::vector<Character*>& characters, std::vector<Turret*>& turrets)
 {
 
     for (const auto& tile : m_tiles) {
@@ -171,13 +171,14 @@ void Level::drawTiles(SDL_Window* window, std::vector<Character*>& characters)
             mousePosY >= tile->destCoords.y && mousePosY <= tile->destCoords.y + tile->destCoords.h) {
 
             // Set color for the outline rectangle (for example white)
+            // 
             SDL_SetRenderDrawColor(scene->game->getRenderer(), 255, 255, 255, 255);
 
             // Draw the outline of the rectangle
             SDL_RenderDrawRect(scene->game->getRenderer(), &tile->destCoords);
             if(placeActor)
             {
-                Character* character = new Character();
+                /*Character* character = new Character();
                 Vec3 position = {
                     static_cast<float>((tile->destCoords.x + tile->destCoords.w) * scene->getxAxis()) / width,
                     scene->getyAxis() - (static_cast<float>((tile->destCoords.y + 0.5 * tile->destCoords.h) * scene->getyAxis()) / height),
@@ -187,21 +188,48 @@ void Level::drawTiles(SDL_Window* window, std::vector<Character*>& characters)
                 character->OnCreate(scene, position);
                 character->setTextureWith("Sprites/hero.png");
                 characters.push_back(character);
-                placeActor = false;
-               /* Turret* turret = new Turret("Sprites/tiles_packed.png", Vec2(6, 7), scene);
-                SpriteSheet::QuerySpriteSheet(12, 10, turret->m_turretTexture);
-                SDL_Rect turretUV = SpriteSheet::GetUVTile(turret->uvCoords.x, turret->uvCoords.y);
-                tile->tileTexture = turret->m_turretTexture;
-                tile->uvCoords = turretUV;
                 placeActor = false;*/
+
+                if (tile->letter == 'G' && tile->needsResizing == false) {
+                    placeTurret(window, turrets, tile);
+                    printf("grass tile\n");
+                }
+                
             }
         }
     }
 }
 
+void Level::placeTurret(SDL_Window* window, std::vector<Turret*>& turrets, Tile* tile)
+{
+    // have mouse x and y from mouse click
+    // get tile position based on mouse pos
+    // check if placement is legal
+    
+    // place turret
+
+    Turret* turret = new Turret("Sprites/tiles_packed.png", Vec2(6, 7), scene);
+    SpriteSheet::QuerySpriteSheet(12, 10, turret->m_turretTexture);
+    SDL_Rect turretUV = SpriteSheet::GetUVTile(turret->uvCoords.x, turret->uvCoords.y);
+    tile->tileTexture = turret->m_turretTexture;
+    tile->uvCoords = turretUV;
+    placeActor = false;
+
+}
+
 char Level::getTile(int x, int y)
 {
     return m_levelData[y][x];
+}
+
+bool Level::compareTile(SDL_Rect r1, SDL_Rect r2)
+{
+    r1.y;
+    if (r1.x != r2.x || r1.y != r2.y || r1.w != r2.w || r1.h != r2.h) {
+        return false;
+    }
+
+    return true;
 }
 
 void Level::levelHandleEvents(const SDL_Event& event)

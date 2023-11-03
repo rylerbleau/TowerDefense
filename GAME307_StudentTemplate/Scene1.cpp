@@ -74,7 +74,7 @@ void Scene1::Render() {
 	SDL_RenderClear(renderer);
 	
 	// Draw level and AI characters
-	level.drawTiles(window, characters);
+	level.drawTiles(window, characters, turrets);
 	for (auto& character : characters) {
 		character->render(1.0f);
 	}
