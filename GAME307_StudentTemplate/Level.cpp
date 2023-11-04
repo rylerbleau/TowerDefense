@@ -208,10 +208,19 @@ void Level::placeTurret(SDL_Window* window, std::vector<Turret*>& turrets, Tile*
     
     // place turret
 
-    Turret* turret = new Turret("Sprites/tiles_packed.png", Vec2(6, 7), scene);
+    Vec3 position = {
+                    static_cast<float>((tile->destCoords.x + tile->destCoords.w) * scene->getxAxis()) / width,
+                    scene->getyAxis() - (static_cast<float>((tile->destCoords.y - 0.5 * tile->destCoords.h) * scene->getyAxis()) / height),
+                    0.0f
+    };
+
+    Turret* turret = new Turret("Sprites/tiles_packed.png", Vec2(6, 7), scene, position);
     SpriteSheet::QuerySpriteSheet(12, 10, turret->m_turretTexture);
     SDL_Rect turretUV = SpriteSheet::GetUVTile(turret->uvCoords.x, turret->uvCoords.y);
+
+    turrets.push_back(turret);
     tile->tileTexture = turret->m_turretTexture;
+    tile->letter = 'M';
     tile->uvCoords = turretUV;
     placeActor = false;
 

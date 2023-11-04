@@ -66,7 +66,14 @@ void Scene1::Update(const float deltaTime) {
 		characters[i]->Update(deltaTime, characters, i);
 	}
 	game->getPlayer()->Update(deltaTime);
+
+	for (const auto& turret : turrets) {
+		turret->GetTarget(characters);
+		turret->Update(deltaTime);
+	}
 }
+
+
 
 void Scene1::Render() {
 	// reset render colour
@@ -78,7 +85,11 @@ void Scene1::Render() {
 	for (auto& character : characters) {
 		character->render(1.0f);
 	}
-
+	for (auto& t : turrets) {
+		if (t->HasTarget()) {
+			t->RenderBullet();
+		}
+	}
 	// render the player
 	game->RenderPlayer(0.10f);
 	SDL_RenderPresent(renderer);

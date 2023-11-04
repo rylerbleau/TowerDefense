@@ -57,6 +57,7 @@ bool Character::setTextureWith(string file)
 
 void Character::Update(float deltaTime, std::vector<Character* > characters, int index)
 {
+	//printf("pos: %f, %f\n", body->getPos().x, body->getPos().y);
 	std::vector<StaticBody* > staticBodies;
 	staticBodies.resize(characters.size());
 	for (uint32_t i = 0; i < characters.size(); i++) {
