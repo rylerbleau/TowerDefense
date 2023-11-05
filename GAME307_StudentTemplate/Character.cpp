@@ -198,6 +198,6 @@ void Character::render(float scale)
 		sourceRect = SpriteSheet::GetUVTile(tileIndexX, tileIndexY);
 		break;
 	}
-	SpriteSheet::draw(renderer, body->getTexture(), sourceRect, square, this->scale, true);
+	SpriteSheet::drawPlayer(renderer, body->getTexture(), sourceRect, square, this->scale, true);
 }
 
