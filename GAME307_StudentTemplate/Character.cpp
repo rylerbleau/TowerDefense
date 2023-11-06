@@ -3,7 +3,11 @@
 #include "StaticBody.h"
 #include "KinematicSeek.h"
 #include "KinematicSeperation.h"
+#include "KinematicArrive.h"
+#include "FollowAPath.h"
 #include <random>
+#include <vector>
+
 
 static std::mt19937 randomEngine(time(nullptr));
 static std::uniform_real_distribution<float> scaleGenerator(0.8f, 1.5f);
@@ -12,11 +16,11 @@ bool Character::OnCreate(Scene* scene_, Vec3 pos /*= Vec3(5.0f, 5.0f, 0.0f)*/)
 {
 	scene = scene_;
 	scale = scaleGenerator(randomEngine);
-	
+
 	// Configure and instantiate the body to use for the demo
 	if (!body)
 	{
-		float radius = 0.2f;
+		float radius = 2.5;
 		float orientation = 0.0f;
 		float rotation = 0.0f;
 		float angular = 0.0f;
@@ -65,10 +69,16 @@ void Character::Update(float deltaTime, std::vector<Character* > characters, int
 	// create a new overall steering output
 	KinematicSteeringOutput* steering = new KinematicSteeringOutput();
 	// This creates the separation plus seek behaviour(might switch to arrive) 
-	SeekAndSeparationSteering(*steering, staticBodies, 0.7f, index);
+	SeekAndSeparationSteering(*steering, staticBodies, 1.5f, index);
 	body->Update(deltaTime, steering);
 	delete steering;
 }
+
+void Character::UpdateKinematic(float deltaTime, KinematicSteeringOutput* steering)
+{
+	body->Update(deltaTime, steering);
+}
+
 
 void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody* > staticBodies, float threshhold, int index)
 {

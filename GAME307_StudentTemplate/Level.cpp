@@ -6,6 +6,7 @@
 #include "Character.h"
 #include "Turret.h"
 
+
 Level::Level(const std::string& fileName, Scene* scene)
     :scene(scene)
 {
@@ -75,6 +76,10 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
     /// than it is pushed in the vector of Tile pointers after what i am going to sort the vector by its scale 
     /// so that sprites won't be overdrawn
     /// </summary>
+    /// 
+    int label = 0;
+    MATH::Vec3 position = {};
+ 
 
     for (size_t y = 0; y < m_levelData.size(); y++) {
         for (size_t x = 0; x < m_levelData[y].size(); x++) {
@@ -84,9 +89,6 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
             SDL_Rect gridPosition = worldTileCoords;
             gridPosition.x *= x;
             gridPosition.y *= y;
-            int a = 0;
-
-            int b = 0;
             Tile* newTile = nullptr;
             Tile* childTile = nullptr;
 
@@ -94,6 +96,12 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
             case 'P':
                 newTile = new Tile{ nullptr, mapTexture, pathRect , gridPosition , 1.0 , false };
                 m_tiles.push_back(newTile);
+
+                 position = { static_cast<float>((gridPosition.x + gridPosition.w) * scene->getxAxis()) / width,
+                    scene->getyAxis() - (static_cast<float>((gridPosition.y - 0.5 * gridPosition.h) * scene->getyAxis()) / height), 
+                     0.0f };
+                 pathNodes.push_back(new Node{ label, position });
+                label++;
                 break;
             case 'G':
                 newTile = new Tile{ nullptr, mapTexture, grassRect , gridPosition , 1.0 , false };

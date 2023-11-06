@@ -136,6 +136,7 @@
     <ClCompile Include="Body.cpp" />
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="Flee.cpp" />
+    <ClCompile Include="FollowAPath.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="imgui.cpp" />
@@ -146,12 +147,14 @@
     <ClCompile Include="imgui_impl_sdlrenderer2.cpp" />
     <ClCompile Include="imgui_tables.cpp" />
     <ClCompile Include="imgui_widgets.cpp" />
+    <ClCompile Include="KinematicArrive.cpp" />
     <ClCompile Include="KinematicSeek.cpp" />
     <ClCompile Include="KinematicSeperation.cpp" />
     <ClCompile Include="KinematicSteeringOutput.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Node.cpp" />
+    <ClCompile Include="Path.cpp" />
     <ClCompile Include="PlayerBody.cpp" />
     <ClCompile Include="Scene1.cpp" />
     <ClCompile Include="Scene2.cpp" />
@@ -170,6 +173,7 @@
     <ClInclude Include="Body.h" />
     <ClInclude Include="Character.h" />
     <ClInclude Include="Flee.h" />
+    <ClInclude Include="FollowAPath.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="imconfig.h" />
@@ -182,12 +186,14 @@
     <ClInclude Include="imstb_rectpack.h" />
     <ClInclude Include="imstb_textedit.h" />
     <ClInclude Include="imstb_truetype.h" />
+    <ClInclude Include="KinematicArrive.h" />
     <ClInclude Include="KinematicSeek.h" />
     <ClInclude Include="KinematicSeperation.h" />
     <ClInclude Include="KinematicSteeringOutput.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="MemoryMonitor.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="Path.h" />
     <ClInclude Include="PlayerBody.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Scene1.h" />

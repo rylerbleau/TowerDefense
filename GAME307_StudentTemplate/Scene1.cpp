@@ -1,6 +1,8 @@
 #include "Scene1.h"
 #include "KinematicSeek.h"
-
+#include "Graph.h"
+#include "KinematicArrive.h"
+#include "FollowAPath.h"
 
 
 Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
@@ -40,6 +42,30 @@ bool Scene1::OnCreate() {
 	/// Turn on the SDL imaging subsystem
 	IMG_Init(IMG_INIT_PNG);
 
+
+	/// Map set up begins here
+	level = Level("Levels/Level2.txt", this);
+	level.LoadMap(12, 11, "Sprites/tilemap.png");
+	graph = new Graph();
+	graph->OnCreate(level.getNodes());
+	for (int i = 0; i < level.getNodes().size(); i++) {
+		Node* fromNode = level.getNodes()[i];
+		int from = fromNode->GetLabel();
+		if (i > 0) {
+			int to = level.getNodes()[i - 1]->GetLabel();
+			graph->AddWeightedConnection(from, to, 1.0f);
+		}
+		if (i < level.getNodes().size() - 1) {
+			int to = level.getNodes()[i + 1]->GetLabel();
+			graph->AddWeightedConnection(from, to, 1.0f);
+		}
+	}
+
+	std::vector<int> nodes = graph->Dijkstra(0, 41);
+	for (auto& node : nodes) {
+		path.push_back(graph->GetNode(node));
+	}
+
 	// Set up characters, choose good values for the constructor
 	// or use the defaults, like this
 	blinky = new Character();
@@ -49,13 +75,14 @@ bool Scene1::OnCreate() {
 	}
 
 	characters.push_back(blinky);
+
 	
-	/// Map set up begins here
-	level = Level("Levels/Level2.txt", this);
-	level.LoadMap(12, 11, "Sprites/tilemap.png");
+	
+
+	
+	
 
 	return true;
-	
 }
 
 void Scene1::OnDestroy() {}
@@ -65,6 +92,8 @@ void Scene1::Update(const float deltaTime) {
 	for (uint32_t i = 0; i < characters.size(); i++) {
 		characters[i]->Update(deltaTime, characters, i);
 	}
+
+
 	game->getPlayer()->Update(deltaTime);
 }
 

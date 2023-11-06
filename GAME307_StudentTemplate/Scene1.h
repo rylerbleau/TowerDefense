@@ -11,6 +11,8 @@
 #include "SpriteSheet.h"
 #include "Turret.h"
 
+class Graph;
+
 using namespace MATH;
 class Scene1 : public Scene {
 private:
@@ -24,6 +26,8 @@ private:
 	Character* blinky;
 	std::vector<Character*> characters;
 	std::vector<Turret*> turrets;
+	std::vector<Node*> path;
+	Graph* graph;
 
 	Level level;
 
@@ -41,6 +45,8 @@ public:
 	SDL_Window* getWindow() { return window; }
     Matrix4 getProjectionMatrix() { return projectionMatrix; }
 	Matrix4 getInverseMatrix() { return inverseProjection; }
+
+	std::vector<Node*> getPath() { return  path; }
 };
 
 #endif

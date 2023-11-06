@@ -93,6 +93,9 @@
       <Filter>Source\Game</Filter>
     </ClCompile>
     <ClCompile Include="Turret.cpp" />
+    <ClCompile Include="FollowAPath.cpp" />
+    <ClCompile Include="KinematicArrive.cpp" />
+    <ClCompile Include="Path.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameManager.h">
@@ -196,6 +199,9 @@
       <Filter>Source\Game</Filter>
     </ClInclude>
     <ClInclude Include="Turret.h" />
+    <ClInclude Include="FollowAPath.h" />
+    <ClInclude Include="KinematicArrive.h" />
+    <ClInclude Include="Path.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header">

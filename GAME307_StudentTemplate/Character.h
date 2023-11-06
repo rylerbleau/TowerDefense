@@ -7,7 +7,9 @@
 #include "KinematicBody.h"
 #include "Seek.h"
 #include "Flee.h"
+#include "Scene1.h"
 
+class Node;
 
 using namespace std;
 enum class Direction {
@@ -25,6 +27,7 @@ private:
 	SDL_Rect sourceRect;
 	Direction direction = Direction::IDLE;
 	float scale = 1.0f;
+	std::vector<Node*> path;
 public:
 	Character() :sourceRect{}
 	{
@@ -39,6 +42,7 @@ public:
 	void OnDestroy() { delete body; };
 	bool setTextureWith(string file);
 	void Update(float deltaTime, std::vector<Character*> characters, int index);
+	void UpdateKinematic(float deltaTime, KinematicSteeringOutput* steering);
 	void HandleEvents(const SDL_Event& event);
 	void render(float scale = 1.0f);
 
