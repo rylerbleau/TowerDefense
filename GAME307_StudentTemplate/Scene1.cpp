@@ -61,7 +61,7 @@ bool Scene1::OnCreate() {
 		}
 	}
 
-	std::vector<int> nodes = graph->Dijkstra(0, 41);
+	std::vector<int> nodes = graph->Dijkstra(graph->NumNodes() - 1, 0);
 	for (auto& node : nodes) {
 		path.push_back(graph->GetNode(node));
 	}
@@ -90,7 +90,7 @@ void Scene1::OnDestroy() {}
 void Scene1::Update(const float deltaTime) {
 	// Calculate and apply any steering for npc's
 	for (uint32_t i = 0; i < characters.size(); i++) {
-		characters[i]->Update(deltaTime, characters, i);
+		characters[i]->Update(deltaTime, characters, i, path);
 	}
 
 

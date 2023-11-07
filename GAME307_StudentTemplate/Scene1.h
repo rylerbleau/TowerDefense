@@ -46,7 +46,7 @@ public:
     Matrix4 getProjectionMatrix() { return projectionMatrix; }
 	Matrix4 getInverseMatrix() { return inverseProjection; }
 
-	std::vector<Node*> getPath() { return  path; }
+	std::vector<Node*> getPath() override { return  path; }
 };
 
 #endif

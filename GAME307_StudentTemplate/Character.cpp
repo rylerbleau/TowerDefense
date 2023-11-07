@@ -4,7 +4,7 @@
 #include "KinematicSeek.h"
 #include "KinematicSeperation.h"
 #include "KinematicArrive.h"
-#include "FollowAPath.h"
+
 #include <random>
 #include <vector>
 
@@ -16,7 +16,7 @@ bool Character::OnCreate(Scene* scene_, Vec3 pos /*= Vec3(5.0f, 5.0f, 0.0f)*/)
 {
 	scene = scene_;
 	scale = scaleGenerator(randomEngine);
-
+	path = new Path(scene->getPath());
 	// Configure and instantiate the body to use for the demo
 	if (!body)
 	{
@@ -59,7 +59,7 @@ bool Character::setTextureWith(string file)
 }
 
 
-void Character::Update(float deltaTime, std::vector<Character* > characters, int index)
+void Character::Update(float deltaTime, std::vector<Character* > characters, int index, std::vector<Node*> path_)
 {
 	std::vector<StaticBody* > staticBodies;
 	staticBodies.resize(characters.size());
@@ -86,9 +86,9 @@ void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std
 	PlayerBody* target = scene->game->getPlayer();
 
 	// using the target, calculate and set values in the overall steering output
-	KinematicSeek* steering_algorithm = new KinematicSeek(body, target);
+	steering_algorithm = new FollowAPath(staticBodies[index], path);
 	KinematicSeperation* separation = new KinematicSeperation(staticBodies, 1.5f, index);
-	steering_outputs.push_back(steering_algorithm->GetSteering());
+	steering_outputs.push_back(steering_algorithm->getSteering());
 	steering_outputs.push_back(separation->GetSteering());
 	for (int i = 0; i < steering_outputs.size(); i++) {
 		if (steering_outputs[i]) {

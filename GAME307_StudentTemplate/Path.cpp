@@ -4,7 +4,7 @@ Path::Path(std::vector<Node*> nodes_)
 {
 	path.resize(nodes_.size());
 	path = nodes_;
-	currentNode = 31;
+	currentNode = 0;
 }
 
 void Path::addNode(Node* node_)

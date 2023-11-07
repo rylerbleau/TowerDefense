@@ -8,7 +8,7 @@ class FollowAPath :
 private:
 	Path* path;
 public:
-	FollowAPath(Body* character_, std::vector<Node*> path);
+	FollowAPath(Body* character_, Path* path_);
 	~FollowAPath();
 	KinematicSteeringOutput* getSteering();
 

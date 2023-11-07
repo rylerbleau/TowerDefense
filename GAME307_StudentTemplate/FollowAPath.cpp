@@ -1,11 +1,11 @@
 #include "FollowAPath.h"
 
-FollowAPath::FollowAPath(Body* character_, std::vector<Node*> path_) : 
+FollowAPath::FollowAPath(Body* character_, Path* path_) : 
     
     KinematicArrive{character_, nullptr}
 {
     target = new Body{};
-    path = new Path(path_);
+    path = path_;
 }
 
 FollowAPath::~FollowAPath()
