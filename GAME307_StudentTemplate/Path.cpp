@@ -14,7 +14,12 @@ void Path::addNode(Node* node_)
 
 void Path::incrementCurrentNode(int step)
 {
-	currentNode += step;
+	if (currentNode != path.size() - 1) {
+		currentNode += step;
+	}
+	else {
+		currentNode = path.size() - 1;
+	}
 }
 
 MATH::Vec3 Path::getCurrentNodePositon()

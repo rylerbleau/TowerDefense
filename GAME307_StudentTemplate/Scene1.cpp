@@ -61,7 +61,7 @@ bool Scene1::OnCreate() {
 		}
 	}
 
-	std::vector<int> nodes = graph->Dijkstra(graph->NumNodes() - 1, 0);
+	std::vector<int> nodes = graph->Dijkstra(0, graph->NumNodes() - 5);
 	for (auto& node : nodes) {
 		path.push_back(graph->GetNode(node));
 	}
