@@ -33,7 +33,7 @@ public:
 	SDL_Window* getWindow() { return window; }
 	Matrix4 getProjectionMatrix() { return projectionMatrix; }
 	Matrix4 getInverseMatrix() { return inverseProjection; }
-	std::vector<Node*> getPath() override { return  {}; }
+	Path* getPath() override { return  {}; }
 };
 
 

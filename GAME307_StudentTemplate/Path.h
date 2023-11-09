@@ -8,9 +8,11 @@ private:
 	int currentNode;
 	std::vector<Node*> path;
 public:
-	Path(std::vector<Node*> nodes_);
+	Path();
+	bool OnCreate(std::vector<Node*> nodes_);
 	void addNode(Node* node_);
 	void incrementCurrentNode(int step);
 	MATH::Vec3 getCurrentNodePositon();
+	int getPathSize() { return path.size(); }
 };
 

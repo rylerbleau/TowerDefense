@@ -44,12 +44,11 @@ public:
 	bool OnCreate(Scene* scene_, Vec3 pos = Vec3(5.0f, 5.0f, 0.0f));
 	void OnDestroy() { delete body; };
 	bool setTextureWith(string file);
-	void Update(float deltaTime, std::vector<Character*> characters, int index, std::vector<Node*> path_);
+	void Update(float deltaTime, std::vector<Character*> characters, int index, Path* path_);
 	void UpdateKinematic(float deltaTime, KinematicSteeringOutput* steering);
 	void HandleEvents(const SDL_Event& event);
 	void render(float scale = 1.0f);
-
-	void SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody* > staticBodies, float threshhold, int index);
+	void SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody*> staticBodies, float threshhold, int index, Path* path_);
 	void SteerToFleePlayer(SteeringOutput& steering);
 	StaticBody* getBody() { return body; }
 };

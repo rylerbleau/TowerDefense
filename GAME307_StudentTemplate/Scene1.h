@@ -26,7 +26,7 @@ private:
 	Character* blinky;
 	std::vector<Character*> characters;
 	std::vector<Turret*> turrets;
-	std::vector<Node*> path;
+	Path* path;
 	Graph* graph;
 
 	Level level;
@@ -46,7 +46,7 @@ public:
     Matrix4 getProjectionMatrix() { return projectionMatrix; }
 	Matrix4 getInverseMatrix() { return inverseProjection; }
 
-	std::vector<Node*> getPath() override { return  path; }
+	Path* getPath() override { return  path; }
 };
 
 #endif

@@ -24,7 +24,7 @@ bool GameManager::OnCreate() {
     const int SCREEN_WIDTH = 1920;
     const int SCREEN_HEIGHT = 1080;
 
-    // Use 1000x600 for less than full screen
+    
    //const int SCREEN_WIDTH = 1280;
    //const int SCREEN_HEIGHT = 720;
 

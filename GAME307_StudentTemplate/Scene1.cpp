@@ -11,10 +11,9 @@ Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 	renderer = SDL_GetRenderer(window);
 	xAxis = 25.0f;
 	yAxis = 15.0f;
-
-	// create a NPC
+	graph = nullptr;
+	path = nullptr;
 	blinky = nullptr;
-	
 }
 
 Scene1::~Scene1(){
@@ -38,50 +37,19 @@ bool Scene1::OnCreate() {
 	Matrix4 ndc = MMath::viewportNDC(w, h);
 	Matrix4 ortho = MMath::orthographic(0.0f, xAxis, 0.0f, yAxis, 0.0f, 1.0f);
 	projectionMatrix = ndc * ortho;
-	
 	/// Turn on the SDL imaging subsystem
 	IMG_Init(IMG_INIT_PNG);
 
-
-	/// Map set up begins here
+	/// Map and initial character set up 
 	level = Level("Levels/Level2.txt", this);
 	level.LoadMap(12, 11, "Sprites/tilemap.png");
-	graph = new Graph();
-	graph->OnCreate(level.getNodes());
-	for (int i = 0; i < level.getNodes().size(); i++) {
-		Node* fromNode = level.getNodes()[i];
-		int from = fromNode->GetLabel();
-		if (i > 0) {
-			int to = level.getNodes()[i - 1]->GetLabel();
-			graph->AddWeightedConnection(from, to, 1.0f);
-		}
-		if (i < level.getNodes().size() - 1) {
-			int to = level.getNodes()[i + 1]->GetLabel();
-			graph->AddWeightedConnection(from, to, 1.0f);
-		}
-	}
-
-	std::vector<int> nodes = graph->Dijkstra(0, graph->NumNodes() - 5);
-	for (auto& node : nodes) {
-		path.push_back(graph->GetNode(node));
-	}
-
-	// Set up characters, choose good values for the constructor
-	// or use the defaults, like this
 	blinky = new Character();
-	if (!blinky->OnCreate(this) || !blinky->setTextureWith("Sprites/hero.png") )
-	{
+	if (!blinky->OnCreate(this) || !blinky->setTextureWith("Sprites/hero.png"))
 		return false;
-	}
-
 	characters.push_back(blinky);
 
-	
-	
-
-	
-	
-
+	/// Creating the Path foe Djikstra
+	path = new Path();
 	return true;
 }
 
@@ -92,8 +60,6 @@ void Scene1::Update(const float deltaTime) {
 	for (uint32_t i = 0; i < characters.size(); i++) {
 		characters[i]->Update(deltaTime, characters, i, path);
 	}
-
-
 	game->getPlayer()->Update(deltaTime);
 }
 

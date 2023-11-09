@@ -1,10 +1,18 @@
 #include "Path.h"
 
-Path::Path(std::vector<Node*> nodes_)
+Path::Path(): currentNode(0), path(0){}
+
+bool Path::OnCreate(std::vector<Node*> nodes_)
 {
+	if (nodes_.empty()) {
+		std::runtime_error("Not enought nodes in the vector");
+		return false;
+	}
+
 	path.resize(nodes_.size());
 	path = nodes_;
 	currentNode = 0;
+	return true;
 }
 
 void Path::addNode(Node* node_)

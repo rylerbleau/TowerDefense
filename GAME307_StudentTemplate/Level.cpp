@@ -5,6 +5,7 @@
 #include "SDL_image.h"
 #include "Character.h"
 #include "Turret.h"
+#include "Graph.h"
 
 
 Level::Level(const std::string& fileName, Scene* scene)
@@ -23,6 +24,7 @@ Level::Level(const std::string& fileName, Scene* scene)
     while (std::getline(file, temp)) {
         m_levelData.push_back(temp);
     }
+    file.close();
 }
 
 Level::~Level() {}
@@ -40,11 +42,18 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
     }
 
     SDL_FreeSurface(surface);
-
+    /// Quering sprite sheet to get dimentions and pass how many tiles along x and y are there
+    /// needed for sprite calculation later
     SpriteSheet::QuerySpriteSheet(tileSizeX, tileSizeY, mapTexture);
 
     SDL_GetWindowSize(scene->game->getWindow(), &width, &height);
 
+    /// <summary>
+    /// GetUVTile function gets the individual texture from the spritesheet. Just pass the coordinates of the tile and
+    /// it will return the sdl rectangle that is used to extract a tile from the spritesheet 
+    /// </summary>
+    /// <param name="indexX"> depending on the spritesheet pass in the coordinate of the tile along X</param>
+    /// <param name="indexY"> depending on the spritesheet pass in the coordinate of the tile along Y</param>
     SDL_Rect pathRect = SpriteSheet::GetUVTile(1, 8);
     SDL_Rect grassRect = SpriteSheet::GetUVTile(1, 10);
     SDL_Rect leftGrassRect = SpriteSheet::GetUVTile(0, 8);
@@ -70,16 +79,16 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
                               ceil((float)height / (float)getHeight()),
                               ceil((float)width / (float)getWidth()),
                               ceil((float)height / (float)getHeight()) };
-    /// <summary>
-    /// Here I pupulate the m_tiles vector. When it detectsa character ir is going to scan through switch statement
+
+    /// Here I pupulate the m_tiles vector. When it detects a character it is going to scan through switch statement
     /// to determine the attributes for that tile that is going to be rendered at that grid location
     /// than it is pushed in the vector of Tile pointers after what i am going to sort the vector by its scale 
     /// so that sprites won't be overdrawn
-    /// </summary>
-    /// 
     int label = 0;
+    float positionX = 0;
+    float positionY = 0;
+
     MATH::Vec3 position = {};
- 
 
     for (size_t y = 0; y < m_levelData.size(); y++) {
         for (size_t x = 0; x < m_levelData[y].size(); x++) {
@@ -91,16 +100,19 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
             gridPosition.y *= y;
             Tile* newTile = nullptr;
             Tile* childTile = nullptr;
+            Node* newNode = nullptr;
 
             switch (tile) {
             case 'P':
-                newTile = new Tile{ nullptr, mapTexture, pathRect , gridPosition , 1.0 , false };
-                m_tiles.push_back(newTile);
+                /// Node position is the centre of that tile that is within the orthographic dimensions
+                positionX = static_cast<float>((gridPosition.x + gridPosition.w) * scene->getxAxis()) / width;
+                positionY = scene->getyAxis() - (static_cast<float>((gridPosition.y + 0.5 * gridPosition.h) * scene->getyAxis()) / height);
+                position = { positionX, positionY, 0.0f };
+                newNode = new Node{ label, position };
+                newTile = new Tile{ nullptr, mapTexture, pathRect , gridPosition , 1.0 , false, true, newNode };
 
-                 position = { static_cast<float>((gridPosition.x + gridPosition.w) * scene->getxAxis()) / width,
-                    scene->getyAxis() - (static_cast<float>((gridPosition.y - 0.5 * gridPosition.h) * scene->getyAxis()) / height), 
-                     0.0f };
-                 pathNodes.push_back(new Node{ label, position });
+                m_tiles.push_back(newTile);
+                pathNodes.push_back(newNode);
                 label++;
                 break;
             case 'G':
@@ -112,7 +124,7 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
                 m_tiles.push_back(newTile);
                 break;
             case 'T':
-                childTile = new Tile{ nullptr, mapTexture, greenTreeRect, gridPosition, 1.0, true, false };
+                childTile = new Tile{ nullptr, mapTexture, greenTreeRect, gridPosition, 1.2, true, false };
                 newTile = new Tile{ childTile, mapTexture, grassRect, gridPosition, 1.0, false, false };
                 m_tiles.push_back(newTile);
                 m_tiles.push_back(childTile);
@@ -163,17 +175,14 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
                 m_tiles.push_back(newTile);
                 m_tiles.push_back(childTile);
                 break;
-
             case 'J':
                 childTile = new Tile{ nullptr, mapTexture, stockRect, gridPosition, 3.0, true, false };
                 newTile = new Tile{ childTile, mapTexture, rockRect, gridPosition, 1.0, false, false };
                 m_tiles.push_back(newTile);
                 m_tiles.push_back(childTile);
-                 
                 break;
-
             case 'V':
-                childTile = new Tile{ nullptr, mapTexture, boardRect, gridPosition, 1.0, false, false };
+                childTile = new Tile{ nullptr, mapTexture, boardRect, gridPosition, 1.2, false, false };
                 newTile = new Tile{ childTile, mapTexture, rockRect, gridPosition, 1.0, false, false };
                 m_tiles.push_back(newTile);
                 m_tiles.push_back(childTile);
@@ -184,7 +193,7 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
             }
         }
     }
-
+    /// resizing tile so that they are not stretched to tile dimension(especially if scale is more than 1)
     for (auto& tile : m_tiles) {
         tile->resizeTile();
     }
@@ -192,6 +201,21 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
     std::sort(m_tiles.begin(), m_tiles.end(), [](const Tile* tile1, const Tile* tile2) {
         return tile1->scale < tile2->scale;
     });
+
+    /// Creating graph and connecting nodes
+    graph.OnCreate(getNodes());
+    for (int i = 0; i < getNodes().size(); i++) {
+        Node* fromNode = getNodes()[i];
+        int from = fromNode->GetLabel();
+        if (i > 0) {
+            int to = getNodes()[i - 1]->GetLabel();
+            graph.AddWeightedConnection(from, to, 1.0f);
+        }
+        if (i < getNodes().size() - 1) {
+            int to = getNodes()[i + 1]->GetLabel();
+            graph.AddWeightedConnection(from, to, 1.0f);
+        }
+    }
 }
 
 void Level::clear() {
@@ -226,7 +250,7 @@ void Level::drawTiles(SDL_Window* window, std::vector<Character*>& characters)
         }
     }
  
-    drawTopTileOutline(scene->game->getRenderer(), mousePosX, mousePosY);
+    drawTopTileOutline(mousePosX, mousePosY);
        
 }
 
@@ -247,7 +271,22 @@ bool Level::isMouseOverTile(const Tile* tile, int mouseX, int mouseY) {
     return withinXBounds && withinYBounds;
 }
 
+Node* Level::getTileNodeUnderMouse(int mousePosX, int mousePosY) {
+    for (auto& tile : m_tiles) {
+        if (isMouseOverTile(tile, mousePosX, mousePosY)) {
+            return tile->tileNode;
+        }
+    }
+    return nullptr;
+}
 
+void Level::setStartNode(int mousePosX, int mousePosY) {
+    startNode = getTileNodeUnderMouse(mousePosX, mousePosY);
+}
+
+void Level::setEndNode(int mousePosX, int mousePosY) {
+    endNode = getTileNodeUnderMouse(mousePosX, mousePosY);
+}
 
 
 void Level::levelHandleEvents(const SDL_Event& event)
@@ -260,6 +299,15 @@ void Level::levelHandleEvents(const SDL_Event& event)
         break;
     case SDL_MOUSEBUTTONDOWN:
         if (event.button.button == SDL_BUTTON_LEFT) {
+            if (!startNode) {
+                setStartNode(mousePosX, mousePosY);
+            }
+            else if (!endNode) {
+                setEndNode(mousePosX, mousePosY);
+                updatePath(mousePosX, mousePosY); 
+            }
+        }
+        if (event.button.button == SDL_BUTTON_RIGHT) {
             if (canPlaceCharacter(mousePosX, mousePosY)) {
                 placeActor = true;
             }
@@ -292,7 +340,7 @@ bool Level::canPlaceCharacter(int mouseX, int mouseY) {
     return hoveredTile != nullptr && hoveredTile->isWalkable;
 }
 
-void Level::drawTopTileOutline(SDL_Renderer* renderer, int mouseX, int mouseY) {
+void Level::drawTopTileOutline(int mouseX, int mouseY) {
     Tile* topTile = nullptr;
 
     for (const auto& tile : m_tiles) {
@@ -304,9 +352,36 @@ void Level::drawTopTileOutline(SDL_Renderer* renderer, int mouseX, int mouseY) {
     }
 
     if (topTile != nullptr) {
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // white
+        SDL_SetRenderDrawColor(scene->game->getRenderer(), 255, 255, 255, 255); // white
         SDL_Rect outlineRect = topTile->destCoords;  //draw the outline
-        SDL_RenderDrawRect(renderer, &outlineRect);
+        SDL_RenderDrawRect(scene->game->getRenderer(), &outlineRect);
+    }
+
+    if (topTile != nullptr && topTile->scale > 1.0f) {
+        SDL_SetRenderDrawColor(scene->game->getRenderer(), 255, 0, 0, 255); // red
+        SDL_Rect outlineRect = topTile->destCoords;  //draw the outline
+        SDL_RenderDrawRect(scene->game->getRenderer(), &outlineRect);
+    }
+}
+
+void Level::updatePath(int mousePosX, int mousePosY)
+{
+
+    if (startNode && endNode) {
+        int startIndex = startNode->GetLabel();
+        int endIndex = endNode->GetLabel();
+
+        std::vector<int> nodes = graph.Dijkstra(startIndex, endIndex);
+
+        std::vector<Node*> path;
+        path.reserve(nodes.size());
+        for (auto& node : nodes) {
+            path.emplace_back(graph.GetNode(node));
+        }
+
+        scene->getPath()->OnCreate(path);
+        startNode = endNode;
+        endNode = nullptr;
     }
 }
 

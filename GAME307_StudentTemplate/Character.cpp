@@ -16,7 +16,7 @@ bool Character::OnCreate(Scene* scene_, Vec3 pos /*= Vec3(5.0f, 5.0f, 0.0f)*/)
 {
 	scene = scene_;
 	scale = scaleGenerator(randomEngine);
-	path = new Path(scene->getPath());
+	/*path = new Path(scene->getPath());*/
 	// Configure and instantiate the body to use for the demo
 	if (!body)
 	{
@@ -59,7 +59,7 @@ bool Character::setTextureWith(string file)
 }
 
 
-void Character::Update(float deltaTime, std::vector<Character* > characters, int index, std::vector<Node*> path_)
+void Character::Update(float deltaTime, std::vector<Character* > characters, int index, Path* path_)
 {
 	std::vector<StaticBody* > staticBodies;
 	staticBodies.resize(characters.size());
@@ -69,7 +69,7 @@ void Character::Update(float deltaTime, std::vector<Character* > characters, int
 	// create a new overall steering output
 	KinematicSteeringOutput* steering = new KinematicSteeringOutput();
 	// This creates the separation plus seek behaviour(might switch to arrive) 
-	SeekAndSeparationSteering(*steering, staticBodies, 1.5f, index);
+	SeekAndSeparationSteering(*steering, staticBodies, 1.5f, index, path_);
 	body->Update(deltaTime, steering);
 	delete steering;
 }
@@ -80,15 +80,18 @@ void Character::UpdateKinematic(float deltaTime, KinematicSteeringOutput* steeri
 }
 
 
-void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody* > staticBodies, float threshhold, int index)
+void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody* > staticBodies, float threshhold, int index, Path* path_)
 {
 	std::vector<KinematicSteeringOutput*> steering_outputs;
 	PlayerBody* target = scene->game->getPlayer();
 
 	// using the target, calculate and set values in the overall steering output
-	steering_algorithm = new FollowAPath(staticBodies[index], path);
-	KinematicSeperation* separation = new KinematicSeperation(staticBodies, 1.5f, index);
+	if (path_->getPathSize() > 0) {
+	steering_algorithm = new FollowAPath(staticBodies[index], path_);
 	steering_outputs.push_back(steering_algorithm->getSteering());
+	}
+
+	KinematicSeperation* separation = new KinematicSeperation(staticBodies, 1.5f, index);
 	steering_outputs.push_back(separation->GetSteering());
 	for (int i = 0; i < steering_outputs.size(); i++) {
 		if (steering_outputs[i]) {
