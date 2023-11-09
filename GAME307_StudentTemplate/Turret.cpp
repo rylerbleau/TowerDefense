@@ -66,6 +66,19 @@ void Turret::GetTarget(const std::vector<Character*>& targets) {
 }
 
 void Turret::Update(float deltaTime) {
+	// TODO
+	// if shooting , continue shooting
+		// continue lerping towards target
+		// if finished, finish 
+		// else
+	
+	// else if no shooting, 
+		// if within range
+			// begin shoot
+		// else
+			// do nothing
+
+	
 
 	if (shooting) {
 		if (lerpT >= 1.0f) {
@@ -88,6 +101,8 @@ void Turret::Update(float deltaTime) {
 		if (curCharge >= chargeTime) {
 		}
 	}
+
+
 
 
 	
