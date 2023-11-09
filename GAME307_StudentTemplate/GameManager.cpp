@@ -24,7 +24,7 @@ bool GameManager::OnCreate() {
     const int SCREEN_WIDTH = 1920;
     const int SCREEN_HEIGHT = 1080;
 
-    // Use 1000x600 for less than full screen
+    
    //const int SCREEN_WIDTH = 1280;
    //const int SCREEN_HEIGHT = 720;
 
@@ -46,11 +46,11 @@ bool GameManager::OnCreate() {
 
     // select scene for specific assignment
 
-    currentScene = new Scene3(windowPtr->GetSDL_Window(), this);
+    currentScene = new Scene1(windowPtr->GetSDL_Window(), this);
     
     // create player
     float mass = 1.0f;
-    float radius = 0.5f;
+    float radius = 2.0f;
     float orientation = 0.0f;
     float rotation = 0.0f;
     float angular = 0.0f;
@@ -79,6 +79,16 @@ bool GameManager::OnCreate() {
         maxAngular,
         this
     );
+    // Set player image to PacMan
+    SDL_Surface* image = nullptr;
+    SDL_Texture* texture = nullptr;
+    if (!image && !texture) {
+        image = IMG_Load("Pacman.png");
+        texture = SDL_CreateTextureFromSurface(getRenderer(), image);
+    }
+    player->setImage(image);
+    player->setTexture(texture);
+
     if ( player->OnCreate() == false ) {
         OnDestroy();
         return false;
@@ -126,7 +136,6 @@ void GameManager::Run() {
 	while (isRunning)
 	{
 
-		handleEvents();
 
         ImGui_ImplSDLRenderer2_NewFrame();
         ImGui_ImplSDL2_NewFrame();
@@ -147,6 +156,7 @@ void GameManager::Run() {
 		}
 
 		currentScene->Render();
+		handleEvents();
 
         if (show_ui) {
             ImGui::Render();

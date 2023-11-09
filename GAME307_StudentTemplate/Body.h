@@ -6,7 +6,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include "KinematicSteeringOutput.h"
-
+#include "SpriteSheet.h"
 using namespace MATH;
 
 class Body {
@@ -57,6 +57,7 @@ public:
     virtual float getMaxAcceleration() { return maxAcceleration; }
     virtual float getMaxRotation() { return maxRotation; }
     virtual float getMaxAngular() { return maxAngular; }
+    virtual float getRadius() { return radius; }
 
     virtual void setImage(SDL_Surface* image_) { image = image_; }
     virtual SDL_Surface* getImage() { return image; }

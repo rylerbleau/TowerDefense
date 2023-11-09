@@ -5,6 +5,7 @@
 #include <SDL_image.h>
 #include <MMath.h>
 #include "GameManager.h"
+#include "Path.h"
 
 using namespace MATH;
 
@@ -22,6 +23,7 @@ public:
 	virtual SDL_Window* getWindow() = 0;
     virtual Matrix4 getProjectionMatrix() = 0;
 	virtual Matrix4 getInverseMatrix() = 0;
+	virtual Path* getPath() = 0;
 };
 
 #endif

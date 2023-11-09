@@ -1,42 +1,16 @@
 #include "SpriteSheet.h"
-#include <iostream>
+class Tile;
 
+int SpriteSheet::w = 0;
+int SpriteSheet::h = 0;
+int SpriteSheet::tilesX = 0;
+int SpriteSheet::tilesY = 0;
 
-
-SpriteSheet::SpriteSheet():
-	renderer(nullptr),
-	surface(nullptr),
-	texture(nullptr),
-	tilesX(0),
-	tilesY(0),
-	w(0),
-	h(0)
+void SpriteSheet::QuerySpriteSheet(const int& tileSizeX_, const int& tileSizeY_, SDL_Texture* _texture)
 {
-}
-
-SpriteSheet::~SpriteSheet()
-{
-	
-}
-
-void SpriteSheet::init(SDL_Renderer* renderer_ , const int& tileSizeX, const int& tileSizeY) {
-	renderer = renderer_;
-	tilesX = tileSizeX;
-	tilesY = tileSizeY;
-}
-
-void SpriteSheet::LoadMapSurface(const char* filename)
-{
-	surface = IMG_Load(filename);
-	if (surface == nullptr) {
-		throw std::runtime_error("Incorrect filepath");
-	}
-
-	if(texture == nullptr){
-		texture = SDL_CreateTextureFromSurface(renderer, surface);
-		SDL_QueryTexture(texture, NULL, NULL, &w, &h);
-	}
-	SDL_FreeSurface(surface);
+	SpriteSheet::tilesX = tileSizeX_;
+	SpriteSheet::tilesY = tileSizeY_;
+	SDL_QueryTexture(_texture, NULL, NULL, &w, &h);
 }
 
 SDL_Rect SpriteSheet::GetUVTile(int indexX, int indexY)
@@ -61,4 +35,39 @@ SDL_Rect SpriteSheet::GetSizedUVTile(int indexX, int indexY, int indexSizeX, int
 	(int)(floor((((float)(abs(indexY - tilesY) + indexSizeY) / (float)tilesY) * (float)h) -
 	((float)(abs(indexY - tilesY)) / (float)tilesY) * (float)h))
 	};
+}
+
+void SpriteSheet::draw(SDL_Renderer* renderer, SDL_Texture* texture, const SDL_Rect& uvRect, SDL_Rect destRect, float scale /*= 1.0f*/ , bool needsResizing /*= false*/)
+{
+	SDL_RenderCopy(renderer, texture, &uvRect, &destRect);
+
+}
+
+void SpriteSheet::drawOutline(SDL_Renderer* renderer, const SDL_Rect& uvRect, SDL_Rect destRect, float scale /*= 1.0f*/, bool needsResizing /*= false*/)
+{
+		SDL_RenderDrawRect(renderer, &destRect);
+}
+
+void SpriteSheet::drawPlayer(SDL_Renderer* renderer, SDL_Texture* texture, const SDL_Rect& uvRect, SDL_Rect destRect, float scale /*= 1.0f*/, bool needsResizing /*= false*/) {
+	if (needsResizing)
+	{
+		int originalWidth = destRect.w;
+		int originalHeight = destRect.h;
+
+		float aspectRatio = static_cast<float>(uvRect.w) / uvRect.h;
+
+		destRect.w = static_cast<int>(originalHeight * aspectRatio * scale);
+		destRect.h = static_cast<int>(originalHeight * scale);
+
+		 //Adjust y-position to make the texture scale upwards
+		destRect.y -= (destRect.h - originalHeight);
+
+		SDL_RenderCopy(renderer, texture, &uvRect, &destRect);
+	}
+	else {
+
+		destRect.w *= scale;
+		destRect.h *= scale;
+		SDL_RenderCopy(renderer, texture, &uvRect, &destRect);
+	}
 }

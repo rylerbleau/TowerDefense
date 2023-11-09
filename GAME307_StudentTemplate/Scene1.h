@@ -3,10 +3,15 @@
 
 #include <MMath.h>
 #include <VMath.h>
+#include <array>
 #include "Scene.h"
 #include "Character.h"
 #include "StaticBody.h"
 #include "Level.h"
+#include "SpriteSheet.h"
+#include "Turret.h"
+
+class Graph;
 
 using namespace MATH;
 class Scene1 : public Scene {
@@ -14,16 +19,17 @@ private:
 	SDL_Window *window;
 	float xAxis = 25.0f;
 	float yAxis = 15.0f;
+
 	SDL_Renderer* renderer;
 	Matrix4 projectionMatrix;
-    Matrix4     inverseProjection;
-
+    Matrix4 inverseProjection;
 	Character* blinky;
+	std::vector<Character*> characters;
+	std::vector<Turret*> turrets;
+	Path* path;
+	Graph* graph;
 
-	StaticBody* myNPC;
-	
 	Level level;
-	
 
 public:
 	Scene1(SDL_Window* sdlWindow, GameManager* game_);
@@ -33,13 +39,14 @@ public:
 	void Update(const float time);
 	void Render();
     void HandleEvents(const SDL_Event &event);
-	void DrawRect(SDL_Rect &rect);
 
 	float getxAxis() { return xAxis; }
 	float getyAxis() { return yAxis; }
 	SDL_Window* getWindow() { return window; }
     Matrix4 getProjectionMatrix() { return projectionMatrix; }
 	Matrix4 getInverseMatrix() { return inverseProjection; }
+
+	Path* getPath() override { return  path; }
 };
 
 #endif

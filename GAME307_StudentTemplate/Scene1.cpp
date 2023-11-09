@@ -1,6 +1,8 @@
 #include "Scene1.h"
 #include "KinematicSeek.h"
-
+#include "Graph.h"
+#include "KinematicArrive.h"
+#include "FollowAPath.h"
 
 
 Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
@@ -9,18 +11,22 @@ Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 	renderer = SDL_GetRenderer(window);
 	xAxis = 25.0f;
 	yAxis = 15.0f;
-
-	// create a NPC
+	graph = nullptr;
+	path = nullptr;
 	blinky = nullptr;
-	myNPC = nullptr;
 }
 
 Scene1::~Scene1(){
-	if (blinky) 
+	if (blinky)
 	{
 		blinky->OnDestroy();
 		delete blinky;
 	}
+	if (!characters.empty()) {
+		characters.clear();
+	}
+
+	level.clear();
 
 }
 
@@ -31,136 +37,52 @@ bool Scene1::OnCreate() {
 	Matrix4 ndc = MMath::viewportNDC(w, h);
 	Matrix4 ortho = MMath::orthographic(0.0f, xAxis, 0.0f, yAxis, 0.0f, 1.0f);
 	projectionMatrix = ndc * ortho;
-	
 	/// Turn on the SDL imaging subsystem
 	IMG_Init(IMG_INIT_PNG);
-	
-	// Set player image to PacMan
 
-	SDL_Surface* image;
-	SDL_Texture* texture;
-
-	image = IMG_Load("pacman.png");
-	texture = SDL_CreateTextureFromSurface(renderer, image);
-	game->getPlayer()->setImage(image);
-	game->getPlayer()->setTexture(texture);
-
-	// Set up characters, choose good values for the constructor
-	// or use the defaults, like this
+	/// Map and initial character set up 
+	level = Level("Levels/Level2.txt", this);
+	level.LoadMap(12, 11, "Sprites/tilemap.png");
 	blinky = new Character();
-	if (!blinky->OnCreate(this) || !blinky->setTextureWith("Blinky.png") )
-	{
+	if (!blinky->OnCreate(this) || !blinky->setTextureWith("Sprites/hero.png"))
 		return false;
-	}
+	characters.push_back(blinky);
 
-	float orientation_ = 0.0f;
-	float maxSpeed_ = 5.0f;
-	float maxRotation_ = 1.0f;
-	Vec3 position_(5.0f, 5.0f, 0.0f);
-	myNPC = new StaticBody(position_, orientation_, maxSpeed_, maxRotation_);
-
-	image = IMG_Load("Clyde.png");
-	texture = SDL_CreateTextureFromSurface(renderer, image);
-
-	if (image == nullptr){
-		std::cerr << "Can't open Clyde.png" << endl;
-		return false;
-	}
-	if (texture == nullptr) {
-		std::cerr << "Can't create Clyde texture" << endl;
-		return false;
-	}
-
-	myNPC->setTexture(texture);
-	SDL_FreeSurface(image);
-
-	level = Level("Levels/Level2.txt", renderer);
-	// end of character set ups
-
+	/// Creating the Path foe Djikstra
+	path = new Path();
 	return true;
 }
 
-void Scene1::OnDestroy() {
-	
-}
+void Scene1::OnDestroy() {}
 
 void Scene1::Update(const float deltaTime) {
 	// Calculate and apply any steering for npc's
-
-	// access violation here MEET WITH GAIL
-	blinky->Update(deltaTime);
-
-	/*KinematicSeek* steeringAlgorithm;
-	KinematicSteeringOutput* steering;*/
-
-	/*Body* target;
-	target = game->getPlayer();
-	steeringAlgorithm = new KinematicSeek(myNPC, target);
-	
-	steering = steeringAlgorithm->GetSteering();*/
-
-	//myNPC->Update(deltaTime, steering);
-
+	for (uint32_t i = 0; i < characters.size(); i++) {
+		characters[i]->Update(deltaTime, characters, i, path);
+	}
 	game->getPlayer()->Update(deltaTime);
-
-		
-	/*if (steeringAlgorithm) {
-		delete steeringAlgorithm;
-	}*/
-	
-	// Update player
 }
 
 void Scene1::Render() {
+	// reset render colour
 	SDL_SetRenderDrawColor(renderer, 210, 180, 140, 0);
 	SDL_RenderClear(renderer);
-
-	// green: 0, 128, 0
-	// tan: 210, 180, 140
-
-
-	// render any npc's
 	
-
-
-
-
-	SDL_Rect rect;
-	Vec3 screenCoords;
-	int w, h;
-
-	screenCoords = projectionMatrix * myNPC->getPos();
-	float scale = 0.15f;
-	SDL_QueryTexture(myNPC->getTexture(), nullptr, nullptr, &w, &h);
-
-	rect.w = static_cast<int>(w * scale);
-	rect.h = static_cast<int>(h * scale);
-	rect.x = static_cast<int>(screenCoords.x - (0.5f * rect.w));
-	rect.y = static_cast<int>(screenCoords.y - (0.5f * rect.h));
-
-	float orientation = myNPC->getOrientation();
-	float orientationDeg = orientation * 180.0f / M_PI;
-
-	SDL_Rect newRect{0, 0, 50, 50};
-	
-	
-	
-	// reset render colour
-	level.drawTiles(renderer, window);
-	blinky->render(0.15f);
-	game->RenderPlayer(0.10f);
+	// Draw level and AI characters
+	level.drawTiles(window, characters);
+	for (auto& character : characters) {
+		character->render(1.0f);
+	}
 
 	// render the player
-
+	game->RenderPlayer(0.10f);
 	SDL_RenderPresent(renderer);
 }
 
 void Scene1::HandleEvents(const SDL_Event& event)
 {
-	// send events to npc's as needed
-
-	// send events to player as needed
 	game->getPlayer()->HandleEvents(event);
+	level.levelHandleEvents(event);
 }
 
 

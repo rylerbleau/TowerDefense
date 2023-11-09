@@ -50,6 +50,8 @@ Body::Body(
 
 
 Body::~Body(){
+    delete image;
+    delete texture;
 }
 
 void Body::ApplyForce( Vec3 force_ ) {
