@@ -217,6 +217,7 @@ void Level::placeTurret(SDL_Window* window, std::vector<Turret*>& turrets, Tile*
     Turret* turret = new Turret("Sprites/tiles_packed.png", Vec2(6, 7), scene, position);
     SpriteSheet::QuerySpriteSheet(12, 10, turret->m_turretTexture);
     SDL_Rect turretUV = SpriteSheet::GetUVTile(turret->uvCoords.x, turret->uvCoords.y);
+    turret->turretUV = turretUV;
 
     turrets.push_back(turret);
     tile->tileTexture = turret->m_turretTexture;
@@ -251,7 +252,10 @@ void Level::levelHandleEvents(const SDL_Event& event)
     case SDL_MOUSEBUTTONDOWN:
         if(event.button.button == SDL_BUTTON_LEFT)
         placeActor = true;
+        //if (event.button.button == SDL_BUTTON_RIGHT)
+        //placeChar = true;
         break;
+    
     case SDL_MOUSEBUTTONUP:
         placeActor = false;
         break;

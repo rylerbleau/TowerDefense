@@ -136,8 +136,8 @@ void Character::render(float scale)
 	w = static_cast<int>(w * scale);
 	h = static_cast<int>(h * scale);
 	screenCoords = projectionMatrix * body->getPos();
-	square.x = static_cast<int>(screenCoords.x - 0.5f * w);
-	square.y = static_cast<int>(screenCoords.y - 0.5f * h);
+	square.x = static_cast<int>(screenCoords.x - 0.1 * w);
+	square.y = static_cast<int>(screenCoords.y - 0.1 * h);
 	square.w = w;
 	square.h = h;
 

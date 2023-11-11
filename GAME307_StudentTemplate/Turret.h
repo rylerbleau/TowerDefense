@@ -28,10 +28,16 @@ private:
 	float lerpT;
 	Vec3 lerpPos;
 	Character* target;
+	int tIndex;
+
 	bool shooting;
 	
 	SDL_Texture* bulletTex;
 	float bulletScale;
+
+	
+	Vec3 scaledPos;
+	Vec3 targetScaledPos;
 public:
 	Turret(const char* filename, MATH::Vec2 _uvCoords, Scene* scene, Vec3 pos_);
 	~Turret();
@@ -40,8 +46,14 @@ public:
 	void GetTarget(const std::vector<Character*>& targets);
 	bool HasTarget() { return (target == nullptr) ? false : true; }
 
-	void Update(float deltaTime);
+	void Update(float deltaTime, std::vector<Character*>& targets, std::vector <Turret*>& turrets);
 	void RenderBullet();
+
+	void DamageTarget(std::vector<Character*>& targets, std::vector <Turret*>& turrets);
+
+	const int GetTIndex() { return tIndex; }
+
+	void RemoveTarget();
 
 };
 

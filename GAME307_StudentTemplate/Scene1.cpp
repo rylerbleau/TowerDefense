@@ -68,8 +68,9 @@ void Scene1::Update(const float deltaTime) {
 	game->getPlayer()->Update(deltaTime);
 
 	for (const auto& turret : turrets) {
-		turret->GetTarget(characters);
-		turret->Update(deltaTime);
+		turret->Update(deltaTime, characters, turrets);
+		//turret->GetTarget(characters);
+		
 	}
 }
 

@@ -37,7 +37,7 @@ public:
 	{};
 
 	bool OnCreate(Scene* scene_, Vec3 pos = Vec3(5.0f, 5.0f, 0.0f));
-	void OnDestroy() { delete body; };
+	void OnDestroy() { if (body != nullptr) { delete body; } };
 	bool setTextureWith(string file);
 	void Update(float deltaTime, std::vector<Character*> characters, int index);
 	void HandleEvents(const SDL_Event& event);
