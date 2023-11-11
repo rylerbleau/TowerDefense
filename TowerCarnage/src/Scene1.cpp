@@ -41,14 +41,14 @@ bool Scene1::OnCreate() {
 	IMG_Init(IMG_INIT_PNG);
 
 	/// Map and initial character set up 
-	level = Level("assets/levels/Level2.txt", this);
+	level = Level("assets/levels/Level2.txt", this, &characters);
 	level.LoadMap(12, 11, "assets/sprites/tilemap.png");
 	blinky = new Character();
 	if (!blinky->OnCreate(this) || !blinky->setTextureWith("assets/sprites/hero.png"))
 		return false;
 	characters.push_back(blinky);
 
-	/// Creating the Path foe Djikstra
+	/// Creating the Path for Djikstra to follow
 	path = new Path();
 	return true;
 }
@@ -69,7 +69,7 @@ void Scene1::Render() {
 	SDL_RenderClear(renderer);
 	
 	// Draw level and AI characters
-	level.drawTiles(window, characters);
+	level.drawTiles(window);
 	for (auto& character : characters) {
 		character->render(1.0f);
 	}

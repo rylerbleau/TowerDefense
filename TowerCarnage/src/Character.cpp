@@ -4,19 +4,18 @@
 #include "KinematicSeek.h"
 #include "KinematicSeperation.h"
 #include "KinematicArrive.h"
+#include "FollowAPath.h"
 
 #include <random>
 #include <vector>
 
-
 static std::mt19937 randomEngine(time(nullptr));
 static std::uniform_real_distribution<float> scaleGenerator(0.8f, 1.5f);
 
-bool Character::OnCreate(Scene* scene_, Vec3 pos /*= Vec3(5.0f, 5.0f, 0.0f)*/)
+bool Character::OnCreate(Scene* scene_, Path* path , Vec3 pos /*= Vec3(5.0f, 5.0f, 0.0f)*/)
 {
 	scene = scene_;
 	scale = scaleGenerator(randomEngine);
-	/*path = new Path(scene->getPath());*/
 	// Configure and instantiate the body to use for the demo
 	if (!body)
 	{
@@ -35,6 +34,7 @@ bool Character::OnCreate(Scene* scene_, Vec3 pos /*= Vec3(5.0f, 5.0f, 0.0f)*/)
 	{
 		return false;
 	}
+	
 
 	return true;
 }
@@ -51,7 +51,7 @@ bool Character::setTextureWith(string file)
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, image);
 	if (!texture) 
 	{
-		std::cerr << "Can't create texture" << std::endl;
+		throw std::runtime_error("Failed to create texture");
 		return false;
 	}
 	body->setTexture(texture);
@@ -74,17 +74,13 @@ void Character::Update(float deltaTime, std::vector<Character* > characters, int
 	delete steering;
 }
 
-void Character::UpdateKinematic(float deltaTime, KinematicSteeringOutput* steering)
-{
-	body->Update(deltaTime, steering);
-}
 
-
+// Th
 void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody* > staticBodies, float threshhold, int index, Path* path_)
 {
 	std::vector<KinematicSteeringOutput*> steering_outputs;
-	PlayerBody* target = scene->game->getPlayer();
 
+	FollowAPath* steering_algorithm = nullptr;
 	// using the target, calculate and set values in the overall steering output
 	if (path_->getPathSize() > 0) {
 	steering_algorithm = new FollowAPath(staticBodies[index], path_);
@@ -93,39 +89,18 @@ void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std
 
 	KinematicSeperation* separation = new KinematicSeperation(staticBodies, 1.5f, index);
 	steering_outputs.push_back(separation->GetSteering());
+	
 	for (int i = 0; i < steering_outputs.size(); i++) {
 		if (steering_outputs[i]) {
 			steering += *steering_outputs[i];
 		}
 	}
 	if (steering_algorithm) {
+		delete steering_algorithm;
+	}
+	if (separation) {
 		delete separation;
-		delete steering_algorithm;
 	}
-}
-
-void Character::SteerToFleePlayer(SteeringOutput& steering)
-{
-	std::vector<SteeringOutput*> steering_outputs;
-	PlayerBody* target = scene->game->getPlayer();
-
-	// using the target, calculate and set values in the overall steering output
-	SteeringBehaviour* steering_algorithm = new Flee(body, target);
-
-	steering_outputs.push_back(steering_algorithm->GetSteering());
-
-	for (int i = 0; i < steering_outputs.size(); i++) {
-
-		if (steering_outputs[i]) {
-			steering += *steering_outputs[i];
-		}
-	}
-
-
-	if (steering_algorithm) {
-		delete steering_algorithm;
-	}
-
 }
 
 

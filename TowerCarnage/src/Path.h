@@ -9,6 +9,7 @@ private:
 	std::vector<Node*> path;
 public:
 	Path();
+	~Path();
 	bool OnCreate(std::vector<Node*> nodes_);
 	void addNode(Node* node_);
 	void incrementCurrentNode(int step);

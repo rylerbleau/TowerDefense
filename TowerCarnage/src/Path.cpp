@@ -1,11 +1,12 @@
 #include "Path.h"
 
 Path::Path(): currentNode(0), path(0){}
-
+Path::~Path() {}
+//
 bool Path::OnCreate(std::vector<Node*> nodes_)
 {
 	if (nodes_.empty()) {
-		std::runtime_error("Not enought nodes in the vector");
+		std::runtime_error("Path::OnCreate: nodes_ is empty");
 		return false;
 	}
 
