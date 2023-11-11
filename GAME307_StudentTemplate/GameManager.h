@@ -27,7 +27,9 @@ private:
     Uint32 changeSceneEventType; // event type number for user defined events
     bool launched = true;
 	bool show_ui;
+	bool gamePaused = false;
 	
+
 
 public:
 	GameManager();
@@ -39,6 +41,8 @@ public:
 	Matrix4 getProjectionMatrix();
     PlayerBody* getPlayer(){ return player; }
 	Uint32 getChangeScene() { return changeSceneEventType; }
+	void TogglePauseGame();
+
 
 	SDL_Renderer* getRenderer();
 	SDL_Window* getWindow();

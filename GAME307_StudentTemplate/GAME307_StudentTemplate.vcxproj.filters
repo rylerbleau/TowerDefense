@@ -88,11 +88,24 @@
     <ClCompile Include="imgui_impl_sdlrenderer2.cpp">
       <Filter>Source\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="SpriteSheet.cpp" />
     <ClCompile Include="Level.cpp">
       <Filter>Source\Game</Filter>
     </ClCompile>
-    <ClCompile Include="Turret.cpp" />
+    <ClCompile Include="FollowAPath.cpp">
+      <Filter>Source\Behaviours</Filter>
+    </ClCompile>
+    <ClCompile Include="KinematicArrive.cpp">
+      <Filter>Source\Behaviours</Filter>
+    </ClCompile>
+    <ClCompile Include="Path.cpp">
+      <Filter>Source\Behaviours</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteSheet.cpp">
+      <Filter>Source\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Turret.cpp">
+      <Filter>Source\Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameManager.h">
@@ -191,8 +204,21 @@
     <ClInclude Include="imgui_impl_sdlrenderer2.h">
       <Filter>Header\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="SpriteSheet.h" />
-    <ClInclude Include="Turret.h" />
+    <ClInclude Include="FollowAPath.h">
+      <Filter>Header\Behaviours</Filter>
+    </ClInclude>
+    <ClInclude Include="KinematicArrive.h">
+      <Filter>Header\Behaviours</Filter>
+    </ClInclude>
+    <ClInclude Include="Path.h">
+      <Filter>Header\Behaviours</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteSheet.h">
+      <Filter>Header\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Turret.h">
+      <Filter>Header\Game</Filter>
+    </ClInclude>
     <ClInclude Include="Level.h">
       <Filter>Header\Game</Filter>
     </ClInclude>

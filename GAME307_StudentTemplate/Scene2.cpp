@@ -13,48 +13,49 @@ Scene2::~Scene2()
 
 bool Scene2::OnCreate()
 {
-	printf("hello scene2\n");
+    printf("hello scene4\n");
 
-	int count = 5;
-	sceneNodes.resize(count);
+    int count = 15; // Increase the number of nodes to 15
+    sceneNodes.resize(count);
 
-	for (int i = 0; i < count; i++) {
-		sceneNodes[i] = new Node(i);
-	}
-	graph = new Graph();
-	if (!graph->OnCreate(sceneNodes)) {
-		std::cerr << "couldn't create graph" << std::endl;
-		return false;
-	}
+    for (int i = 0; i < count; i++) {
+        sceneNodes[i] = new Node(i);
+    }
 
-	//				0
-	//				|
-	//   1 -------- 2 --------- 3
-	//				|
-	//				4
+    graph = new Graph();
+    if (!graph->OnCreate(sceneNodes)) {
+        std::cerr << "couldn't create graph" << std::endl;
+        return false;
+    }
 
-	graph->AddWeightedConnection(0, 2, 1.0f);
-	graph->AddWeightedConnection(1, 2, 1.0f);
-	graph->AddWeightedConnection(2, 1, 1.0f);
-	graph->AddWeightedConnection(2, 0, 1.0f);
-	graph->AddWeightedConnection(2, 3, 1.0f);
-	graph->AddWeightedConnection(2, 4, 1.0f);
-	graph->AddWeightedConnection(3, 2, 1.0f);
-	graph->AddWeightedConnection(4, 2, 1.0f);
+    // Complex graph with 15 nodes and various weighted edges
+    // This is a non-exhaustive setup; edges are selectively chosen for complexity
+    graph->AddWeightedConnection(0, 1, 4.5f);
+    graph->AddWeightedConnection(0, 4, 2.0f);
+    graph->AddWeightedConnection(1, 2, 1.5f);
+    graph->AddWeightedConnection(1, 5, 3.2f);
+    graph->AddWeightedConnection(2, 3, 2.2f);
+    graph->AddWeightedConnection(2, 6, 4.1f);
+    graph->AddWeightedConnection(3, 7, 1.0f);
+    graph->AddWeightedConnection(4, 5, 2.7f);
+    graph->AddWeightedConnection(5, 8, 3.3f);
+    graph->AddWeightedConnection(5, 6, 2.0f);
+    graph->AddWeightedConnection(6, 7, 1.5f);
+    graph->AddWeightedConnection(6, 10, 3.8f);
+    graph->AddWeightedConnection(7, 11, 2.6f);
+    graph->AddWeightedConnection(8, 12, 4.0f);
+    graph->AddWeightedConnection(9, 13, 2.1f);
+    graph->AddWeightedConnection(10, 0, 1.9f);
+    graph->AddWeightedConnection(10, 11, 2.3f);
+    graph->AddWeightedConnection(11, 0, 3.4f);
+    graph->AddWeightedConnection(12, 13, 1.1f);
+    graph->AddWeightedConnection(13, 14, 2.8f);
 
+    std::vector<int> path = graph->Dijkstra(0, 14);
 
-	std::cout << "Scene 2" << std::endl;
-
-	int myNode = 2;
-
-	std::cout << "Neighbours of " << myNode << std::endl;
-
-	for (int nodeLabel : graph->Neighbours(myNode)) {
-		std::cout << "node " << nodeLabel << std::endl;
-	}
-
-
-
+    for (auto& node : path) {
+        std::cout << node << std::endl;
+    }
 
 
 	return true;

@@ -24,7 +24,7 @@ bool GameManager::OnCreate() {
     const int SCREEN_WIDTH = 1920;
     const int SCREEN_HEIGHT = 1080;
 
-    // Use 1000x600 for less than full screen
+    
    //const int SCREEN_WIDTH = 1280;
    //const int SCREEN_HEIGHT = 720;
 
@@ -50,7 +50,7 @@ bool GameManager::OnCreate() {
     
     // create player
     float mass = 1.0f;
-    float radius = 0.5f;
+    float radius = 2.0f;
     float orientation = 0.0f;
     float rotation = 0.0f;
     float angular = 0.0f;
@@ -142,11 +142,15 @@ void GameManager::Run() {
         ImGui::NewFrame();
 
      
-
 		timer->UpdateFrameTicks();
+
 		if ( launched )
 		{
-		    currentScene->Update(timer->GetDeltaTime());
+            
+            if (!gamePaused) {
+
+		        currentScene->Update(timer->GetDeltaTime());
+            }
 		    // launched boolean just helps user stop and start action
 		    // and useful for debugging and teaching
 		}
@@ -216,6 +220,10 @@ void GameManager::handleEvents()
                         break;
                     case SDL_SCANCODE_3:
                         LoadScene(3);
+                        break;
+                    case SDL_SCANCODE_SPACE:
+                        TogglePauseGame();
+                        break;
                     default:
                         break;
                 }
@@ -264,6 +272,12 @@ float GameManager::getSceneWidth()
 
 Matrix4 GameManager::getProjectionMatrix() 
 { return currentScene->getProjectionMatrix(); }
+
+void GameManager::TogglePauseGame()
+{
+    gamePaused = !gamePaused;
+
+}
 
 SDL_Renderer* GameManager::getRenderer()
 {

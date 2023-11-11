@@ -3,7 +3,11 @@
 #include "StaticBody.h"
 #include "KinematicSeek.h"
 #include "KinematicSeperation.h"
+#include "KinematicArrive.h"
+
 #include <random>
+#include <vector>
+
 
 static std::mt19937 randomEngine(time(nullptr));
 static std::uniform_real_distribution<float> scaleGenerator(0.8f, 1.5f);
@@ -12,11 +16,11 @@ bool Character::OnCreate(Scene* scene_, Vec3 pos /*= Vec3(5.0f, 5.0f, 0.0f)*/)
 {
 	scene = scene_;
 	scale = scaleGenerator(randomEngine);
-	
+	/*path = new Path(scene->getPath());*/
 	// Configure and instantiate the body to use for the demo
 	if (!body)
 	{
-		float radius = 0.2f;
+		float radius = 2.5;
 		float orientation = 0.0f;
 		float rotation = 0.0f;
 		float angular = 0.0f;
@@ -55,7 +59,7 @@ bool Character::setTextureWith(string file)
 }
 
 
-void Character::Update(float deltaTime, std::vector<Character* > characters, int index)
+void Character::Update(float deltaTime, std::vector<Character* > characters, int index, Path* path_)
 {
 	//printf("pos: %f, %f\n", body->getPos().x, body->getPos().y);
 	std::vector<StaticBody* > staticBodies;
@@ -66,20 +70,29 @@ void Character::Update(float deltaTime, std::vector<Character* > characters, int
 	// create a new overall steering output
 	KinematicSteeringOutput* steering = new KinematicSteeringOutput();
 	// This creates the separation plus seek behaviour(might switch to arrive) 
-	SeekAndSeparationSteering(*steering, staticBodies, 0.7f, index);
+	SeekAndSeparationSteering(*steering, staticBodies, 1.5f, index, path_);
 	body->Update(deltaTime, steering);
 	delete steering;
 }
 
-void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody* > staticBodies, float threshhold, int index)
+void Character::UpdateKinematic(float deltaTime, KinematicSteeringOutput* steering)
+{
+	body->Update(deltaTime, steering);
+}
+
+
+void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody* > staticBodies, float threshhold, int index, Path* path_)
 {
 	std::vector<KinematicSteeringOutput*> steering_outputs;
 	PlayerBody* target = scene->game->getPlayer();
 
 	// using the target, calculate and set values in the overall steering output
-	KinematicSeek* steering_algorithm = new KinematicSeek(body, target);
+	if (path_->getPathSize() > 0) {
+	steering_algorithm = new FollowAPath(staticBodies[index], path_);
+	steering_outputs.push_back(steering_algorithm->getSteering());
+	}
+
 	KinematicSeperation* separation = new KinematicSeperation(staticBodies, 1.5f, index);
-	steering_outputs.push_back(steering_algorithm->GetSteering());
 	steering_outputs.push_back(separation->GetSteering());
 	for (int i = 0; i < steering_outputs.size(); i++) {
 		if (steering_outputs[i]) {
@@ -199,6 +212,6 @@ void Character::render(float scale)
 		sourceRect = SpriteSheet::GetUVTile(tileIndexX, tileIndexY);
 		break;
 	}
-	SpriteSheet::draw(renderer, body->getTexture(), sourceRect, square, this->scale, true);
+	SpriteSheet::drawPlayer(renderer, body->getTexture(), sourceRect, square, this->scale, true);
 }
 

@@ -5,6 +5,7 @@
 #include "SDL_image.h"
 #include "Character.h"
 #include "Turret.h"
+#include "Graph.h"
 
 Level::Level(const std::string& fileName, Scene* scene)
     :scene(scene)
@@ -22,6 +23,7 @@ Level::Level(const std::string& fileName, Scene* scene)
     while (std::getline(file, temp)) {
         m_levelData.push_back(temp);
     }
+    file.close();
 }
 
 Level::~Level() {}
@@ -39,11 +41,18 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
     }
 
     SDL_FreeSurface(surface);
-
+    /// Quering sprite sheet to get dimentions and pass how many tiles along x and y are there
+    /// needed for sprite calculation later
     SpriteSheet::QuerySpriteSheet(tileSizeX, tileSizeY, mapTexture);
 
     SDL_GetWindowSize(scene->game->getWindow(), &width, &height);
 
+    /// <summary>
+    /// GetUVTile function gets the individual texture from the spritesheet. Just pass the coordinates of the tile and
+    /// it will return the sdl rectangle that is used to extract a tile from the spritesheet 
+    /// </summary>
+    /// <param name="indexX"> depending on the spritesheet pass in the coordinate of the tile along X</param>
+    /// <param name="indexY"> depending on the spritesheet pass in the coordinate of the tile along Y</param>
     SDL_Rect pathRect = SpriteSheet::GetUVTile(1, 8);
     SDL_Rect grassRect = SpriteSheet::GetUVTile(1, 10);
     SDL_Rect leftGrassRect = SpriteSheet::GetUVTile(0, 8);
@@ -69,12 +78,16 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
                               ceil((float)height / (float)getHeight()),
                               ceil((float)width / (float)getWidth()),
                               ceil((float)height / (float)getHeight()) };
-    /// <summary>
-    /// Here I pupulate the m_tiles vector. When it detectsa character ir is going to scan through switch statement
+
+    /// Here I pupulate the m_tiles vector. When it detects a character it is going to scan through switch statement
     /// to determine the attributes for that tile that is going to be rendered at that grid location
     /// than it is pushed in the vector of Tile pointers after what i am going to sort the vector by its scale 
     /// so that sprites won't be overdrawn
-    /// </summary>
+    int label = 0;
+    float positionX = 0;
+    float positionY = 0;
+
+    MATH::Vec3 position = {};
 
     for (size_t y = 0; y < m_levelData.size(); y++) {
         for (size_t x = 0; x < m_levelData[y].size(); x++) {
@@ -84,63 +97,94 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
             SDL_Rect gridPosition = worldTileCoords;
             gridPosition.x *= x;
             gridPosition.y *= y;
+            Tile* newTile = nullptr;
+            Tile* childTile = nullptr;
+            Node* newNode = nullptr;
 
             switch (tile) {
             case 'P':
-                m_tiles.push_back(new Tile{ mapTexture, pathRect , gridPosition , 1.0 , false, tile});
+                /// Node position is the centre of that tile that is within the orthographic dimensions
+                positionX = static_cast<float>((gridPosition.x + gridPosition.w) * scene->getxAxis()) / width;
+                positionY = scene->getyAxis() - (static_cast<float>((gridPosition.y + 0.5 * gridPosition.h) * scene->getyAxis()) / height);
+                position = { positionX, positionY, 0.0f };
+                newNode = new Node{ label, position };
+                newTile = new Tile{ nullptr, mapTexture, pathRect , gridPosition , 1.0 , false, true, newNode };
+
+                m_tiles.push_back(newTile);
+                pathNodes.push_back(newNode);
+                label++;
                 break;
             case 'G':
-                m_tiles.push_back(new Tile{ mapTexture, grassRect , gridPosition , 1.0 , false, tile });
+                newTile = new Tile{ nullptr, mapTexture, grassRect , gridPosition , 1.0 , false };
+                m_tiles.push_back(newTile);
                 break;
             case 'F':
-                m_tiles.push_back(new Tile{ mapTexture, grassRect , gridPosition , 1.0 , false, tile });
-                m_tiles.push_back(new Tile{ mapTexture, flowerRect , gridPosition , 1.0 , false, tile });
+                newTile = new Tile{ nullptr, mapTexture, flowerRect , gridPosition , 1.0 , false };
+                m_tiles.push_back(newTile);
                 break;
             case 'T':
-                m_tiles.push_back(new Tile{ mapTexture, grassRect , gridPosition , 1.0 , false, tile });
-                m_tiles.push_back(new Tile{ mapTexture, greenTreeRect , gridPosition , 1.0 , true, tile });
+                childTile = new Tile{ nullptr, mapTexture, greenTreeRect, gridPosition, 1.2, true, false };
+                newTile = new Tile{ childTile, mapTexture, grassRect, gridPosition, 1.0, false, false };
+                m_tiles.push_back(newTile);
+                m_tiles.push_back(childTile);
                 break;
             case 'O':
-                m_tiles.push_back(new Tile{ mapTexture, grassRect , gridPosition , 1.0 , false, tile });
-                m_tiles.push_back(new Tile{ mapTexture, orangeTreeRect , gridPosition , 2.0 , true, tile });
+                childTile = new Tile{ nullptr, mapTexture, orangeTreeRect, gridPosition, 2.0, true, false };
+                newTile = new Tile{ childTile, mapTexture, grassRect, gridPosition, 1.0, false, false };
+                m_tiles.push_back(newTile);
+                m_tiles.push_back(childTile);
                 break;
             case 'R':
-                m_tiles.push_back(new Tile{ mapTexture, rightGrassRect , gridPosition , 1.0 , false, tile });
+                newTile = new Tile{ nullptr, mapTexture, rightGrassRect , gridPosition , 1.0 , false };
+                m_tiles.push_back(newTile);
                 break;
             case 'L':
-                m_tiles.push_back(new Tile{ mapTexture, leftGrassRect , gridPosition , 1.0 , false, tile });
+                newTile = new Tile{ nullptr, mapTexture, leftGrassRect , gridPosition , 1.0 , false };
+                m_tiles.push_back(newTile);
                 break;
             case 'B':
-                m_tiles.push_back(new Tile{ mapTexture, bottomRect , gridPosition , 1.0 , false, tile });
+                newTile = new Tile{ nullptr, mapTexture, bottomRect , gridPosition , 1.0 , false };
+                m_tiles.push_back(newTile);
                 break;
             case 'N':
-                m_tiles.push_back(new Tile{ mapTexture, topRect , gridPosition , 1.0 , false, tile });
+                newTile = new Tile{ nullptr, mapTexture, topRect , gridPosition , 1.0 , false };
+                m_tiles.push_back(newTile);
                 break;
             case '1':
-                m_tiles.push_back(new Tile{ mapTexture, bottomLeftGrassCorner , gridPosition , 1.0 , false, tile });
+                newTile = new Tile{ nullptr, mapTexture, bottomLeftGrassCorner , gridPosition , 1.0 , false };
+                m_tiles.push_back(newTile);
                 break;
             case '2':
-                m_tiles.push_back(new Tile{ mapTexture, topRightGrassCorner , gridPosition , 1.0 , false, tile });
+                newTile = new Tile{ nullptr, mapTexture, topRightGrassCorner , gridPosition , 1.0 , false };
+                m_tiles.push_back(newTile);
                 break;
             case 'C':
-                m_tiles.push_back(new Tile{ mapTexture, buildingRect , gridPosition , 6.0 , true, tile });
+                newTile = new Tile{ nullptr, mapTexture, buildingRect , gridPosition , 6.0 , true, false };
+                m_tiles.push_back(newTile);
                 gridPosition.x += 210;
-                m_tiles.push_back(new Tile{ mapTexture, doorRect , gridPosition , 2.0 , true, tile });
+                m_tiles.push_back(new Tile{ newTile, mapTexture, doorRect , gridPosition , 2.0 , true, false });
                 break;
             case 'S':
-                m_tiles.push_back(new Tile{ mapTexture, rockRect , gridPosition , 1.0 , false, tile });
+                newTile = new Tile{ nullptr, mapTexture, rockRect , gridPosition , 1.0 , false };
+                m_tiles.push_back(newTile);
                 break;
             case 'W':
-                m_tiles.push_back(new Tile{ mapTexture, rockRect, gridPosition, 1.0, false, tile });
-                m_tiles.push_back(new Tile{ mapTexture, wellRect, gridPosition, 3.0, true, tile });
+                childTile = new Tile{ nullptr, mapTexture, wellRect, gridPosition, 3.0, true, false };
+                newTile = new Tile{ childTile, mapTexture, rockRect, gridPosition, 1.0, false, false };
+                m_tiles.push_back(newTile);
+                m_tiles.push_back(childTile);
                 break;
             case 'J':
-                m_tiles.push_back(new Tile{ mapTexture, rockRect , gridPosition , 1.0 , false, tile });
-                m_tiles.push_back(new Tile{ mapTexture, stockRect , gridPosition , 3.0 , true, tile });
+                childTile = new Tile{ nullptr, mapTexture, stockRect, gridPosition, 3.0, true, false };
+                newTile = new Tile{ childTile, mapTexture, rockRect, gridPosition, 1.0, false, false };
+                m_tiles.push_back(newTile);
+                m_tiles.push_back(childTile);
                 break;
             case 'V':
-                m_tiles.push_back(new Tile{ mapTexture, rockRect , gridPosition , 1.0 , false, tile });
-                m_tiles.push_back(new Tile{ mapTexture, boardRect , gridPosition , 1.0 , false, tile });
+                childTile = new Tile{ nullptr, mapTexture, boardRect, gridPosition, 1.2, false, false };
+                newTile = new Tile{ childTile, mapTexture, rockRect, gridPosition, 1.0, false, false };
+                m_tiles.push_back(newTile);
+                m_tiles.push_back(childTile);
                 break;
             default:
                 printf("Unexpected symbol %c at (%d, %d)", tile, x, y);
@@ -148,10 +192,29 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
             }
         }
     }
+    /// resizing tile so that they are not stretched to tile dimension(especially if scale is more than 1)
+    for (auto& tile : m_tiles) {
+        tile->resizeTile();
+    }
 
     std::sort(m_tiles.begin(), m_tiles.end(), [](const Tile* tile1, const Tile* tile2) {
         return tile1->scale < tile2->scale;
     });
+
+    /// Creating graph and connecting nodes
+    graph.OnCreate(getNodes());
+    for (int i = 0; i < getNodes().size(); i++) {
+        Node* fromNode = getNodes()[i];
+        int from = fromNode->GetLabel();
+        if (i > 0) {
+            int to = getNodes()[i - 1]->GetLabel();
+            graph.AddWeightedConnection(from, to, 1.0f);
+        }
+        if (i < getNodes().size() - 1) {
+            int to = getNodes()[i + 1]->GetLabel();
+            graph.AddWeightedConnection(from, to, 1.0f);
+        }
+    }
 }
 
 void Level::clear() {
@@ -161,45 +224,98 @@ void Level::clear() {
     m_tiles.clear();
 }
 
-void Level::drawTiles(SDL_Window* window, std::vector<Character*>& characters, std::vector<Turret*>& turrets)
+void Level::drawTiles(SDL_Window* window, std::vector<Character*>& characters)
 {
+    SDL_SetRenderDrawColor(scene->game->getRenderer(), 255, 255, 255, 255);
 
-    for (const auto& tile : m_tiles) {
-        SpriteSheet::draw(scene->game->getRenderer(), tile->tileTexture, tile->uvCoords, tile->destCoords, tile->scale, tile->needsResizing);
+    for (size_t i = 0; i < m_tiles.size(); ++i) {
+        SpriteSheet::draw(scene->game->getRenderer(), m_tiles[i]->tileTexture, m_tiles[i]->uvCoords, m_tiles[i]->destCoords, m_tiles[i]->scale, m_tiles[i]->needsResizing);
+    
+        if (isMouseOverTile(m_tiles[i], mousePosX, mousePosY)) {
+            if (placeActor) {
 
-        if (mousePosX >= tile->destCoords.x && mousePosX <= tile->destCoords.x + tile->destCoords.w &&
-            mousePosY >= tile->destCoords.y && mousePosY <= tile->destCoords.y + tile->destCoords.h) {
-
-            // Set color for the outline rectangle (for example white)
-            // 
-            SDL_SetRenderDrawColor(scene->game->getRenderer(), 255, 255, 255, 255);
-
-            // Draw the outline of the rectangle
-            SDL_RenderDrawRect(scene->game->getRenderer(), &tile->destCoords);
-            if(placeActor)
-            {
-                /*Character* character = new Character();
+                Character* character = new Character();
                 Vec3 position = {
-                    static_cast<float>((tile->destCoords.x + tile->destCoords.w) * scene->getxAxis()) / width,
-                    scene->getyAxis() - (static_cast<float>((tile->destCoords.y + 0.5 * tile->destCoords.h) * scene->getyAxis()) / height),
+                    static_cast<float>((m_tiles[i]->destCoords.x + m_tiles[i]->destCoords.w) * scene->getxAxis()) / width,
+                    scene->getyAxis() - (static_cast<float>((m_tiles[i]->destCoords.y + 0.5 * m_tiles[i]->destCoords.h) * scene->getyAxis()) / height),
                     0.0f
                 };
 
                 character->OnCreate(scene, position);
                 character->setTextureWith("Sprites/hero.png");
                 characters.push_back(character);
-                placeActor = false;*/
+                placeActor = false;
 
                 if (tile->letter == 'G' && tile->needsResizing == false) {
                     placeTurret(window, turrets, tile);
                     printf("grass tile\n");
                 }
-                
+
+            }
             }
         }
     }
+ 
+    drawTopTileOutline(mousePosX, mousePosY);
+       
 }
 
+void Level::placeTurret(SDL_Window* window, std::vector<Turret*>& turrets, Tile* tile)
+{
+    // have mouse x and y from mouse click
+    // get tile position based on mouse pos
+    // check if placement is legal
+
+    // place turret
+
+    Vec3 position = {
+                    static_cast<float>((tile->destCoords.x + tile->destCoords.w) * scene->getxAxis()) / width,
+                    scene->getyAxis() - (static_cast<float>((tile->destCoords.y - 0.5 * tile->destCoords.h) * scene->getyAxis()) / height),
+                    0.0f
+    };
+
+    Turret* turret = new Turret("Sprites/tiles_packed.png", Vec2(6, 7), scene, position);
+    SpriteSheet::QuerySpriteSheet(12, 10, turret->m_turretTexture);
+    SDL_Rect turretUV = SpriteSheet::GetUVTile(turret->uvCoords.x, turret->uvCoords.y);
+    turret->turretUV = turretUV;
+
+    turrets.push_back(turret);
+    tile->tileTexture = turret->m_turretTexture;
+    tile->letter = 'M';
+    tile->uvCoords = turretUV;
+    placeActor = false;
+
+}
+
+bool Level::isMouseOverTile(const Tile* tile, int mouseX, int mouseY) {
+    const Tile& tempTile = (tile->chlid) ? *(tile->chlid) : *tile;
+
+    SDL_Rect adjustedRect = tempTile.destCoords;
+
+    if (tempTile.needsResizing) {
+        float aspectRatio = static_cast<float>(tempTile.uvCoords.w) / tempTile.uvCoords.h;
+        adjustedRect.w = static_cast<int>(tempTile.destCoords.h * aspectRatio);
+    }
+
+    //check if the mouse position is within the bounds of the rectangle
+    bool withinXBounds = mouseX >= adjustedRect.x && mouseX <= adjustedRect.x + adjustedRect.w;
+    bool withinYBounds = mouseY >= adjustedRect.y && mouseY <= adjustedRect.y + adjustedRect.h;
+
+    return withinXBounds && withinYBounds;
+}
+
+Node* Level::getTileNodeUnderMouse(int mousePosX, int mousePosY) {
+    for (auto& tile : m_tiles) {
+        if (isMouseOverTile(tile, mousePosX, mousePosY)) {
+            return tile->tileNode;
+        }
+    }
+    return nullptr;
+}
+
+void Level::setStartNode(int mousePosX, int mousePosY) {
+    startNode = getTileNodeUnderMouse(mousePosX, mousePosY);
+}
 void Level::placeTurret(SDL_Window* window, std::vector<Turret*>& turrets, Tile* tile)
 {
     // have mouse x and y from mouse click
@@ -226,21 +342,10 @@ void Level::placeTurret(SDL_Window* window, std::vector<Turret*>& turrets, Tile*
     placeActor = false;
 
 }
-
-char Level::getTile(int x, int y)
-{
-    return m_levelData[y][x];
+void Level::setEndNode(int mousePosX, int mousePosY) {
+    endNode = getTileNodeUnderMouse(mousePosX, mousePosY);
 }
 
-bool Level::compareTile(SDL_Rect r1, SDL_Rect r2)
-{
-    r1.y;
-    if (r1.x != r2.x || r1.y != r2.y || r1.w != r2.w || r1.h != r2.h) {
-        return false;
-    }
-
-    return true;
-}
 
 void Level::levelHandleEvents(const SDL_Event& event)
 {
@@ -248,12 +353,23 @@ void Level::levelHandleEvents(const SDL_Event& event)
     case SDL_MOUSEMOTION:
         mousePosX = event.motion.x;
         mousePosY = event.motion.y;
+
         break;
     case SDL_MOUSEBUTTONDOWN:
-        if(event.button.button == SDL_BUTTON_LEFT)
-        placeActor = true;
-        //if (event.button.button == SDL_BUTTON_RIGHT)
-        //placeChar = true;
+        if (event.button.button == SDL_BUTTON_LEFT) {
+            if (!startNode) {
+                setStartNode(mousePosX, mousePosY);
+            }
+            else if (!endNode) {
+                setEndNode(mousePosX, mousePosY);
+                updatePath(mousePosX, mousePosY); 
+            }
+        }
+        if (event.button.button == SDL_BUTTON_RIGHT) {
+            if (canPlaceCharacter(mousePosX, mousePosY)) {
+                placeActor = true;
+            }
+        }
         break;
     
     case SDL_MOUSEBUTTONUP:
@@ -261,5 +377,92 @@ void Level::levelHandleEvents(const SDL_Event& event)
         break;
     default:
         break;
+    }
+}
+
+bool Level::canPlaceCharacter(int mouseX, int mouseY) {
+    
+    Tile* hoveredTile = nullptr;
+    for (const auto& tile : m_tiles) {
+        if (isMouseOverTile(tile, mouseX, mouseY)) {
+            //if this tile isn't walkable, you can't place a character
+            if (!tile->isWalkable) return false;
+
+            //keeps track of the top tile under the mouse
+            if (hoveredTile == nullptr || tile->scale > hoveredTile->scale) {
+                hoveredTile = tile;
+            }
+        }
+    }
+
+    // Can place a character if the topmost tile under the mouse is walkable
+    return hoveredTile != nullptr && hoveredTile->isWalkable;
+}
+
+void Level::drawTopTileOutline(int mouseX, int mouseY) {
+    Tile* topTile = nullptr;
+
+    for (const auto& tile : m_tiles) {
+        if (isMouseOverTile(tile, mouseX, mouseY)) {
+            if (topTile == nullptr || tile->scale > topTile->scale) {
+                topTile = tile;
+            }
+        }
+    }
+
+    if (topTile != nullptr) {
+        SDL_SetRenderDrawColor(scene->game->getRenderer(), 255, 255, 255, 255); // white
+        SDL_Rect outlineRect = topTile->destCoords;  //draw the outline
+        SDL_RenderDrawRect(scene->game->getRenderer(), &outlineRect);
+    }
+
+    if (topTile != nullptr && topTile->scale > 1.0f) {
+        SDL_SetRenderDrawColor(scene->game->getRenderer(), 255, 0, 0, 255); // red
+        SDL_Rect outlineRect = topTile->destCoords;  //draw the outline
+        SDL_RenderDrawRect(scene->game->getRenderer(), &outlineRect);
+    }
+}
+
+void Level::updatePath(int mousePosX, int mousePosY)
+{
+
+    if (startNode && endNode) {
+        int startIndex = startNode->GetLabel();
+        int endIndex = endNode->GetLabel();
+
+        std::vector<int> nodes = graph.Dijkstra(startIndex, endIndex);
+
+        std::vector<Node*> path;
+        path.reserve(nodes.size());
+        for (auto& node : nodes) {
+            path.emplace_back(graph.GetNode(node));
+        }
+
+        scene->getPath()->OnCreate(path);
+        startNode = endNode;
+        endNode = nullptr;
+    }
+}
+
+
+void Tile::resizeTile()
+{
+   
+    if (needsResizing)
+    {
+        int originalWidth = destCoords.w;
+        int originalHeight = destCoords.h;
+
+        float aspectRatio = static_cast<float>(uvCoords.w) / uvCoords.h;
+
+        destCoords.w = static_cast<int>(originalHeight * aspectRatio * scale);
+        destCoords.h = static_cast<int>(originalHeight * scale);
+
+        // Adjust y-position to make the texture scale upwards
+        destCoords.y -= (destCoords.h - originalHeight);
+    }
+    else {
+        destCoords.w *= scale;
+        destCoords.h *= scale;
     }
 }

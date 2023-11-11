@@ -53,7 +53,7 @@ bool Scene3::OnCreate() {
 
     // Set up characters
     blinky = new Character();
-    if (!blinky->OnCreate(this) || !blinky->setTextureWith("Blinky.png")) {
+    if (!blinky->OnCreate(this, {}) || !blinky->setTextureWith("Blinky.png")) {
         return false;
     }
 
