@@ -29,13 +29,10 @@ class Level {
 private:
     Scene* scene;
     std::vector<Tile*> m_tiles;
-    std::vector<Node*> pathNodes;
     std::vector<std::string> m_levelData;
     std::vector<Character*>* characters;
-    Node* startNode;
-    Node* endNode;
+    Node* endNode = nullptr;
     Graph* graph;
-    Path* path;
     int mousePosX;
     int mousePosY;
     int width;
@@ -51,19 +48,13 @@ public:
     void clear();
     void drawTiles(SDL_Window* window);
     bool isMouseOverTile(const Tile* tile, int mouseX, int mouseY);
-    Node* getTileNodeUnderMouse(int mousePosX, int mousePosY);
-    void setStartNode();
-    void setEndNode(int mousePosX, int mousePosY);
+    Node* getTileNodeUnderMouse();
     void levelHandleEvents(const SDL_Event& event);
     bool canPlaceCharacter(int mouseX, int mouseY);
     void drawTopTileOutline(int mouseX, int mouseY);
-    Node* findNearestWalkableNode();
-
-  
+    void setEndNode();
 
     int getWidth() const { return m_levelData[0].size(); }
     int getHeight() const { return m_levelData.size(); }
     const std::vector<std::string>& getLevelData() const { return m_levelData; }
-    const std::vector<Node*>& getNodes() const { return pathNodes; }
-    void updatePath();
 };

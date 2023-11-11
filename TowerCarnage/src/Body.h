@@ -24,12 +24,12 @@ protected:
     float maxRotation;
     float maxAngular;
     float radius;           // for getting near walls
-
 	Vec3 imageSizeWorldCoords;
     SDL_Surface* image;
     SDL_Texture* texture;
 
 public:
+    int currentNode;
     Body();
 	Body(
         Vec3 pos_, Vec3 vel_, Vec3 accel_, 
@@ -58,6 +58,7 @@ public:
     virtual float getMaxRotation() { return maxRotation; }
     virtual float getMaxAngular() { return maxAngular; }
     virtual float getRadius() { return radius; }
+    virtual float getCurrentNode() { return currentNode; }
 
     virtual void setImage(SDL_Surface* image_) { image = image_; }
     virtual SDL_Surface* getImage() { return image; }

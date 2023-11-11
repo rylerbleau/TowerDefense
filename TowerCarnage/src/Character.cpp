@@ -12,7 +12,11 @@
 static std::mt19937 randomEngine(time(nullptr));
 static std::uniform_real_distribution<float> scaleGenerator(0.8f, 1.5f);
 
-bool Character::OnCreate(Scene* scene_, Path* path , Vec3 pos /*= Vec3(5.0f, 5.0f, 0.0f)*/)
+Character::~Character()
+{
+}
+
+bool Character::OnCreate(Scene* scene_, Graph* graph_, Vec3 pos /*= Vec3(5.0f, 5.0f, 0.0f)*/)
 {
 	scene = scene_;
 	scale = scaleGenerator(randomEngine);
@@ -34,7 +38,10 @@ bool Character::OnCreate(Scene* scene_, Path* path , Vec3 pos /*= Vec3(5.0f, 5.0
 	{
 		return false;
 	}
-	
+
+	graph = graph_;
+	path = new Path();
+	setStartNode();
 
 	return true;
 }
@@ -59,7 +66,7 @@ bool Character::setTextureWith(string file)
 }
 
 
-void Character::Update(float deltaTime, std::vector<Character* > characters, int index, Path* path_)
+void Character::Update(float deltaTime, std::vector<Character* > characters, int index)
 {
 	std::vector<StaticBody* > staticBodies;
 	staticBodies.resize(characters.size());
@@ -68,20 +75,60 @@ void Character::Update(float deltaTime, std::vector<Character* > characters, int
 	}
 	// create a new overall steering output
 	KinematicSteeringOutput* steering = new KinematicSteeringOutput();
-	// This creates the separation plus seek behaviour(might switch to arrive) 
-	SeekAndSeparationSteering(*steering, staticBodies, 1.5f, index, path_);
+	// This creates the separation plus seek behaviour(might switch to arrive)
+	updatePath();	
+	SeekAndSeparationSteering(*steering, staticBodies, 1.5f, index, path);
 	body->Update(deltaTime, steering);
 	delete steering;
 }
 
+Node* Character::findNearestWalkableNode() {
+	Node* closestNode = nullptr;
+		Vec3 characterPos = getBody()->getPos();
+		for (int i = 0; i < graph->NumNodes(); i++) {
+			float tileDistance = VMath::distance(characterPos, graph->GetNode(i)->getPosition());
+			if (tileDistance < maxDistance) {
+				maxDistance = tileDistance;
+				closestNode = graph->GetNode(i);
+			}
+		}
+	
+	return closestNode;
+}
 
-// Th
+void Character::setStartNode() {
+	startNode = findNearestWalkableNode();
+}
+
+void Character::setEndNode(Node* node_) {
+	endNode = node_;
+}
+
+void Character::updatePath()
+{
+
+	if (startNode && endNode) {
+		int startIndex = startNode->GetLabel();
+		int endIndex = endNode->GetLabel();
+
+		std::vector<int> nodes = graph->Dijkstra(startIndex, endIndex);
+
+		for (auto& node : nodes) {
+			path->addNode(graph->GetNode(node));
+		}
+
+		startNode = endNode;
+		endNode = nullptr;
+	}
+}
+
 void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody* > staticBodies, float threshhold, int index, Path* path_)
 {
 	std::vector<KinematicSteeringOutput*> steering_outputs;
 
 	FollowAPath* steering_algorithm = nullptr;
 	// using the target, calculate and set values in the overall steering output
+
 	if (path_->getPathSize() > 0) {
 	steering_algorithm = new FollowAPath(staticBodies[index], path_);
 	steering_outputs.push_back(steering_algorithm->getSteering());
@@ -104,9 +151,9 @@ void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std
 }
 
 
-void Character::HandleEvents(const SDL_Event& event)
+void Character::HandleEvents(const SDL_Event& event, Node* node_)
 {
-	// handle events here, if needed
+
 }
 
 void Character::render(float scale)

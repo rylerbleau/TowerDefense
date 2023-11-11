@@ -17,16 +17,6 @@ Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 }
 
 Scene1::~Scene1(){
-	if (blinky)
-	{
-		blinky->OnDestroy();
-		delete blinky;
-	}
-	if (!characters.empty()) {
-		characters.clear();
-	}
-
-	level.clear();
 
 }
 
@@ -43,22 +33,25 @@ bool Scene1::OnCreate() {
 	/// Map and initial character set up 
 	level = Level("assets/levels/Level2.txt", this, &characters);
 	level.LoadMap(12, 11, "assets/sprites/tilemap.png");
-	blinky = new Character();
-	if (!blinky->OnCreate(this) || !blinky->setTextureWith("assets/sprites/hero.png"))
-		return false;
-	characters.push_back(blinky);
-
+	
 	/// Creating the Path for Djikstra to follow
-	path = new Path();
 	return true;
 }
 
-void Scene1::OnDestroy() {}
+void Scene1::OnDestroy() {
+	if (!characters.empty()) {
+		for (auto& character : characters) {
+			character->OnDestroy();
+		}
+	}
+
+	level.clear();
+}
 
 void Scene1::Update(const float deltaTime) {
 	// Calculate and apply any steering for npc's
 	for (uint32_t i = 0; i < characters.size(); i++) {
-		characters[i]->Update(deltaTime, characters, i, path);
+		characters[i]->Update(deltaTime, characters, i);
 	}
 	game->getPlayer()->Update(deltaTime);
 }
@@ -83,6 +76,7 @@ void Scene1::HandleEvents(const SDL_Event& event)
 {
 	game->getPlayer()->HandleEvents(event);
 	level.levelHandleEvents(event);
+	
 }
 
 

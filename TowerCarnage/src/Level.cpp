@@ -10,7 +10,7 @@
 
 
 Level::Level(const std::string& fileName, Scene* scene, std::vector<Character*>* characters)
-    :scene(scene), graph(nullptr), startNode(nullptr), endNode(nullptr), placeActor(false), mousePosX(0), mousePosY(0), width(0), height(0)
+    :scene(scene), graph(nullptr), placeActor(false), mousePosX(0), mousePosY(0), width(0), height(0)
 {
     std::ifstream file;
     file.open(fileName);
@@ -115,7 +115,6 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
                 newTile = new Tile{ nullptr, mapTexture, pathRect , gridPosition , 1.0 , false, true, newNode };
 
                 m_tiles.push_back(newTile);
-                pathNodes.push_back(newNode);
                 label++;
                 break;
             case 'G':
@@ -197,8 +196,12 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
         }
     }
     /// resizing tile so that they are not stretched to tile dimension(especially if scale is more than 1)
+    std::vector<Node*> nodes;
     for (auto& tile : m_tiles) {
         tile->resizeTile();
+        if (tile->tileNode != nullptr) {
+            nodes.push_back(tile->tileNode);
+        }
     }
 
     std::sort(m_tiles.begin(), m_tiles.end(), [](const Tile* tile1, const Tile* tile2) {
@@ -207,16 +210,16 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
 
     /// Creating graph and connecting nodes
     graph = new Graph();
-    graph->OnCreate(getNodes());
-    for (int i = 0; i < getNodes().size(); i++) {
-        Node* fromNode = getNodes()[i];
+    graph->OnCreate(nodes);
+    for (int i = 0; i < nodes.size(); i++) {
+        Node* fromNode = nodes[i];
         int from = fromNode->GetLabel();
         if (i > 0) {
-            int to = getNodes()[i - 1]->GetLabel();
+            int to = nodes[i - 1]->GetLabel();
             graph->AddWeightedConnection(from, to, 1.0f);
         }
-        if (i < getNodes().size() - 1) {
-            int to = getNodes()[i + 1]->GetLabel();
+        if (i < nodes.size() - 1) {
+            int to = nodes[i + 1]->GetLabel();
             graph->AddWeightedConnection(from, to, 1.0f);
         }
     }
@@ -247,7 +250,7 @@ void Level::drawTiles(SDL_Window* window)
                     0.0f
                 };
 
-                character->OnCreate(scene, path, position);
+                character->OnCreate(scene, graph, position);
                 character->setTextureWith("assets/sprites/hero.png");
                 characters->push_back(character);
                 placeActor = false;
@@ -274,7 +277,7 @@ bool Level::isMouseOverTile(const Tile* tile, int mouseX, int mouseY) {
     return withinXBounds && withinYBounds;
 }
 
-Node* Level::getTileNodeUnderMouse(int mousePosX, int mousePosY) {
+Node* Level::getTileNodeUnderMouse() {
     for (auto& tile : m_tiles) {
         if (isMouseOverTile(tile, mousePosX, mousePosY)) {
             return tile->tileNode;
@@ -283,16 +286,9 @@ Node* Level::getTileNodeUnderMouse(int mousePosX, int mousePosY) {
     return nullptr;
 }
 
-
-
-void Level::setStartNode() {
-    startNode = findNearestWalkableNode();
+void Level::setEndNode() {
+    endNode = getTileNodeUnderMouse();
 }
-
-void Level::setEndNode(int mousePosX, int mousePosY) {
-    endNode = getTileNodeUnderMouse(mousePosX, mousePosY);
-}
-
 
 void Level::levelHandleEvents(const SDL_Event& event)
 {
@@ -303,11 +299,7 @@ void Level::levelHandleEvents(const SDL_Event& event)
         break;
     case SDL_MOUSEBUTTONDOWN:
         if (event.button.button == SDL_BUTTON_LEFT) {
-            setStartNode();
-            if (!endNode) {
-                setEndNode(mousePosX, mousePosY);
-                updatePath();
-            }
+            setEndNode();
         }
         if (event.button.button == SDL_BUTTON_RIGHT) {
             if (canPlaceCharacter(mousePosX, mousePosY)) {
@@ -366,42 +358,7 @@ void Level::drawTopTileOutline(int mouseX, int mouseY) {
     }
 }
 
-Node* Level::findNearestWalkableNode() {
-    Node* closestNode = nullptr;
-    static float maxDistance = 10000000;
-    for (const auto& character : *characters) {
-        Vec3 characterPos = character->getBody()->getPos();
-        for (auto& tile : m_tiles) {
-            if (tile->tileNode != nullptr) {
-                float tileDistance = VMath::distance(characterPos, tile->tileNode->getPosition());
-                if (tileDistance < maxDistance) {
-                    maxDistance = tileDistance;
-                    closestNode = tile->tileNode;
-                }
-            }
-        }
-    }
-    return closestNode;
-}
 
-
-void Level::updatePath()
-{
-
-    if (startNode && endNode) {
-        int startIndex = startNode->GetLabel();
-        int endIndex = endNode->GetLabel();
-
-        std::vector<int> path = graph->Dijkstra(startIndex, endIndex);
-       
-        for (auto& node : path) {
-          scene->getPath()->addNode(graph->GetNode(node));
-        }
-
-        startNode = nullptr;
-        endNode = nullptr;
-    }
-}
 
 
 void Tile::resizeTile()
