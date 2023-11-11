@@ -251,6 +251,7 @@ void Level::drawTiles(SDL_Window* window)
                 };
 
                 character->OnCreate(scene, graph, position);
+                character->setEndNode(endNode);
                 character->setTextureWith("assets/sprites/hero.png");
                 characters->push_back(character);
                 placeActor = false;
