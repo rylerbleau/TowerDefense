@@ -32,7 +32,7 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
-!vendor/SDL/bin/
+!TowerCarnage/vendor/SDL/bin/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
