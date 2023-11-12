@@ -28,9 +28,9 @@ private:
 	float scale = 1.0f;
 	Graph* graph;
 	Path* path;
-	Node* startNode;
 	Node* endNode;
-	float maxDistance = 10000000;
+	Node* startNode;
+	
 public:
 	Character() :sourceRect{}
 	{
@@ -44,11 +44,9 @@ public:
 	void OnDestroy() { /*delete body*/ };
 	bool setTextureWith(string file);
 	void Update(float deltaTime, std::vector<Character* > characters, int index);
-	void setStartNode();
-	void setEndNode(Node* node_);
-	void updatePath();
+	void updatePath(Node* endNode);
 	Node* findNearestWalkableNode();
-	void HandleEvents(const SDL_Event& event, Node* node_);
+	void HandleEvents(const SDL_Event& event);
 	void render();
 	void SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody*> staticBodies, float threshhold, int index);
 };

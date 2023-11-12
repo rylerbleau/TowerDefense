@@ -223,10 +223,10 @@ void Level::drawTiles()
         SpriteSheet::draw(scene->game->getRenderer(), tile->tileTexture, tile->uvCoords, tile->destCoords, tile->scale, tile->needsResizing);
     }
 
-    drawTopTileOutline(mousePosX, mousePosY);
+    drawTopTileOutline();
 }
 
-bool Level::isMouseOverTile(const Tile* tile, int mouseX, int mouseY) {
+bool Level::isMouseOverTile(const Tile* tile) {
     const Tile& tempTile = (tile->child) ? *(tile->child) : *tile;
 
     SDL_Rect adjustedRect = tempTile.destCoords;
@@ -237,15 +237,15 @@ bool Level::isMouseOverTile(const Tile* tile, int mouseX, int mouseY) {
     }
 
     //check if the mouse position is within the bounds of the rectangle
-    bool withinXBounds = mouseX >= adjustedRect.x && mouseX <= adjustedRect.x + adjustedRect.w;
-    bool withinYBounds = mouseY >= adjustedRect.y && mouseY <= adjustedRect.y + adjustedRect.h;
+    bool withinXBounds = mousePosX >= adjustedRect.x && mousePosX <= adjustedRect.x + adjustedRect.w;
+    bool withinYBounds = mousePosY >= adjustedRect.y && mousePosY <= adjustedRect.y + adjustedRect.h;
 
     return withinXBounds && withinYBounds;
 }
 
 Node* Level::getTileNodeUnderMouse() {
     for (auto& tile : m_tiles) {
-        if (isMouseOverTile(tile, mousePosX, mousePosY)) {
+        if (isMouseOverTile(tile)) {
             return tile->tileNode;
         }
     }
@@ -263,16 +263,18 @@ void Level::levelHandleEvents(const SDL_Event& event)
     }
 }
 
-bool Level::canPlaceCharacter(int mouseX, int mouseY) {
+bool Level::canPlaceEntity() {
     // Can place a character if the topmost tile under the mouse is walkable
     return topTile != nullptr && topTile->isWalkable;
 }
 
-void Level::drawTopTileOutline(int mouseX, int mouseY) {
+void Level::drawTopTileOutline() {
     Tile* drawTile = nullptr;
+
+    // iterating backwards to make fewer iterations because biggest scaled tiles are at the back of the vector
     for (auto it = m_tiles.rbegin(); it != m_tiles.rend(); ++it) {
         Tile* currentTile = *it;
-        if (isMouseOverTile(*it, mouseX, mouseY)) {
+        if (isMouseOverTile(*it)) {
             if (drawTile == nullptr || currentTile->scale > drawTile->scale)
             drawTile = *it;
             topTile = *it;

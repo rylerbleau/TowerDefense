@@ -25,6 +25,7 @@ public:
 	void OnDestroy();
 	int NumNodes();
 	Node* GetNode(int label) { return nodes[label]; }
+	Node* findNode(int node);
 	void AddWeightedConnection(int fromNode, int toNode, float weight);
 	std::vector<int> Neighbours(int fromNode);
 	std::vector<int> Dijkstra(int start, int goal);

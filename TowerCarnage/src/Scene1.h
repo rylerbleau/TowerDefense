@@ -19,8 +19,6 @@ private:
 	SDL_Window *window;
 	float xAxis = 25.0f;
 	float yAxis = 15.0f;
-	int mousePosX;
-	int mousePosY;
 	bool placeActor;
 
 	SDL_Renderer* renderer;
@@ -30,6 +28,7 @@ private:
 	std::vector<Character*> characters;
 	std::vector<Turret*> turrets;
 	Graph* graph;
+	Node* endNode;
 	Level level;
 
 public:
@@ -41,6 +40,8 @@ public:
 	void Render();
     void HandleEvents(const SDL_Event &event);
 	void createNewCharacter();
+
+	Node* findNode();
 
 	float getxAxis() { return xAxis; }
 	float getyAxis() { return yAxis; }

@@ -13,6 +13,7 @@ Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 	yAxis = 15.0f;
 	graph = nullptr;
 	blinky = nullptr;
+	
 }
 
 Scene1::~Scene1(){
@@ -37,6 +38,7 @@ bool Scene1::OnCreate() {
 	/// Creating graph and connecting nodes
 	graph = new Graph();
 	auto walkableNodes = level.getWalkableTileNodes();
+
 	graph->OnCreate(walkableNodes);
 	for (int i = 0; i < walkableNodes.size(); i++) {
 		Node* fromNode = walkableNodes[i];
@@ -50,6 +52,8 @@ bool Scene1::OnCreate() {
 			graph->AddWeightedConnection(from, to, 1.0f);
 		}
 	}
+
+	endNode = graph->GetNode(graph->NumNodes() - 1);
 
 	return true;
 }
@@ -95,30 +99,41 @@ void Scene1::HandleEvents(const SDL_Event& event)
 	level.levelHandleEvents(event);
 
 	switch (event.type) {
-	case SDL_MOUSEMOTION:
-		mousePosX = event.motion.x;
-		mousePosY = event.motion.y;
-		break;
 	case SDL_MOUSEBUTTONDOWN:
 		if (event.button.button == SDL_BUTTON_LEFT) {
 			createNewCharacter();
 		}
+		if (event.button.button == SDL_BUTTON_RIGHT) {
+			endNode = findNode();
+			for (auto& character : characters) {
+				character->updatePath(endNode);
+			}
+		}
+		break;
+	default:
+		break;
 	}
 }
 
 void Scene1::createNewCharacter() {
 	for (const auto& tile : level.getTiles()) {
-		if (level.canPlaceCharacter(mousePosX, mousePosY) && level.isMouseOverTile(tile, mousePosX, mousePosY)) {
+		if (level.canPlaceEntity() && level.isMouseOverTile(tile)) {
+
 			float posX = static_cast<float>((tile->destCoords.x + tile->destCoords.w) * getxAxis() / game->getWindowWidth());
 			float posY = getyAxis() - (static_cast<float>((tile->destCoords.y + 0.5 * tile->destCoords.h) * getyAxis() / game->getWindowHeight()));
 			Vec3 position = { posX, posY, 0.0f };
 
 			Character* character = new Character();
 			character->OnCreate(this, graph, position);
+			character->updatePath(endNode);
 			character->setTextureWith("assets/sprites/hero.png");
 			characters.push_back(character);
 		}
 	}
 }
 
-
+Node* Scene1::findNode() {
+	Node* node = level.getTileNodeUnderMouse();
+	if (node) return node;
+	return graph->GetNode(graph->NumNodes() - 1);
+}

@@ -42,11 +42,11 @@ public:
     void loadMap(const int& tileSizeX, const int& tileSizeY, const char* filename);
     void clear();
     void drawTiles();
-    bool isMouseOverTile(const Tile* tile, int mouseX, int mouseY);
+    bool isMouseOverTile(const Tile* tile);
     Node* getTileNodeUnderMouse();
     void levelHandleEvents(const SDL_Event& event);
-    bool canPlaceCharacter(int mouseX, int mouseY);
-    void drawTopTileOutline(int mouseX, int mouseY);
+    bool canPlaceEntity();
+    void drawTopTileOutline();
 
     int getWidth() const { return m_levelData[0].size(); }
     int getHeight() const { return m_levelData.size(); }

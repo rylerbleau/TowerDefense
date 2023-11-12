@@ -26,13 +26,21 @@ bool Graph::OnCreate(std::vector<Node*> nodes_)
 	return true;
 }
 
-void Graph::OnDestroy()
-{
-}
+void Graph::OnDestroy() {}
 
 int Graph::NumNodes()
 {
 	return nodes.size();
+}
+
+Node* Graph::findNode(int node)
+{
+	if (nodes.find(node) != nodes.end()) {
+		return GetNode(node);
+	}
+	else {
+		return nullptr;
+	}
 }
 
 void Graph::AddWeightedConnection(int fromNode, int toNode, float weight)
