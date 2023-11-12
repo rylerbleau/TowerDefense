@@ -31,7 +31,7 @@ bool Scene1::OnCreate() {
 	IMG_Init(IMG_INIT_PNG);
 
 	/// Map and initial character set up 
-	level = Level("assets/levels/Level2.txt", this, &characters);
+	level = Level("assets/levels/Level2.txt", this);
 	level.LoadMap(12, 11, "assets/sprites/tilemap.png");
 	
 	/// Creating the Path for Djikstra to follow
@@ -62,7 +62,7 @@ void Scene1::Render() {
 	SDL_RenderClear(renderer);
 	
 	// Draw level and AI characters
-	level.drawTiles(window);
+	level.drawTiles(window, characters);
 	for (auto& character : characters) {
 		character->render(1.0f);
 	}

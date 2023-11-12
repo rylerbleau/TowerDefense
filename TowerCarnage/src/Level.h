@@ -6,9 +6,9 @@
 #include "SpriteSheet.h"
 
 class Scene;
-class Character;
 class Turret;
 class Graph;
+class Character;
 class Node;
 class Path;
 
@@ -30,7 +30,6 @@ private:
     Scene* scene;
     std::vector<Tile*> m_tiles;
     std::vector<std::string> m_levelData;
-    std::vector<Character*>* characters;
     Node* endNode = nullptr;
     Graph* graph;
     int mousePosX;
@@ -41,18 +40,17 @@ private:
 
 public:
     Level() = default;
-    Level(const std::string& fileName, Scene* scene, std::vector<Character*>* characters);
+    Level(const std::string& fileName, Scene* scene);
     ~Level();
 
     void LoadMap(const int& tileSizeX, const int& tileSizeY, const char* filename);
     void clear();
-    void drawTiles(SDL_Window* window);
+    void drawTiles(SDL_Window* window, std::vector<Character*>& characters);
     bool isMouseOverTile(const Tile* tile, int mouseX, int mouseY);
     Node* getTileNodeUnderMouse();
     void levelHandleEvents(const SDL_Event& event);
     bool canPlaceCharacter(int mouseX, int mouseY);
     void drawTopTileOutline(int mouseX, int mouseY);
-    void setEndNode();
 
     int getWidth() const { return m_levelData[0].size(); }
     int getHeight() const { return m_levelData.size(); }

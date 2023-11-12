@@ -9,7 +9,7 @@
 #include "Path.h"
 
 
-Level::Level(const std::string& fileName, Scene* scene, std::vector<Character*>* characters)
+Level::Level(const std::string& fileName, Scene* scene)
     :scene(scene), graph(nullptr), placeActor(false), mousePosX(0), mousePosY(0), width(0), height(0)
 {
     std::ifstream file;
@@ -27,7 +27,6 @@ Level::Level(const std::string& fileName, Scene* scene, std::vector<Character*>*
     }
     file.close();
 
-    this->characters = characters;
 }
 
 Level::~Level() {}
@@ -233,31 +232,30 @@ void Level::clear() {
     delete graph;
 }
 
-void Level::drawTiles(SDL_Window* window)
+void Level::drawTiles(SDL_Window* window, std::vector<Character*>& characters)
 {
     SDL_SetRenderDrawColor(scene->game->getRenderer(), 255, 255, 255, 255);
 
-    for (size_t i = 0; i < m_tiles.size(); ++i) {
-        SpriteSheet::draw(scene->game->getRenderer(), m_tiles[i]->tileTexture, m_tiles[i]->uvCoords, m_tiles[i]->destCoords, m_tiles[i]->scale, m_tiles[i]->needsResizing);
-    
-        if (isMouseOverTile(m_tiles[i], mousePosX, mousePosY)) {
-            if (placeActor) {
+    for (auto& tile : m_tiles) {
+        SpriteSheet::draw(scene->game->getRenderer(), tile->tileTexture, tile->uvCoords, tile->destCoords, tile->scale, tile->needsResizing);
 
-                Character* character = new Character();
-                Vec3 position = {
-                    static_cast<float>((m_tiles[i]->destCoords.x + m_tiles[i]->destCoords.w) * scene->getxAxis()) / width,
-                    scene->getyAxis() - (static_cast<float>((m_tiles[i]->destCoords.y + 0.5 * m_tiles[i]->destCoords.h) * scene->getyAxis()) / height),
-                    0.0f
-                };
+        if (placeActor && isMouseOverTile(tile, mousePosX, mousePosY)) {
 
-                character->OnCreate(scene, graph, position);
-                character->setEndNode(endNode);
-                character->setTextureWith("assets/sprites/hero.png");
-                characters->push_back(character);
-                placeActor = false;
-            }
+            Character* character = new Character();
+            Vec3 position = {
+                static_cast<float>((tile->destCoords.x + tile->destCoords.w) * scene->getxAxis()) / width,
+                scene->getyAxis() - (static_cast<float>((tile->destCoords.y + 0.5 * tile->destCoords.h) * scene->getyAxis()) / height),
+                0.0f
+            };
+
+            character->OnCreate(scene, graph, position);
+            character->setEndNode(endNode);
+            character->setTextureWith("assets/sprites/hero.png");
+            characters.push_back(character);
+            placeActor = false;
         }
     }
+
     drawTopTileOutline(mousePosX, mousePosY);
 }
 
@@ -287,9 +285,8 @@ Node* Level::getTileNodeUnderMouse() {
     return nullptr;
 }
 
-void Level::setEndNode() {
-    endNode = getTileNodeUnderMouse();
-}
+
+
 
 void Level::levelHandleEvents(const SDL_Event& event)
 {
@@ -300,9 +297,10 @@ void Level::levelHandleEvents(const SDL_Event& event)
         break;
     case SDL_MOUSEBUTTONDOWN:
         if (event.button.button == SDL_BUTTON_LEFT) {
-            setEndNode();
-        }
-        if (event.button.button == SDL_BUTTON_RIGHT) {
+            if (!endNode) {
+                endNode = getTileNodeUnderMouse();
+                break;
+            }
             if (canPlaceCharacter(mousePosX, mousePosY)) {
                 placeActor = true;
             }
