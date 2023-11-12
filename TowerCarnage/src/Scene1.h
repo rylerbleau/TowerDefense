@@ -41,6 +41,8 @@ public:
     void HandleEvents(const SDL_Event &event);
 	void createNewCharacter();
 
+	void placeTurret();
+
 	Node* findNode();
 
 	float getxAxis() { return xAxis; }

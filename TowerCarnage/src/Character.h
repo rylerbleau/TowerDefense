@@ -49,6 +49,7 @@ public:
 	void HandleEvents(const SDL_Event& event);
 	void render();
 	void SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody*> staticBodies, float threshhold, int index);
+	StaticBody* getBody() { return body; }
 };
 
 #endif

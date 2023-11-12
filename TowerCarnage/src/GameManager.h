@@ -42,6 +42,8 @@ public:
 	Matrix4 getProjectionMatrix();
     PlayerBody* getPlayer(){ return player; }
 	Uint32 getChangeScene() { return changeSceneEventType; }
+	void TogglePauseGame();
+
 
 	SDL_Renderer* getRenderer();
 	SDL_Window* getWindow();

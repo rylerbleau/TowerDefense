@@ -65,6 +65,7 @@ bool Character::setTextureWith(string file)
 
 void Character::Update(float deltaTime, std::vector<Character*> characters, int index)
 {
+	//printf("pos: %f, %f\n", body->getPos().x, body->getPos().y);
 	std::vector<StaticBody* > staticBodies;
 	staticBodies.resize(characters.size());
 	for (uint32_t i = 0; i < characters.size(); i++) {
@@ -160,8 +161,8 @@ void Character::render()
 	w = static_cast<int>(w * scale);
 	h = static_cast<int>(h * scale);
 	screenCoords = projectionMatrix * body->getPos();
-	square.x = static_cast<int>(screenCoords.x - 0.5f * w);
-	square.y = static_cast<int>(screenCoords.y - 0.5f * h);
+	square.y = static_cast<int>(screenCoords.y - 0.5 * h);
+	square.x = static_cast<int>(screenCoords.x - 0.5 * w);
 	square.w = w;
 	square.h = h;
 

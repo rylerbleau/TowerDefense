@@ -6,7 +6,6 @@
 #include "Scene.h"
 #include "Turret.h"
 
-
 Level::Level(const std::string& fileName, Scene* scene)
     :scene(scene), mousePosX(0), mousePosY(0), topTile(nullptr)
 {
@@ -112,7 +111,7 @@ void Level::loadMap(const int& tileSizeX, const int& tileSizeY, const char* file
                 label++;
                 break;
             case 'G':
-                newTile = new Tile{ nullptr, mapTexture, grassRect , gridPosition , 1.0 , false };
+                newTile = new Tile{ nullptr, mapTexture, grassRect , gridPosition , 1.0 , false, true, nullptr, tile};
                 m_tiles.push_back(newTile);
                 break;
             case 'F':
@@ -219,12 +218,12 @@ void Level::drawTiles()
 {
     SDL_SetRenderDrawColor(scene->game->getRenderer(), 255, 255, 255, 255);
 
-    for (auto& tile : m_tiles) {
-        SpriteSheet::draw(scene->game->getRenderer(), tile->tileTexture, tile->uvCoords, tile->destCoords, tile->scale, tile->needsResizing);
+    for (size_t i = 0; i < m_tiles.size(); ++i) {
+        SpriteSheet::draw(scene->game->getRenderer(), m_tiles[i]->tileTexture, m_tiles[i]->uvCoords, m_tiles[i]->destCoords, m_tiles[i]->scale, m_tiles[i]->needsResizing);
     }
-
     drawTopTileOutline();
 }
+       
 
 bool Level::isMouseOverTile(const Tile* tile) {
     const Tile& tempTile = (tile->child) ? *(tile->child) : *tile;
@@ -259,6 +258,8 @@ void Level::levelHandleEvents(const SDL_Event& event)
     case SDL_MOUSEMOTION:
         mousePosX = event.motion.x;
         mousePosY = event.motion.y;
+        break;
+    default:
         break;
     }
 }

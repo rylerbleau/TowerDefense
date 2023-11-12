@@ -21,6 +21,7 @@ struct Tile {
     bool needsResizing = false;
     bool isWalkable = true;
     Node* tileNode = nullptr;
+    char letter = ' ';
 
     void resizeTile();
 };
@@ -47,6 +48,7 @@ public:
     void levelHandleEvents(const SDL_Event& event);
     bool canPlaceEntity();
     void drawTopTileOutline();
+    void placeTurret(SDL_Window* window, std::vector<Turret*>& turrets, Tile* tile);
 
     int getWidth() const { return m_levelData[0].size(); }
     int getHeight() const { return m_levelData.size(); }

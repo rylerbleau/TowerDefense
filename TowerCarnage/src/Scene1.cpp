@@ -73,6 +73,11 @@ void Scene1::Update(const float deltaTime) {
 	for (uint32_t i = 0; i < characters.size(); i++) {
 		characters[i]->Update(deltaTime, characters, i);
 	}
+	for (const auto& turret : turrets) {
+		turret->Update(deltaTime, characters, turrets);
+		//turret->GetTarget(characters);
+
+	}
 	//game->getPlayer()->Update(deltaTime);
 }
 
@@ -86,6 +91,12 @@ void Scene1::Render() {
 
 	for (auto& character : characters) {
 		character->render();
+	}
+
+	for (auto& t : turrets) {
+		if (t->HasTarget()) {
+			t->RenderBullet();
+		}
 	}
 
 	// render the player
@@ -109,6 +120,9 @@ void Scene1::HandleEvents(const SDL_Event& event)
 				character->updatePath(endNode);
 			}
 		}
+		if (event.button.button == SDL_BUTTON_MIDDLE) {
+			placeTurret();
+		}
 		break;
 	default:
 		break;
@@ -130,6 +144,37 @@ void Scene1::createNewCharacter() {
 			characters.push_back(character);
 		}
 	}
+}
+
+void Scene1::placeTurret()
+{
+	// have mouse x and y from mouse click
+	// get tile position based on mouse pos
+	// check if placement is legal
+
+	// place turret
+	for (const auto& tile : level.getTiles()) {
+		if (level.canPlaceEntity() && level.isMouseOverTile(tile)) {
+
+			Vec3 position = {
+							static_cast<float>((tile->destCoords.x + tile->destCoords.w) * getxAxis()) / game->getWindowWidth(),
+							getyAxis() - (static_cast<float>((tile->destCoords.y + 0.5 * tile->destCoords.h) * getyAxis()) / game->getWindowHeight()),
+							0.0f
+			};
+
+			Turret* turret = new Turret("assets/sprites/tiles_packed.png", Vec2(6, 7), this, position);
+			SpriteSheet::QuerySpriteSheet(12, 10, turret->m_turretTexture);
+			SDL_Rect turretUV = SpriteSheet::GetUVTile(turret->uvCoords.x, turret->uvCoords.y);
+			turret->turretUV = turretUV;
+
+			turrets.push_back(turret);
+			tile->tileTexture = turret->m_turretTexture;
+			tile->letter = 'M';
+			tile->uvCoords = turretUV;
+			placeActor = false;
+		}
+	}
+
 }
 
 Node* Scene1::findNode() {
