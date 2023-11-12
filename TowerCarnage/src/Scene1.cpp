@@ -135,5 +135,5 @@ void Scene1::createNewCharacter() {
 Node* Scene1::findNode() {
 	Node* node = level.getTileNodeUnderMouse();
 	if (node) return node;
-	return graph->GetNode(graph->NumNodes() - 1);
+	return endNode;
 }
