@@ -10,7 +10,7 @@
 #include <vector>
 
 static std::mt19937 randomEngine(time(nullptr));
-static std::uniform_real_distribution<float> scaleGenerator(0.8f, 1.5f);
+static std::uniform_real_distribution<float> scaleGenerator(0.8f, 1.0f);
 
 Character::~Character()
 {
@@ -95,6 +95,9 @@ Node* Character::findNearestWalkableNode() {
 
 void Character::updatePath(Node* endNode_)
 {
+	if (path);
+	delete path;
+
 	path = new Path();
 	Node* startNode = findNearestWalkableNode();
 	endNode = endNode_;
@@ -108,8 +111,6 @@ void Character::updatePath(Node* endNode_)
 		for (auto& node : nodes) {
 			path->addNode(graph->GetNode(node));
 		}
-
-		
 	}
 }
 
@@ -121,7 +122,6 @@ void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std
 	// using the target, calculate and set values in the overall steering output
 	FollowAPath* steering_algorithm = steering_algorithm = new FollowAPath(body, path);
 	steering_outputs.push_back(steering_algorithm->getSteering());
-	
 
 	KinematicSeperation* separation = new KinematicSeperation(staticBodies, 1.5f, index);
 	steering_outputs.push_back(separation->GetSteering());
@@ -132,11 +132,9 @@ void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std
 		}
 		delete steering_outputs[i];
 	}
-
 	if (steering_algorithm) {
 		delete steering_algorithm;
 	}
-
 	if (separation) {
 		delete separation;
 	}
