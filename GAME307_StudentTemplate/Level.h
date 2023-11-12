@@ -23,6 +23,7 @@ struct Tile {
     bool needsResizing = false;
     bool isWalkable = true;
     Node* tileNode = nullptr;
+    char letter = ' ';
     void resizeTile();
 };
 
@@ -49,7 +50,7 @@ public:
 
     void LoadMap(const int& tileSizeX, const int& tileSizeY, const char* filename);
     void clear();
-    void drawTiles(SDL_Window* window, std::vector<Character*>& characters);
+    void drawTiles(SDL_Window* window, std::vector<Character*>& characters, std::vector<Turret*>& turrets);
     void placeTurret(SDL_Window* window, std::vector<Turret*>& turrets, Tile* tile);
     bool isMouseOverTile(const Tile* tile, int mouseX, int mouseY);
     Node* getTileNodeUnderMouse(int mousePosX, int mousePosY);

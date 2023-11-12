@@ -115,7 +115,7 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
                 label++;
                 break;
             case 'G':
-                newTile = new Tile{ nullptr, mapTexture, grassRect , gridPosition , 1.0 , false };
+                newTile = new Tile{ nullptr, mapTexture, grassRect , gridPosition , 1.0 , false, true, nullptr, tile};
                 m_tiles.push_back(newTile);
                 break;
             case 'F':
@@ -224,17 +224,17 @@ void Level::clear() {
     m_tiles.clear();
 }
 
-void Level::drawTiles(SDL_Window* window, std::vector<Character*>& characters)
+void Level::drawTiles(SDL_Window* window, std::vector<Character*>& characters, std::vector<Turret*>& turrets)
 {
     SDL_SetRenderDrawColor(scene->game->getRenderer(), 255, 255, 255, 255);
 
     for (size_t i = 0; i < m_tiles.size(); ++i) {
         SpriteSheet::draw(scene->game->getRenderer(), m_tiles[i]->tileTexture, m_tiles[i]->uvCoords, m_tiles[i]->destCoords, m_tiles[i]->scale, m_tiles[i]->needsResizing);
-    
+
         if (isMouseOverTile(m_tiles[i], mousePosX, mousePosY)) {
             if (placeActor) {
 
-                Character* character = new Character();
+                /*Character* character = new Character();
                 Vec3 position = {
                     static_cast<float>((m_tiles[i]->destCoords.x + m_tiles[i]->destCoords.w) * scene->getxAxis()) / width,
                     scene->getyAxis() - (static_cast<float>((m_tiles[i]->destCoords.y + 0.5 * m_tiles[i]->destCoords.h) * scene->getyAxis()) / height),
@@ -244,21 +244,20 @@ void Level::drawTiles(SDL_Window* window, std::vector<Character*>& characters)
                 character->OnCreate(scene, position);
                 character->setTextureWith("Sprites/hero.png");
                 characters.push_back(character);
-                placeActor = false;
+                placeActor = false;*/
 
-                if (tile->letter == 'G' && tile->needsResizing == false) {
-                    placeTurret(window, turrets, tile);
+                if (m_tiles[i]->letter == 'G' && m_tiles[i]->needsResizing == false) {
+                    placeTurret(window, turrets, m_tiles[i]);
                     printf("grass tile\n");
                 }
 
             }
-            }
         }
     }
- 
     drawTopTileOutline(mousePosX, mousePosY);
-       
 }
+       
+
 
 void Level::placeTurret(SDL_Window* window, std::vector<Turret*>& turrets, Tile* tile)
 {
@@ -316,32 +315,7 @@ Node* Level::getTileNodeUnderMouse(int mousePosX, int mousePosY) {
 void Level::setStartNode(int mousePosX, int mousePosY) {
     startNode = getTileNodeUnderMouse(mousePosX, mousePosY);
 }
-void Level::placeTurret(SDL_Window* window, std::vector<Turret*>& turrets, Tile* tile)
-{
-    // have mouse x and y from mouse click
-    // get tile position based on mouse pos
-    // check if placement is legal
-    
-    // place turret
 
-    Vec3 position = {
-                    static_cast<float>((tile->destCoords.x + tile->destCoords.w) * scene->getxAxis()) / width,
-                    scene->getyAxis() - (static_cast<float>((tile->destCoords.y - 0.5 * tile->destCoords.h) * scene->getyAxis()) / height),
-                    0.0f
-    };
-
-    Turret* turret = new Turret("Sprites/tiles_packed.png", Vec2(6, 7), scene, position);
-    SpriteSheet::QuerySpriteSheet(12, 10, turret->m_turretTexture);
-    SDL_Rect turretUV = SpriteSheet::GetUVTile(turret->uvCoords.x, turret->uvCoords.y);
-    turret->turretUV = turretUV;
-
-    turrets.push_back(turret);
-    tile->tileTexture = turret->m_turretTexture;
-    tile->letter = 'M';
-    tile->uvCoords = turretUV;
-    placeActor = false;
-
-}
 void Level::setEndNode(int mousePosX, int mousePosY) {
     endNode = getTileNodeUnderMouse(mousePosX, mousePosY);
 }
