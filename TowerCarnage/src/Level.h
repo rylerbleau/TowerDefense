@@ -28,6 +28,7 @@ struct Tile {
 class Level {
 private:
     Scene* scene;
+    Tile* topTile;
     std::vector<Tile*> m_tiles;
     std::vector<Node*> walkableTileNodes;
     std::vector<std::string> m_levelData;

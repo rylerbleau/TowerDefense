@@ -8,7 +8,7 @@
 
 
 Level::Level(const std::string& fileName, Scene* scene)
-    :scene(scene), mousePosX(0), mousePosY(0)
+    :scene(scene), mousePosX(0), mousePosY(0), topTile(nullptr)
 {
     std::ifstream file;
     file.open(fileName);
@@ -264,44 +264,31 @@ void Level::levelHandleEvents(const SDL_Event& event)
 }
 
 bool Level::canPlaceCharacter(int mouseX, int mouseY) {
-    
-    Tile* hoveredTile = nullptr;
-    for (const auto& tile : m_tiles) {
-        if (isMouseOverTile(tile, mouseX, mouseY)) {
-            //if this tile isn't walkable, you can't place a character
-            if (!tile->isWalkable) return false;
-
-            //keeps track of the top tile under the mouse
-            if (hoveredTile == nullptr || tile->scale > hoveredTile->scale) {
-                hoveredTile = tile;
-            }
-        }
-    }
-
     // Can place a character if the topmost tile under the mouse is walkable
-    return hoveredTile != nullptr && hoveredTile->isWalkable;
+    return topTile != nullptr && topTile->isWalkable;
 }
 
 void Level::drawTopTileOutline(int mouseX, int mouseY) {
-    Tile* topTile = nullptr;
-
-    for (const auto& tile : m_tiles) {
-        if (isMouseOverTile(tile, mouseX, mouseY)) {
-            if (topTile == nullptr || tile->scale > topTile->scale) {
-                topTile = tile;
-            }
+    Tile* drawTile = nullptr;
+    for (auto it = m_tiles.rbegin(); it != m_tiles.rend(); ++it) {
+        Tile* currentTile = *it;
+        if (isMouseOverTile(*it, mouseX, mouseY)) {
+            if (drawTile == nullptr || currentTile->scale > drawTile->scale)
+            drawTile = *it;
+            topTile = *it;
+            break;  // Break because no other tile can be above this one
         }
     }
 
-    if (topTile != nullptr) {
+    if (drawTile != nullptr) {
         SDL_SetRenderDrawColor(scene->game->getRenderer(), 255, 255, 255, 255); // white
-        SDL_Rect outlineRect = topTile->destCoords;  //draw the outline
+        SDL_Rect outlineRect = drawTile->destCoords;  //draw the outline
         SDL_RenderDrawRect(scene->game->getRenderer(), &outlineRect);
     }
 
-    if (topTile != nullptr && topTile->scale > 1.0f) {
+    if (drawTile != nullptr && drawTile->scale > 1.0f) {
         SDL_SetRenderDrawColor(scene->game->getRenderer(), 255, 0, 0, 255); // red
-        SDL_Rect outlineRect = topTile->destCoords;  //draw the outline
+        SDL_Rect outlineRect = drawTile->destCoords;  //draw the outline
         SDL_RenderDrawRect(scene->game->getRenderer(), &outlineRect);
     }
 }
