@@ -27,15 +27,18 @@ private:
     Uint32 changeSceneEventType; // event type number for user defined events
     bool launched = true;
 	bool show_ui;
-	
+	const int SCREEN_WIDTH = 1920;
+	const int SCREEN_HEIGHT = 1080;
 
 public:
 	GameManager();
 	~GameManager();
 	bool OnCreate();
 	void OnDestroy();
-	float getSceneHeight();
-	float getSceneWidth();
+	float const getSceneHeight();
+	float const getSceneWidth();
+	float const getWindowHeight();
+	float const getWindowWidth();
 	Matrix4 getProjectionMatrix();
     PlayerBody* getPlayer(){ return player; }
 	Uint32 getChangeScene() { return changeSceneEventType; }

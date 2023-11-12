@@ -8,13 +8,12 @@
 class Scene;
 class Turret;
 class Graph;
-class Character;
 class Node;
 class Path;
 
 // Tile struct declaration 
 struct Tile {
-    Tile* chlid;
+    Tile* child;
     SDL_Texture* tileTexture;
     SDL_Rect uvCoords;
     SDL_Rect destCoords;
@@ -22,6 +21,7 @@ struct Tile {
     bool needsResizing = false;
     bool isWalkable = true;
     Node* tileNode = nullptr;
+
     void resizeTile();
 };
 
@@ -29,23 +29,18 @@ class Level {
 private:
     Scene* scene;
     std::vector<Tile*> m_tiles;
+    std::vector<Node*> walkableTileNodes;
     std::vector<std::string> m_levelData;
-    Node* endNode = nullptr;
-    Graph* graph;
     int mousePosX;
     int mousePosY;
-    int width;
-    int height;
-    bool placeActor;
-
 public:
     Level() = default;
     Level(const std::string& fileName, Scene* scene);
     ~Level();
 
-    void LoadMap(const int& tileSizeX, const int& tileSizeY, const char* filename);
+    void loadMap(const int& tileSizeX, const int& tileSizeY, const char* filename);
     void clear();
-    void drawTiles(SDL_Window* window, std::vector<Character*>& characters);
+    void drawTiles();
     bool isMouseOverTile(const Tile* tile, int mouseX, int mouseY);
     Node* getTileNodeUnderMouse();
     void levelHandleEvents(const SDL_Event& event);
@@ -54,5 +49,6 @@ public:
 
     int getWidth() const { return m_levelData[0].size(); }
     int getHeight() const { return m_levelData.size(); }
-    const std::vector<std::string>& getLevelData() const { return m_levelData; }
+    const std::vector<Node*>& getWalkableTileNodes() const { return walkableTileNodes; }
+    const std::vector<Tile*>& getTiles() const { return m_tiles; }
 };

@@ -3,14 +3,12 @@
 #include <iostream>
 #include <random>
 #include "SDL_image.h"
-#include "Character.h"
+#include "Scene.h"
 #include "Turret.h"
-#include "Graph.h"
-#include "Path.h"
 
 
 Level::Level(const std::string& fileName, Scene* scene)
-    :scene(scene), graph(nullptr), placeActor(false), mousePosX(0), mousePosY(0), width(0), height(0)
+    :scene(scene), mousePosX(0), mousePosY(0)
 {
     std::ifstream file;
     file.open(fileName);
@@ -29,15 +27,15 @@ Level::Level(const std::string& fileName, Scene* scene)
 
 }
 
-Level::~Level() {}
+Level::~Level() { clear(); }
 
-void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* filename)
+void Level::loadMap(const int& tileSizeX, const int& tileSizeY, const char* filename)
 {
     SDL_Surface* surface = IMG_Load(filename);
     if (surface == nullptr) {
         throw std::runtime_error("Incorrect filepath");
     }
-   
+
     SDL_Texture* mapTexture = SDL_CreateTextureFromSurface(scene->game->getRenderer(), surface);
     if (mapTexture == nullptr) {
         throw std::runtime_error("Map Texture was not created!");
@@ -47,8 +45,6 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
     /// Quering sprite sheet to get dimentions and pass how many tiles along x and y are there
     /// needed for sprite calculation later
     SpriteSheet::QuerySpriteSheet(tileSizeX, tileSizeY, mapTexture);
-
-    SDL_GetWindowSize(scene->game->getWindow(), &width, &height);
 
     /// <summary>
     /// GetUVTile function gets the individual texture from the spritesheet. Just pass the coordinates of the tile and
@@ -77,10 +73,10 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
     SDL_Rect stockRect = SpriteSheet::GetSizedUVTile(8, 5, 3, 3);
     SDL_Rect boardRect = SpriteSheet::GetUVTile(11, 4);
 
-    static const SDL_Rect worldTileCoords{ ceil((float)width / (float)getWidth()),
-                              ceil((float)height / (float)getHeight()),
-                              ceil((float)width / (float)getWidth()),
-                              ceil((float)height / (float)getHeight()) };
+    static const SDL_Rect worldTileCoords{ ceil((float)scene->game->getWindowWidth() / (float)getWidth()),
+                              ceil((float)scene->game->getWindowHeight() / (float)getHeight()),
+                              ceil((float)scene->game->getWindowWidth() / (float)getWidth()),
+                              ceil((float)scene->game->getWindowHeight() / (float)getHeight()) };
 
     /// Here I pupulate the m_tiles vector. When it detects a character it is going to scan through switch statement
     /// to determine the attributes for that tile that is going to be rendered at that grid location
@@ -107,12 +103,11 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
             switch (tile) {
             case 'P':
                 /// Node position is the centre of that tile that is within the orthographic dimensions
-                positionX = static_cast<float>((gridPosition.x + gridPosition.w) * scene->getxAxis()) / width;
-                positionY = scene->getyAxis() - (static_cast<float>((gridPosition.y + 0.5 * gridPosition.h) * scene->getyAxis()) / height);
+                positionX = static_cast<float>((gridPosition.x + gridPosition.w) * scene->getxAxis()) / scene->game->getWindowWidth();
+                positionY = scene->getyAxis() - (static_cast<float>((gridPosition.y + 0.5 * gridPosition.h) * scene->getyAxis()) / scene->game->getWindowHeight());
                 position = { positionX, positionY, 0.0f };
                 newNode = new Node{ label, position };
                 newTile = new Tile{ nullptr, mapTexture, pathRect , gridPosition , 1.0 , false, true, newNode };
-
                 m_tiles.push_back(newTile);
                 label++;
                 break;
@@ -194,73 +189,45 @@ void Level::LoadMap(const int& tileSizeX, const int& tileSizeY, const char* file
             }
         }
     }
+
     /// resizing tile so that they are not stretched to tile dimension(especially if scale is more than 1)
-    std::vector<Node*> nodes;
     for (auto& tile : m_tiles) {
         tile->resizeTile();
         if (tile->tileNode != nullptr) {
-            nodes.push_back(tile->tileNode);
+            walkableTileNodes.push_back(tile->tileNode);
         }
     }
 
     std::sort(m_tiles.begin(), m_tiles.end(), [](const Tile* tile1, const Tile* tile2) {
         return tile1->scale < tile2->scale;
-    });
+        });
 
-    /// Creating graph and connecting nodes
-    graph = new Graph();
-    graph->OnCreate(nodes);
-    for (int i = 0; i < nodes.size(); i++) {
-        Node* fromNode = nodes[i];
-        int from = fromNode->GetLabel();
-        if (i > 0) {
-            int to = nodes[i - 1]->GetLabel();
-            graph->AddWeightedConnection(from, to, 1.0f);
-        }
-        if (i < nodes.size() - 1) {
-            int to = nodes[i + 1]->GetLabel();
-            graph->AddWeightedConnection(from, to, 1.0f);
-        }
-    }
+
 }
 
 void Level::clear() {
-    for (auto tile : m_tiles) {
+    for (auto& tile : m_tiles) {
         delete tile;
     }
+    for (auto& nodes : walkableTileNodes) {
+        delete nodes;
+    }
     m_tiles.clear();
-    delete graph;
 }
 
-void Level::drawTiles(SDL_Window* window, std::vector<Character*>& characters)
+void Level::drawTiles()
 {
     SDL_SetRenderDrawColor(scene->game->getRenderer(), 255, 255, 255, 255);
 
     for (auto& tile : m_tiles) {
         SpriteSheet::draw(scene->game->getRenderer(), tile->tileTexture, tile->uvCoords, tile->destCoords, tile->scale, tile->needsResizing);
-
-        if (placeActor && isMouseOverTile(tile, mousePosX, mousePosY)) {
-
-            Character* character = new Character();
-            Vec3 position = {
-                static_cast<float>((tile->destCoords.x + tile->destCoords.w) * scene->getxAxis()) / width,
-                scene->getyAxis() - (static_cast<float>((tile->destCoords.y + 0.5 * tile->destCoords.h) * scene->getyAxis()) / height),
-                0.0f
-            };
-
-            character->OnCreate(scene, graph, position);
-            character->setEndNode(endNode);
-            character->setTextureWith("assets/sprites/hero.png");
-            characters.push_back(character);
-            placeActor = false;
-        }
     }
 
     drawTopTileOutline(mousePosX, mousePosY);
 }
 
 bool Level::isMouseOverTile(const Tile* tile, int mouseX, int mouseY) {
-    const Tile& tempTile = (tile->chlid) ? *(tile->chlid) : *tile;
+    const Tile& tempTile = (tile->child) ? *(tile->child) : *tile;
 
     SDL_Rect adjustedRect = tempTile.destCoords;
 
@@ -286,30 +253,12 @@ Node* Level::getTileNodeUnderMouse() {
 }
 
 
-
-
 void Level::levelHandleEvents(const SDL_Event& event)
 {
     switch (event.type) {
     case SDL_MOUSEMOTION:
         mousePosX = event.motion.x;
         mousePosY = event.motion.y;
-        break;
-    case SDL_MOUSEBUTTONDOWN:
-        if (event.button.button == SDL_BUTTON_LEFT) {
-            if (!endNode) {
-                endNode = getTileNodeUnderMouse();
-                break;
-            }
-            if (canPlaceCharacter(mousePosX, mousePosY)) {
-                placeActor = true;
-            }
-        }
-        break;
-    case SDL_MOUSEBUTTONUP:
-        placeActor = false;
-        break;
-    default:
         break;
     }
 }
@@ -356,8 +305,6 @@ void Level::drawTopTileOutline(int mouseX, int mouseY) {
         SDL_RenderDrawRect(scene->game->getRenderer(), &outlineRect);
     }
 }
-
-
 
 
 void Tile::resizeTile()

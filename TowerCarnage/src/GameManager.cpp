@@ -20,10 +20,6 @@ GameManager::GameManager() {
 }
 
 bool GameManager::OnCreate() {
-    // My display is 1920 x 1080 but the following seems to work best to fill the screen.
-    const int SCREEN_WIDTH = 1920;
-    const int SCREEN_HEIGHT = 1080;
-
     
    //const int SCREEN_WIDTH = 1280;
    //const int SCREEN_HEIGHT = 720;
@@ -256,11 +252,21 @@ void GameManager::OnDestroy(){
 	if (currentScene) delete currentScene;
 }
 
-float GameManager::getSceneHeight()
-{ return currentScene->getyAxis(); }
+ float const GameManager::getSceneHeight()
+{ return  currentScene->getyAxis(); }
 
-float GameManager::getSceneWidth()
+float const GameManager::getSceneWidth()
 { return currentScene->getxAxis(); }
+
+float const GameManager::getWindowHeight()
+{
+    return SCREEN_HEIGHT;
+}
+
+float const GameManager::getWindowWidth()
+{
+    return SCREEN_WIDTH;
+}
 
 Matrix4 GameManager::getProjectionMatrix() 
 { return currentScene->getProjectionMatrix(); }

@@ -19,6 +19,9 @@ private:
 	SDL_Window *window;
 	float xAxis = 25.0f;
 	float yAxis = 15.0f;
+	int mousePosX;
+	int mousePosY;
+	bool placeActor;
 
 	SDL_Renderer* renderer;
 	Matrix4 projectionMatrix;
@@ -26,9 +29,7 @@ private:
 	Character* blinky;
 	std::vector<Character*> characters;
 	std::vector<Turret*> turrets;
-	Path* path;
 	Graph* graph;
-
 	Level level;
 
 public:
@@ -39,6 +40,7 @@ public:
 	void Update(const float time);
 	void Render();
     void HandleEvents(const SDL_Event &event);
+	void createNewCharacter();
 
 	float getxAxis() { return xAxis; }
 	float getyAxis() { return yAxis; }
@@ -46,7 +48,6 @@ public:
     Matrix4 getProjectionMatrix() { return projectionMatrix; }
 	Matrix4 getInverseMatrix() { return inverseProjection; }
 
-	Path* getPath() override { return  path; }
 };
 
 #endif

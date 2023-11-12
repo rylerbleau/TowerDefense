@@ -3,7 +3,7 @@
 #include "Graph.h"
 #include "KinematicArrive.h"
 #include "FollowAPath.h"
-
+#include <Vector.h>
 
 Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 	window = sdlWindow_;
@@ -12,7 +12,6 @@ Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 	xAxis = 25.0f;
 	yAxis = 15.0f;
 	graph = nullptr;
-	path = nullptr;
 	blinky = nullptr;
 }
 
@@ -27,25 +26,42 @@ bool Scene1::OnCreate() {
 	Matrix4 ndc = MMath::viewportNDC(w, h);
 	Matrix4 ortho = MMath::orthographic(0.0f, xAxis, 0.0f, yAxis, 0.0f, 1.0f);
 	projectionMatrix = ndc * ortho;
+
 	/// Turn on the SDL imaging subsystem
 	IMG_Init(IMG_INIT_PNG);
 
 	/// Map and initial character set up 
 	level = Level("assets/levels/Level2.txt", this);
-	level.LoadMap(12, 11, "assets/sprites/tilemap.png");
-	
-	/// Creating the Path for Djikstra to follow
+	level.loadMap(12, 11, "assets/sprites/tilemap.png");
+
+	/// Creating graph and connecting nodes
+	graph = new Graph();
+	auto walkableNodes = level.getWalkableTileNodes();
+	graph->OnCreate(walkableNodes);
+	for (int i = 0; i < walkableNodes.size(); i++) {
+		Node* fromNode = walkableNodes[i];
+		int from = fromNode->GetLabel();
+		if (i > 0) {
+			int to = walkableNodes[i - 1]->GetLabel();
+			graph->AddWeightedConnection(from, to, 1.0f);
+		}
+		if (i < walkableNodes.size() - 1) {
+			int to = walkableNodes[i + 1]->GetLabel();
+			graph->AddWeightedConnection(from, to, 1.0f);
+		}
+	}
+
 	return true;
 }
 
 void Scene1::OnDestroy() {
-	if (!characters.empty()) {
+	/*if (!characters.empty()) {
 		for (auto& character : characters) {
 			character->OnDestroy();
 		}
-	}
-
+	}*/
 	level.clear();
+	delete graph;
 }
 
 void Scene1::Update(const float deltaTime) {
@@ -53,7 +69,7 @@ void Scene1::Update(const float deltaTime) {
 	for (uint32_t i = 0; i < characters.size(); i++) {
 		characters[i]->Update(deltaTime, characters, i);
 	}
-	game->getPlayer()->Update(deltaTime);
+	//game->getPlayer()->Update(deltaTime);
 }
 
 void Scene1::Render() {
@@ -62,9 +78,10 @@ void Scene1::Render() {
 	SDL_RenderClear(renderer);
 	
 	// Draw level and AI characters
-	level.drawTiles(window, characters);
+	level.drawTiles();
+
 	for (auto& character : characters) {
-		character->render(1.0f);
+		character->render();
 	}
 
 	// render the player
@@ -76,7 +93,32 @@ void Scene1::HandleEvents(const SDL_Event& event)
 {
 	game->getPlayer()->HandleEvents(event);
 	level.levelHandleEvents(event);
-	
+
+	switch (event.type) {
+	case SDL_MOUSEMOTION:
+		mousePosX = event.motion.x;
+		mousePosY = event.motion.y;
+		break;
+	case SDL_MOUSEBUTTONDOWN:
+		if (event.button.button == SDL_BUTTON_LEFT) {
+			createNewCharacter();
+		}
+	}
+}
+
+void Scene1::createNewCharacter() {
+	for (const auto& tile : level.getTiles()) {
+		if (level.canPlaceCharacter(mousePosX, mousePosY) && level.isMouseOverTile(tile, mousePosX, mousePosY)) {
+			float posX = static_cast<float>((tile->destCoords.x + tile->destCoords.w) * getxAxis() / game->getWindowWidth());
+			float posY = getyAxis() - (static_cast<float>((tile->destCoords.y + 0.5 * tile->destCoords.h) * getyAxis() / game->getWindowHeight()));
+			Vec3 position = { posX, posY, 0.0f };
+
+			Character* character = new Character();
+			character->OnCreate(this, graph, position);
+			character->setTextureWith("assets/sprites/hero.png");
+			characters.push_back(character);
+		}
+	}
 }
 
 

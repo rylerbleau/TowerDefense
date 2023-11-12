@@ -1,7 +1,6 @@
 #include "FollowAPath.h"
 
 FollowAPath::FollowAPath(Body* character_, Path* path_) : 
-    
     KinematicArrive{character_, nullptr}
 {
     target = new Body{};
@@ -10,6 +9,7 @@ FollowAPath::FollowAPath(Body* character_, Path* path_) :
 
 FollowAPath::~FollowAPath()
 {
+    delete target;
 }
 
 KinematicSteeringOutput* FollowAPath::getSteering()

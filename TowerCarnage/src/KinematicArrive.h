@@ -15,7 +15,7 @@ protected:
 	float timeToTarget;
 public:
 	KinematicArrive(Body* character_, Body* target_);
-	~KinematicArrive();
+	virtual  ~KinematicArrive();
 	KinematicSteeringOutput* getSteering();
 };
 

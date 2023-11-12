@@ -7,7 +7,6 @@ KinematicSteeringOutput::KinematicSteeringOutput() {
 KinematicSteeringOutput::KinematicSteeringOutput(Vec3 vel_, float rot_) {
 	velocity = vel_;
 	rotation = rot_;
-
 }
 
 

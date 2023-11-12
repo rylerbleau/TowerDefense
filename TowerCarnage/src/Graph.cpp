@@ -11,6 +11,7 @@ bool Graph::OnCreate(std::vector<Node*> nodes_)
 
 	for (int i = 0; i < numNodes; i++) {
 		if (i != nodes_[i]->GetLabel()) {
+			printf("nodes_[i]->GetLabel() = %d", nodes_[i]->GetLabel());
 			std::cerr << "node with label 'i' not in the 'i'th position for " << i << std::endl;
 			return false;
 		}

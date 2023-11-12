@@ -41,7 +41,7 @@ public:
 	~Character();
 
 	bool OnCreate(Scene* scene_, Graph* graph, Vec3 pos = Vec3(15.0f, 10.0f, 0.0f));
-	void OnDestroy() { delete body; };
+	void OnDestroy() { /*delete body*/ };
 	bool setTextureWith(string file);
 	void Update(float deltaTime, std::vector<Character* > characters, int index);
 	void setStartNode();
@@ -49,9 +49,8 @@ public:
 	void updatePath();
 	Node* findNearestWalkableNode();
 	void HandleEvents(const SDL_Event& event, Node* node_);
-	void render(float scale = 1.0f);
-	void SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody*> staticBodies, float threshhold, int index, Path* path_);
-	StaticBody* getBody() { return body; }
+	void render();
+	void SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody*> staticBodies, float threshhold, int index);
 };
 
 #endif
