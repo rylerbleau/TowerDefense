@@ -66,7 +66,10 @@ void Turret::GetTarget(const std::vector<Character*>& targets) {
 }
 
 void Turret::Update(float deltaTime, std::vector<Character*>& targets, std::vector <Turret*>& turrets) {
+	float ratio = pos.x / turretUV.x;
+	Vec3 offset(-0.2f * turretUV.w * ratio, -0.05f * turretUV.h * ratio, 0);
 
+	
 	if (shooting) {
 		// check finished
 		if (lerpT >= 1.0f) {
@@ -78,8 +81,10 @@ void Turret::Update(float deltaTime, std::vector<Character*>& targets, std::vect
 		}
 		else {
 			// continue lerping
+			targetScaledPos = target->getBody()->getPos() + offset;
+
 			lerpT += 0.02f;
-			lerpPos = VMath::lerp(scaledPos, target->getBody()->getPos(), lerpT);
+			lerpPos = VMath::lerp(scaledPos, targetScaledPos, lerpT);
 		}
 	}
 
@@ -89,13 +94,13 @@ void Turret::Update(float deltaTime, std::vector<Character*>& targets, std::vect
 		shooting = true;
 		lerpT = 0.0f;
 		
-		float ratio = pos.x / turretUV.x;
-		Vec3 offset(-0.25f * turretUV.w * ratio, -0.25f * turretUV.h * ratio, 0);
+		
+		// values to offset bullet 
+		
 
 		scaledPos = pos + offset;
 		lerpPos = scaledPos;
 
-		targetScaledPos = offset;
 	}
 
 	else {
@@ -108,6 +113,8 @@ void Turret::Update(float deltaTime, std::vector<Character*>& targets, std::vect
 
 void Turret::DamageTarget(std::vector<Character*>& targets, std::vector <Turret*>& turrets)
 {
+
+	// if any other turrets are targeting the killed character, reset them
 	for (const auto& t : turrets) {
 		if (t->GetTIndex() == tIndex) {
 			t->RemoveTarget();
@@ -153,7 +160,7 @@ void Turret::RenderBullet()
 	square.w = w;
 	square.h = h;
 
-	Vec3 dir = target->getBody()->getPos() - lerpPos;
+	Vec3 dir = targetScaledPos - lerpPos;
 	float orientationDegrees = std::atan2(dir.x, dir.y) * 180.0f / M_PI + 180;
 
 
