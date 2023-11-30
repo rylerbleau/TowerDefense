@@ -71,11 +71,14 @@ void Turret::Update(float deltaTime, std::vector<Character*>& targets, std::vect
 
 	
 	if (shooting) {
+		if (!target) {
+			return;
+		}
 		// check finished
 		if (lerpT >= 1.0f) {
 			// finished, damage target then remove target
 			
-			//DamageTarget(targets, turrets);
+			target->TakeDamage(2.0f);
 			RemoveTarget();
 
 		}
@@ -108,25 +111,8 @@ void Turret::Update(float deltaTime, std::vector<Character*>& targets, std::vect
 		GetTarget(targets);
 	}
 
-
 }
 
-void Turret::DamageTarget(std::vector<Character*>& targets, std::vector <Turret*>& turrets)
-{
-
-	// if any other turrets are targeting the killed character, reset them
-	for (const auto& t : turrets) {
-		if (t->GetTIndex() == tIndex) {
-			t->RemoveTarget();
-		}
-	}
-
-	delete targets[tIndex];
-	targets[tIndex] = nullptr;
-	targets.back() = targets[tIndex];
-	targets.pop_back();
-
-}
 
 void Turret::RemoveTarget()
 {
@@ -137,6 +123,20 @@ void Turret::RemoveTarget()
 	lerpT = 0.0f;
 	lerpPos = Vec3();
 
+}
+
+void Turret::ResetTargets(std::vector<Character*>& targets, std::vector<Turret*>& turrets, int index)
+{
+	for (const auto& t : turrets) {
+		if (t->GetTIndex() == index) {
+			t->RemoveTarget();
+		}
+	}
+
+	delete targets[index];
+	targets[index] = nullptr;
+	targets.back() = targets[index];
+	targets.pop_back();
 }
 
 void Turret::RenderBullet()

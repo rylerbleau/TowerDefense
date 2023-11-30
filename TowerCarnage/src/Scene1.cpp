@@ -72,6 +72,9 @@ void Scene1::Update(const float deltaTime) {
 	// Calculate and apply any steering for npc's
 	for (uint32_t i = 0; i < characters.size(); i++) {
 		characters[i]->Update(deltaTime, characters, i);
+		if (characters[i]->isDead()) {
+			Turret::ResetTargets(characters, turrets, i);
+		}
 	}
 	for (const auto& turret : turrets) {
 		turret->Update(deltaTime, characters, turrets);
@@ -91,6 +94,8 @@ void Scene1::Render() {
 
 	for (auto& character : characters) {
 		character->render();
+		character->RenderUI();
+		
 	}
 
 	for (auto& t : turrets) {
@@ -98,6 +103,9 @@ void Scene1::Render() {
 			t->RenderBullet();
 		}
 	}
+
+
+	
 
 	// render the player
 	game->RenderPlayer(0.10f);

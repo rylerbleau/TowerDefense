@@ -21,6 +21,11 @@ bool Character::OnCreate(Scene* scene_, Graph* graph_, Vec3 pos /*= Vec3(5.0f, 5
 	scene = scene_;
 	scale = scaleGenerator(randomEngine);
 	// Configure and instantiate the body to use for the demo
+
+	maxHP = 2.0f;
+	curHP = maxHP;
+
+
 	if (!body)
 	{
 		float radius = 2.5;
@@ -139,6 +144,48 @@ void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std
 	if (separation) {
 		delete separation;
 	}
+}
+
+
+bool Character::TakeDamage(float dmg)
+{
+	curHP -= dmg;
+
+	// return false if dead
+	return (curHP <= 0) ? false : true;
+
+}
+
+void Character::RenderUI()
+{
+	SDL_Renderer* renderer = scene->game->getRenderer();
+	Matrix4 projectionMatrix = scene->getProjectionMatrix();
+
+	SDL_Rect HPoutline;
+	SDL_Rect HPfill;
+	Vec3 screenCoords;
+	float    w = 40, h = 10;
+
+	// notice use of "body" in the following
+	
+	w = static_cast<int>(w);
+	h = static_cast<int>(h);
+	screenCoords = projectionMatrix * body->getPos();
+	
+	HPoutline.y = static_cast<int>(screenCoords.y - 2.8f * h * scale);
+	HPoutline.x = static_cast<int>(screenCoords.x - 1.5f * w);
+	HPoutline.w = w;
+	HPoutline.h = h;
+
+	HPfill = HPoutline;
+	HPfill.w = curHP / maxHP * w;
+	// red for fill
+	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+	SDL_RenderFillRect(renderer, &HPfill);
+
+
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_RenderDrawRect(renderer, &HPoutline);
 }
 
 

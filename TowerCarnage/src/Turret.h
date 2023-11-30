@@ -49,11 +49,12 @@ public:
 	void Update(float deltaTime, std::vector<Character*>& targets, std::vector <Turret*>& turrets);
 	void RenderBullet();
 
-	void DamageTarget(std::vector<Character*>& targets, std::vector <Turret*>& turrets);
 
 	const int GetTIndex() { return tIndex; }
 
 	void RemoveTarget();
 
+	static void ResetTargets(std::vector<Character*>& targets, std::vector <Turret*>& turrets, int index);
+		
 };
 

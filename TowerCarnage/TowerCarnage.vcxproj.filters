@@ -76,5 +76,6 @@
     <ClInclude Include="src\Timer.h" />
     <ClInclude Include="src\Turret.h" />
     <ClInclude Include="src\Window.h" />
+    <ClInclude Include="src\Interfaces.h" />
   </ItemGroup>
 </Project>

@@ -11,6 +11,9 @@
 #include "Graph.h"
 
 using namespace std;
+
+
+
 enum class Direction {
 	RIGHT,
 	LEFT,
@@ -18,7 +21,7 @@ enum class Direction {
 	BACKWARD,
 	IDLE
 };
-class Character
+class Character : public I_HasUI
 {
 private:
 	class StaticBody* body;
@@ -30,6 +33,10 @@ private:
 	Path* path;
 	Node* endNode;
 	Node* startNode;
+
+	float maxHP;
+	float curHP;
+
 	
 public:
 	Character() :sourceRect{}
@@ -50,6 +57,15 @@ public:
 	void render();
 	void SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody*> staticBodies, float threshhold, int index);
 	StaticBody* getBody() { return body; }
+
+
+
+
+
+	bool TakeDamage(float dmg);
+	bool isDead(){ return (curHP <= 0) ? true : false; }
+	void RenderUI();
+
 };
 
 #endif
