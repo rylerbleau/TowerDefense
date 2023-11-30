@@ -128,15 +128,11 @@ void Turret::RemoveTarget()
 void Turret::ResetTargets(std::vector<Character*>& targets, std::vector<Turret*>& turrets, int index)
 {
 	for (const auto& t : turrets) {
-		if (t->GetTIndex() == index) {
-			t->RemoveTarget();
-		}
+		
+		t->RemoveTarget();
+		
 	}
 
-	delete targets[index];
-	targets[index] = nullptr;
-	targets.back() = targets[index];
-	targets.pop_back();
 }
 
 void Turret::RenderBullet()

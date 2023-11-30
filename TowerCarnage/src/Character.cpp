@@ -22,7 +22,7 @@ bool Character::OnCreate(Scene* scene_, Graph* graph_, Vec3 pos /*= Vec3(5.0f, 5
 	scale = scaleGenerator(randomEngine);
 	// Configure and instantiate the body to use for the demo
 
-	maxHP = 2.0f;
+	maxHP = 8.0f;
 	curHP = maxHP;
 
 
@@ -147,14 +147,6 @@ void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std
 }
 
 
-bool Character::TakeDamage(float dmg)
-{
-	curHP -= dmg;
-
-	// return false if dead
-	return (curHP <= 0) ? false : true;
-
-}
 
 void Character::RenderUI()
 {

@@ -48,7 +48,7 @@ public:
 	~Character();
 
 	bool OnCreate(Scene* scene_, Graph* graph, Vec3 pos = Vec3(15.0f, 10.0f, 0.0f));
-	void OnDestroy() { /*delete body*/ };
+	void OnDestroy() { /*delete body;*/ scene = nullptr; };
 	bool setTextureWith(string file);
 	void Update(float deltaTime, std::vector<Character* > characters, int index);
 	void updatePath(Node* endNode);
@@ -62,7 +62,7 @@ public:
 
 
 
-	bool TakeDamage(float dmg);
+	void TakeDamage(float dmg) { curHP -= dmg; };
 	bool isDead(){ return (curHP <= 0) ? true : false; }
 	void RenderUI();
 
