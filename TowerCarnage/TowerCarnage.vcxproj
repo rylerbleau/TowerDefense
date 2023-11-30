@@ -191,6 +191,7 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Interfaces.h" />
     <ClInclude Include="src\Body.h" />
     <ClInclude Include="src\Character.h" />
     <ClInclude Include="src\Flee.h" />

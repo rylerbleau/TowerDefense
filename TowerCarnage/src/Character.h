@@ -7,6 +7,9 @@
 #include "Graph.h"
 
 using namespace std;
+
+
+
 enum class Direction {
 	RIGHT,
 	LEFT,
@@ -14,7 +17,7 @@ enum class Direction {
 	BACKWARD,
 	IDLE
 };
-class Character
+class Character : public I_HasUI
 {
 private:
 	class StaticBody* body;
@@ -24,6 +27,12 @@ private:
 	float scale = 1.0f;
 	Graph* graph;
 	Path* path;
+	Node* endNode;
+	Node* startNode;
+
+	float maxHP;
+	float curHP;
+
 	
 public:
 	Character() :sourceRect{}
@@ -35,7 +44,7 @@ public:
 	~Character();
 
 	bool OnCreate(Scene* scene_, Graph* graph, Vec3 pos = Vec3(15.0f, 10.0f, 0.0f));
-	void OnDestroy() { /*delete body*/ };
+	void OnDestroy() { /*delete body;*/ scene = nullptr; };
 	bool setTextureWith(string file);
 	void Update(float deltaTime, std::vector<Character* > characters, int index);
 	void updatePath(Node* endNode);
@@ -44,6 +53,15 @@ public:
 	void render();
 	void SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody*> staticBodies, float threshhold, int index);
 	StaticBody* getBody() { return body; }
+
+
+
+
+
+	void TakeDamage(float dmg) { curHP -= dmg; };
+	bool isDead(){ return (curHP <= 0) ? true : false; }
+	void RenderUI();
+
 };
 
 #endif

@@ -66,20 +66,28 @@ void Turret::GetTarget(const std::vector<Character*>& targets) {
 }
 
 void Turret::Update(float deltaTime, std::vector<Character*>& targets, std::vector <Turret*>& turrets) {
+	float ratio = pos.x / turretUV.x;
+	Vec3 offset(-0.2f * turretUV.w * ratio, -0.05f * turretUV.h * ratio, 0);
 
+	
 	if (shooting) {
+		if (!target) {
+			return;
+		}
 		// check finished
 		if (lerpT >= 1.0f) {
 			// finished, damage target then remove target
 			
-			//DamageTarget(targets, turrets);
+			target->TakeDamage(2.0f);
 			RemoveTarget();
 
 		}
 		else {
 			// continue lerping
+			targetScaledPos = target->getBody()->getPos() + offset;
+
 			lerpT += 0.02f;
-			lerpPos = VMath::lerp(scaledPos, target->getBody()->getPos(), lerpT);
+			lerpPos = VMath::lerp(scaledPos, targetScaledPos, lerpT);
 		}
 	}
 
@@ -89,13 +97,13 @@ void Turret::Update(float deltaTime, std::vector<Character*>& targets, std::vect
 		shooting = true;
 		lerpT = 0.0f;
 		
-		float ratio = pos.x / turretUV.x;
-		Vec3 offset(-0.25f * turretUV.w * ratio, -0.25f * turretUV.h * ratio, 0);
+		
+		// values to offset bullet 
+		
 
 		scaledPos = pos + offset;
 		lerpPos = scaledPos;
 
-		targetScaledPos = offset;
 	}
 
 	else {
@@ -103,23 +111,8 @@ void Turret::Update(float deltaTime, std::vector<Character*>& targets, std::vect
 		GetTarget(targets);
 	}
 
-
 }
 
-void Turret::DamageTarget(std::vector<Character*>& targets, std::vector <Turret*>& turrets)
-{
-	for (const auto& t : turrets) {
-		if (t->GetTIndex() == tIndex) {
-			t->RemoveTarget();
-		}
-	}
-
-	delete targets[tIndex];
-	targets[tIndex] = nullptr;
-	targets.back() = targets[tIndex];
-	targets.pop_back();
-
-}
 
 void Turret::RemoveTarget()
 {
@@ -129,6 +122,16 @@ void Turret::RemoveTarget()
 	shooting = false;
 	lerpT = 0.0f;
 	lerpPos = Vec3();
+
+}
+
+void Turret::ResetTargets(std::vector<Character*>& targets, std::vector<Turret*>& turrets, int index)
+{
+	for (const auto& t : turrets) {
+		
+		t->RemoveTarget();
+		
+	}
 
 }
 
@@ -153,7 +156,7 @@ void Turret::RenderBullet()
 	square.w = w;
 	square.h = h;
 
-	Vec3 dir = target->getBody()->getPos() - lerpPos;
+	Vec3 dir = targetScaledPos - lerpPos;
 	float orientationDegrees = std::atan2(dir.x, dir.y) * 180.0f / M_PI + 180;
 
 
