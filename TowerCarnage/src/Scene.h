@@ -7,6 +7,9 @@
 #include "GameManager.h"
 #include "Path.h"
 
+#include "Interfaces.h"
+
+
 using namespace MATH;
 
 class Scene {

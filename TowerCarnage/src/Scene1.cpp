@@ -4,6 +4,7 @@
 #include "KinematicArrive.h"
 #include "FollowAPath.h"
 #include <Vector.h>
+#include "imgui.h"
 
 Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 	window = sdlWindow_;
@@ -55,6 +56,9 @@ bool Scene1::OnCreate() {
 
 	endNode = graph->GetNode(graph->NumNodes() - 1);
 
+	usingUI = false;
+	paused = false;
+
 	return true;
 }
 
@@ -69,19 +73,32 @@ void Scene1::OnDestroy() {
 }
 
 void Scene1::Update(const float deltaTime) {
-	// Calculate and apply any steering for npc's
-	for (uint32_t i = 0; i < characters.size(); i++) {
-		characters[i]->Update(deltaTime, characters, i);
+	//HandleTheGUI();
+	if (paused) {
+		return;
 	}
+
+	// Calculate and apply any steering for npc's
 	for (const auto& turret : turrets) {
 		turret->Update(deltaTime, characters, turrets);
 		//turret->GetTarget(characters);
 
 	}
+	for (uint32_t i = 0; i < characters.size(); i++) {
+		characters[i]->Update(deltaTime, characters, i);
+		if (characters[i]->isDead()) {
+
+			Turret::ResetTargets(characters, turrets, i);
+			delete characters[i];
+			characters.erase(characters.begin()+i);
+			
+		}
+	}
 	//game->getPlayer()->Update(deltaTime);
 }
 
 void Scene1::Render() {
+
 	// reset render colour
 	SDL_SetRenderDrawColor(renderer, 210, 180, 140, 0);
 	SDL_RenderClear(renderer);
@@ -91,6 +108,8 @@ void Scene1::Render() {
 
 	for (auto& character : characters) {
 		character->render();
+		character->RenderUI();
+		
 	}
 
 	for (auto& t : turrets) {
@@ -99,28 +118,37 @@ void Scene1::Render() {
 		}
 	}
 
+
+	
+
 	// render the player
-	game->RenderPlayer(0.10f);
-	SDL_RenderPresent(renderer);
+	//game->RenderPlayer(0.10f);
+	//SDL_RenderPresent(renderer);
+	HandleTheGUI();
 }
 
 void Scene1::HandleEvents(const SDL_Event& event)
 {
+	if (paused) {
+		return;
+	}
 	game->getPlayer()->HandleEvents(event);
 	level.levelHandleEvents(event);
-
+	if (usingUI) {
+		return;
+	}
 	switch (event.type) {
 	case SDL_MOUSEBUTTONDOWN:
-		if (event.button.button == SDL_BUTTON_LEFT) {
+		if (event.button.button == SDL_BUTTON_RIGHT) {
 			createNewCharacter();
 		}
-		if (event.button.button == SDL_BUTTON_RIGHT) {
+		if (event.button.button == SDL_BUTTON_MIDDLE) {
 			endNode = findNode();
 			for (auto& character : characters) {
 				character->updatePath(endNode);
 			}
 		}
-		if (event.button.button == SDL_BUTTON_MIDDLE) {
+		if (event.button.button == SDL_BUTTON_LEFT) {
 			placeTurret();
 		}
 		break;
@@ -154,7 +182,7 @@ void Scene1::placeTurret()
 
 	// place turret
 	for (const auto& tile : level.getTiles()) {
-		if (level.canPlaceEntity() && level.isMouseOverTile(tile)) {
+		if (level.canPlaceEntity() && level.isMouseOverTile(tile) && tile->letter == 'G') {
 
 			Vec3 position = {
 							static_cast<float>((tile->destCoords.x + tile->destCoords.w) * getxAxis()) / game->getWindowWidth(),
@@ -181,4 +209,33 @@ Node* Scene1::findNode() {
 	Node* node = level.getTileNodeUnderMouse();
 	if (node) return node;
 	return endNode;
+}
+
+void Scene1::HandleTheGUI() {
+	
+	if (ImGui::Begin("Test", NULL, 
+		ImGuiWindowFlags_NoResize			  |		ImGuiWindowFlags_NoCollapse   | 
+		ImGuiWindowFlags_NoTitleBar			  |		ImGuiWindowFlags_NoBackground |
+		ImGuiWindowFlags_NoScrollWithMouse	  |		ImGuiWindowFlags_NoScrollbar  |
+		ImGuiWindowFlags_NoNavInputs		  |     ImGuiHoveredFlags_AnyWindow)) {
+
+		
+		if (ImGui::Button("pause", ImVec2(50, 30))) {
+			paused = !paused;
+		}
+		
+
+	}
+	if (ImGui::IsWindowHovered()) {
+		usingUI = true;
+	}
+	else {
+		usingUI = false;
+	}
+
+
+
+	ImGui::End();
+
+
 }

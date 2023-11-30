@@ -31,6 +31,9 @@ private:
 	Node* endNode;
 	Level level;
 
+	bool usingUI;
+	bool paused;
+
 public:
 	Scene1(SDL_Window* sdlWindow, GameManager* game_);
 	~Scene1();
@@ -50,6 +53,8 @@ public:
 	SDL_Window* getWindow() { return window; }
     Matrix4 getProjectionMatrix() { return projectionMatrix; }
 	Matrix4 getInverseMatrix() { return inverseProjection; }
+
+	void HandleTheGUI();
 
 };
 

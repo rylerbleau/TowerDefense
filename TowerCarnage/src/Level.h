@@ -47,6 +47,7 @@ public:
     Node* getTileNodeUnderMouse();
     void levelHandleEvents(const SDL_Event& event);
     bool canPlaceEntity();
+    
     void drawTopTileOutline();
     void placeTurret(SDL_Window* window, std::vector<Turret*>& turrets, Tile* tile);
 

@@ -131,6 +131,7 @@ void GameManager::Run() {
     
 	while (isRunning)
 	{
+		handleEvents();
 
 
         ImGui_ImplSDLRenderer2_NewFrame();
@@ -144,7 +145,6 @@ void GameManager::Run() {
            
 
 		currentScene->Render();
-		handleEvents();
 
         if (show_ui) {
             ImGui::Render();
@@ -312,7 +312,7 @@ void GameManager::LoadScene( int i )
             currentScene = new Scene3(windowPtr->GetSDL_Window(), this);
             break;
         default:
-            currentScene = new Scene1( windowPtr->GetSDL_Window(), this );
+            currentScene = new Scene3( windowPtr->GetSDL_Window(), this );
             break;
     }
     // using ValidateCurrentScene() to safely run OnCreate
