@@ -129,6 +129,9 @@ void Scene1::Render() {
 
 void Scene1::HandleEvents(const SDL_Event& event)
 {
+	if (paused) {
+		return;
+	}
 	game->getPlayer()->HandleEvents(event);
 	level.levelHandleEvents(event);
 	if (usingUI) {
@@ -136,16 +139,16 @@ void Scene1::HandleEvents(const SDL_Event& event)
 	}
 	switch (event.type) {
 	case SDL_MOUSEBUTTONDOWN:
-		if (event.button.button == SDL_BUTTON_LEFT) {
+		if (event.button.button == SDL_BUTTON_RIGHT) {
 			createNewCharacter();
 		}
-		if (event.button.button == SDL_BUTTON_RIGHT) {
+		if (event.button.button == SDL_BUTTON_MIDDLE) {
 			endNode = findNode();
 			for (auto& character : characters) {
 				character->updatePath(endNode);
 			}
 		}
-		if (event.button.button == SDL_BUTTON_MIDDLE) {
+		if (event.button.button == SDL_BUTTON_LEFT) {
 			placeTurret();
 		}
 		break;
