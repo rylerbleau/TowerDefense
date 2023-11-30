@@ -17,7 +17,6 @@ Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 }
 
 Scene1::~Scene1(){
-
 }
 
 bool Scene1::OnCreate() {
@@ -32,12 +31,12 @@ bool Scene1::OnCreate() {
 	IMG_Init(IMG_INIT_PNG);
 
 	/// Map and initial character set up 
-	level = Level("assets/levels/Level2.txt", this);
-	level.loadMap(12, 11, "assets/sprites/tilemap.png");
+	level = new Level("assets/levels/Level2.txt", this);
+	level->loadMap(12, 11, "assets/sprites/tilemap.png");
 
 	/// Creating graph and connecting nodes
 	graph = new Graph();
-	auto walkableNodes = level.getWalkableTileNodes();
+	auto walkableNodes = level->getWalkableTileNodes();
 
 	graph->OnCreate(walkableNodes);
 	for (int i = 0; i < walkableNodes.size(); i++) {
@@ -59,13 +58,14 @@ bool Scene1::OnCreate() {
 }
 
 void Scene1::OnDestroy() {
-	/*if (!characters.empty()) {
+	if (!characters.empty()) {
 		for (auto& character : characters) {
 			character->OnDestroy();
 		}
-	}*/
-	level.clear();
+	}
 	delete graph;
+	level->clear();
+	delete level;
 }
 
 void Scene1::Update(const float deltaTime) {
@@ -87,7 +87,7 @@ void Scene1::Render() {
 	SDL_RenderClear(renderer);
 	
 	// Draw level and AI characters
-	level.drawTiles();
+	level->drawTiles();
 
 	for (auto& character : characters) {
 		character->render();
@@ -100,14 +100,13 @@ void Scene1::Render() {
 	}
 
 	// render the player
-	game->RenderPlayer(0.10f);
+
 	SDL_RenderPresent(renderer);
 }
 
 void Scene1::HandleEvents(const SDL_Event& event)
 {
-	game->getPlayer()->HandleEvents(event);
-	level.levelHandleEvents(event);
+	level->levelHandleEvents(event);
 
 	switch (event.type) {
 	case SDL_MOUSEBUTTONDOWN:
@@ -130,8 +129,8 @@ void Scene1::HandleEvents(const SDL_Event& event)
 }
 
 void Scene1::createNewCharacter() {
-	for (const auto& tile : level.getTiles()) {
-		if (level.canPlaceEntity() && level.isMouseOverTile(tile)) {
+	for (const auto& tile : level->getTiles()) {
+		if (level->canPlaceEntity() && level->isMouseOverTile(tile)) {
 
 			float posX = static_cast<float>((tile->destCoords.x + tile->destCoords.w) * getxAxis() / game->getWindowWidth());
 			float posY = getyAxis() - (static_cast<float>((tile->destCoords.y + 0.5 * tile->destCoords.h) * getyAxis() / game->getWindowHeight()));
@@ -153,8 +152,8 @@ void Scene1::placeTurret()
 	// check if placement is legal
 
 	// place turret
-	for (const auto& tile : level.getTiles()) {
-		if (level.canPlaceEntity() && level.isMouseOverTile(tile)) {
+	for (const auto& tile : level->getTiles()) {
+		if (level->canPlaceEntity() && level->isMouseOverTile(tile)) {
 
 			Vec3 position = {
 							static_cast<float>((tile->destCoords.x + tile->destCoords.w) * getxAxis()) / game->getWindowWidth(),
@@ -178,7 +177,7 @@ void Scene1::placeTurret()
 }
 
 Node* Scene1::findNode() {
-	Node* node = level.getTileNodeUnderMouse();
+	Node* node = level->getTileNodeUnderMouse();
 	if (node) return node;
 	return endNode;
 }

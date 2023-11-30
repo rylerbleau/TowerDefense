@@ -29,6 +29,7 @@ struct Tile {
 class Level {
 private:
     Scene* scene;
+    SDL_Texture* mapTexture;
     Tile* topTile;
     std::vector<Tile*> m_tiles;
     std::vector<Node*> walkableTileNodes;

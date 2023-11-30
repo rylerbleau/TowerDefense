@@ -2,11 +2,7 @@
 #define CHARACTER_H
 
 #include <vector>
-
 #include "Scene.h"
-#include "steering/KinematicBody.h"
-#include "Seek.h"
-#include "Flee.h"
 #include "StaticBody.h"
 #include "Graph.h"
 
@@ -28,8 +24,6 @@ private:
 	float scale = 1.0f;
 	Graph* graph;
 	Path* path;
-	Node* endNode;
-	Node* startNode;
 	
 public:
 	Character() :sourceRect{}

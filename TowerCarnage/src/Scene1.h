@@ -29,7 +29,7 @@ private:
 	std::vector<Turret*> turrets;
 	Graph* graph;
 	Node* endNode;
-	Level level;
+	Level* level;
 
 public:
 	Scene1(SDL_Window* sdlWindow, GameManager* game_);

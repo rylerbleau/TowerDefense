@@ -26,7 +26,9 @@ Level::Level(const std::string& fileName, Scene* scene)
 
 }
 
-Level::~Level() { clear(); }
+Level::~Level() {
+   
+}
 
 void Level::loadMap(const int& tileSizeX, const int& tileSizeY, const char* filename)
 {
@@ -35,7 +37,7 @@ void Level::loadMap(const int& tileSizeX, const int& tileSizeY, const char* file
         throw std::runtime_error("Incorrect filepath");
     }
 
-    SDL_Texture* mapTexture = SDL_CreateTextureFromSurface(scene->game->getRenderer(), surface);
+    mapTexture = SDL_CreateTextureFromSurface(scene->game->getRenderer(), surface);
     if (mapTexture == nullptr) {
         throw std::runtime_error("Map Texture was not created!");
     }
@@ -193,13 +195,13 @@ void Level::loadMap(const int& tileSizeX, const int& tileSizeY, const char* file
     for (auto& tile : m_tiles) {
         tile->resizeTile();
         if (tile->tileNode != nullptr) {
-            walkableTileNodes.push_back(tile->tileNode);
+            walkableTileNodes.emplace_back(tile->tileNode);
         }
     }
 
     std::sort(m_tiles.begin(), m_tiles.end(), [](const Tile* tile1, const Tile* tile2) {
         return tile1->scale < tile2->scale;
-        });
+    });
 
 
 }
@@ -212,6 +214,9 @@ void Level::clear() {
         delete nodes;
     }
     m_tiles.clear();
+    walkableTileNodes.clear();
+
+   
 }
 
 void Level::drawTiles()

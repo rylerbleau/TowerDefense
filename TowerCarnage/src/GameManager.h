@@ -47,7 +47,6 @@ public:
 
 	SDL_Renderer* getRenderer();
 	SDL_Window* getWindow();
-	void RenderPlayer(float scale = 1.0f);
 	void Run();
     void LoadScene( int i );
     void handleEvents();

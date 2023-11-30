@@ -5,9 +5,8 @@
 #include "KinematicSeperation.h"
 #include "KinematicArrive.h"
 #include "FollowAPath.h"
-
 #include <random>
-#include <vector>
+
 
 static std::mt19937 randomEngine(time(nullptr));
 static std::uniform_real_distribution<float> scaleGenerator(0.8f, 1.0f);
@@ -101,7 +100,7 @@ void Character::updatePath(Node* endNode_)
 
 	path = new Path();
 	Node* startNode = findNearestWalkableNode();
-	endNode = endNode_;
+	Node* endNode = endNode_;
 
 	if (startNode && endNode) {
 		int startIndex = startNode->GetLabel();
@@ -174,17 +173,20 @@ void Character::render()
 
 	SpriteSheet::QuerySpriteSheet(8, 3, body->getTexture());
 
-	if (body->getVel().x > 0.0f && abs(body->getVel().x) > abs(body->getVel().y)) {
+	if (body->getVel().x > 0.2f && abs(body->getVel().x) > abs(body->getVel().y)) {
 		direction = Direction::RIGHT;
 	}
-	else if (body->getVel().x < 0.0f && abs(body->getVel().x) > abs(body->getVel().y)) {
+	else if (body->getVel().x < -0.2f && abs(body->getVel().x) > abs(body->getVel().y)) {
 		direction = Direction::LEFT;
 	}
-	else if (body->getVel().y > 0.0f && abs(body->getVel().y) > abs(body->getVel().x)) {
+	else if (body->getVel().y > 0.2f && abs(body->getVel().y) > abs(body->getVel().x)) {
 		direction = Direction::FORWARD;
 	}
-	else if (body->getVel().y < 0.0f && abs(body->getVel().y) > abs(body->getVel().x)) {
+	else if (body->getVel().y < -0.2f && abs(body->getVel().y) > abs(body->getVel().x)) {
 		direction = Direction::BACKWARD;
+	}
+	else {
+		direction = Direction::IDLE;
 	}
 	int startPosX = 0;
 	int tileIndexY = 0;
@@ -222,6 +224,10 @@ void Character::render()
 		tileIndexY = 2;
 		tileIndexX = startPosX + ((SDL_GetTicks() / FRAME_SPEED) % numFrames);
 		sourceRect = SpriteSheet::GetUVTile(tileIndexX, tileIndexY);
+		break;
+	case Direction::IDLE:
+	
+		sourceRect = SpriteSheet::GetUVTile(4, 2);
 		break;
 	}
 	SpriteSheet::drawPlayer(renderer, body->getTexture(), sourceRect, square, this->scale, true);

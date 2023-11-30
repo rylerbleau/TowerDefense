@@ -27,5 +27,4 @@ KinematicSteeringOutput* FollowAPath::getSteering()
     target->setPos(target_position);
 
     return KinematicArrive::getSteering();
-
 }

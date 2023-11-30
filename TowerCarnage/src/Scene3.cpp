@@ -144,7 +144,7 @@ void Scene3::Render() {
         SDL_RenderCopyEx(renderer, body->getTexture(), nullptr, &bodyRect, orientationDeg, nullptr, SDL_FLIP_NONE);
     }
 
-    game->RenderPlayer(0.10f);
+   
 
     SDL_RenderPresent(renderer);
 }

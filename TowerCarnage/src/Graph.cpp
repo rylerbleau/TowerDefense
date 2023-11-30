@@ -85,16 +85,12 @@ public:
 		printf("Node: %i, priority: %.2f \n", node->GetLabel(), priority);
 	}
 
-	
-};
-
-struct ComparePriority
-{
 	bool operator()(NodeAndPriority const& lhs, NodeAndPriority const& rhs)
 	{
 		// make it a min queue
 		return lhs.priority > rhs.priority;
 	}
+	
 };
 
 std::vector<int> Graph::Dijkstra(int start, int goal)
@@ -103,7 +99,7 @@ std::vector<int> Graph::Dijkstra(int start, int goal)
 	float priority;
 	Node* current = nodes[start];
 
-	std::priority_queue<NodeAndPriority, std::deque<NodeAndPriority>, ComparePriority > frontier;
+	std::priority_queue<NodeAndPriority, std::deque<NodeAndPriority>, NodeAndPriority > frontier;
 	frontier.push(NodeAndPriority{ current, 0.0f });
 
 	//track solution path
@@ -141,6 +137,7 @@ std::vector<int> Graph::Dijkstra(int start, int goal)
 				frontier.push(NodeAndPriority{ newNode, priority });
 				/// breadcrumbs to follow tha path
 				came_from[neighbour] = current->GetLabel();
+
 			}
 		}
 	}
