@@ -43,6 +43,7 @@ public:
 
     void loadMap(const int& tileSizeX, const int& tileSizeY, const char* filename);
     void clear();
+    void sortTiles();
     void drawTiles();
     bool isMouseOverTile(const Tile* tile);
     Node* getTileNodeUnderMouse();
@@ -54,6 +55,20 @@ public:
 
     int getWidth() const { return m_levelData[0].size(); }
     int getHeight() const { return m_levelData.size(); }
-    const std::vector<Node*>& getWalkableTileNodes() const { return walkableTileNodes; }
-    const std::vector<Tile*>& getTiles() const { return m_tiles; }
+       
+    std::vector<Node*> getWalkableTileNodes() const { return walkableTileNodes; }
+    std::vector<Tile*> getTiles() const { return m_tiles; }
+    Tile* getTile(int x, int y)
+    {
+        if (x < 0) x = 0;
+        if (x >= m_levelData[0].size()) x = m_levelData[0].size() - 1;
+
+        if (y < 0) y = 0;
+        if (y >= m_levelData.size()) y = m_levelData.size() - 1;
+        // get the position of a 1d array as if it was a 2d array(better cache-coherency)
+        //each row represents a data of columns scattered around no the heap which does 
+        //not make the 2D array contiguous
+        return m_tiles[y * m_levelData[0].size() + x];
+    }
+
 };

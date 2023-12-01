@@ -42,24 +42,47 @@ bool Scene1::OnCreate() {
 
 	/// Creating graph and connecting nodes
 	graph = new Graph();
-	auto walkableNodes = level->getWalkableTileNodes();
+	graph->OnCreate(level->getWalkableTileNodes());
+	
+	int rows = level->getHeight();
+	int cols = level->getWidth();
+	int tileWidth = level->getTiles()[0]->destCoords.w;
+	int tileHeight = level->getTiles()[0]->destCoords.h;
 
-	graph->OnCreate(walkableNodes);
-	for (int i = 0; i < walkableNodes.size(); i++) {
-		Node* fromNode = walkableNodes[i];
-		int from = fromNode->GetLabel();
-		if (i > 0) {
-			int to = walkableNodes[i - 1]->GetLabel();
-			graph->AddWeightedConnection(from, to, 1.0f);
-		}
-		if (i < walkableNodes.size() - 1) {
-			int to = walkableNodes[i + 1]->GetLabel();
-			graph->AddWeightedConnection(from, to, 1.0f);
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			Node* fromNode = level->getTile(j, i)->tileNode;
+			int from = fromNode->GetLabel();
+			if (j > 0) {
+				if (level->getTile(j - 1, i)->isWalkable) {
+					int to = level->getTile(j - 1, i)->tileNode->GetLabel();
+					graph->AddWeightedConnection(from, to, tileWidth);
+				}
+			}
+			if (j < cols - 1) {
+				if (level->getTile(j + 1, i)->isWalkable) {
+					int to = level->getTile(j + 1, i)->tileNode->GetLabel();
+					graph->AddWeightedConnection(from, to, tileWidth);
+				}
+			}
+			if (i > 0) {
+				if (level->getTile(j, i - 1)->isWalkable) {
+					int to = level->getTile(j, i - 1)->tileNode->GetLabel();
+					graph->AddWeightedConnection(from, to, tileHeight);
+				}
+			}
+			if (i < rows - 1) {
+				if (level->getTile(j, i + 1)->isWalkable) {
+					int to = level->getTile(j, i + 1)->tileNode->GetLabel();
+					graph->AddWeightedConnection(from, to, tileHeight);
+				}
+			}
 		}
 	}
 
 	endNode = graph->GetNode(graph->NumNodes() - 1);
 
+	level->sortTiles();
 	usingUI = false;
 	paused = false;
 
@@ -210,7 +233,9 @@ void Scene1::placeTurret()
 
 Node* Scene1::findNode() {
 	Node* node = level->getTileNodeUnderMouse();
-	if (node) return node;
+	if (graph->hasConnections(node->GetLabel())) {
+		return node;
+	}
 	return endNode;
 }
 

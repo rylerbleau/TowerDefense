@@ -43,6 +43,16 @@ Node* Graph::findNode(int node)
 	}
 }
 
+bool Graph::hasConnections(int node)
+{
+	for (int i = 0; i < NumNodes(); i++) {
+		if (costs[node][i] > 0.0f) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void Graph::AddWeightedConnection(int fromNode, int toNode, float weight)
 {
 	costs[fromNode][toNode] = weight;

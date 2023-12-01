@@ -91,6 +91,7 @@ void Level::loadMap(const int& tileSizeX, const int& tileSizeY, const char* file
     MATH::Vec3 position = {};
 
     for (size_t y = 0; y < m_levelData.size(); y++) {
+
         for (size_t x = 0; x < m_levelData[y].size(); x++) {
 
             char tile = m_levelData[y][x];
@@ -107,85 +108,76 @@ void Level::loadMap(const int& tileSizeX, const int& tileSizeY, const char* file
             positionY = scene->getyAxis() - (static_cast<float>((gridPosition.y + 0.5 * gridPosition.h) * scene->getyAxis()) / scene->game->getWindowHeight());
             position = { positionX, positionY, 0.0f };
 
+            newNode = new Node{ label, position };
             switch (tile) {
             case 'P':
-                newNode = new Node{ label, position };
                 newTile = new Tile{ nullptr, mapTexture, pathRect , gridPosition , 1.0 , false, true, newNode };
-                m_tiles.push_back(newTile);
-                label++;
                 break;
             case 'G':
-                newTile = new Tile{ nullptr, mapTexture, grassRect , gridPosition , 1.0 , false, true, nullptr, tile};
-                m_tiles.push_back(newTile);
+                newTile = new Tile{ nullptr, mapTexture, grassRect , gridPosition , 1.0 , false, false, newNode, tile};
                 break;
             case 'F':
-                newTile = new Tile{ nullptr, mapTexture, flowerRect , gridPosition , 1.0 , false };
-                m_tiles.push_back(newTile);
+                newTile = new Tile{ nullptr, mapTexture, flowerRect , gridPosition , 1.0 , false, true, newNode };
                 break;
             case 'T':
                 childTile = new Tile{ nullptr, mapTexture, greenTreeRect, gridPosition, 1.2, true, false };
-                newTile = new Tile{ childTile, mapTexture, grassRect, gridPosition, 1.0, false, false };
-                m_tiles.push_back(newTile);
+                newTile = new Tile{ childTile, mapTexture, grassRect, gridPosition, 1.0, false, false, newNode };
                 break;
             case 'O':
                 childTile = new Tile{ nullptr, mapTexture, orangeTreeRect, gridPosition, 2.0, true, false };
-                newTile = new Tile{ childTile, mapTexture, grassRect, gridPosition, 1.0, false, false };
-                m_tiles.push_back(newTile);
+                newTile = new Tile{ childTile, mapTexture, grassRect, gridPosition, 1.0, false, false, newNode };
                 break;
             case 'R':
-                newTile = new Tile{ nullptr, mapTexture, rightGrassRect , gridPosition , 1.0 , false };
-                m_tiles.push_back(newTile);
+                newTile = new Tile{ nullptr, mapTexture, rightGrassRect , gridPosition , 1.0 , false, true, newNode };
                 break;
             case 'L':
-                newTile = new Tile{ nullptr, mapTexture, leftGrassRect , gridPosition , 1.0 , false };
-                m_tiles.push_back(newTile);
+                newTile = new Tile{ nullptr, mapTexture, leftGrassRect , gridPosition , 1.0 , false, true, newNode };
                 break;
             case 'B':
-                newTile = new Tile{ nullptr, mapTexture, bottomRect , gridPosition , 1.0 , false };
-                m_tiles.push_back(newTile);
+                newTile = new Tile{ nullptr, mapTexture, bottomRect , gridPosition , 1.0 , false, true,  newNode };
                 break;
             case 'N':
-                newTile = new Tile{ nullptr, mapTexture, topRect , gridPosition , 1.0 , false };
-                m_tiles.push_back(newTile);
+                newTile = new Tile{ nullptr, mapTexture, topRect , gridPosition , 1.0 , false, true, newNode };
                 break;
             case '1':
-                newTile = new Tile{ nullptr, mapTexture, bottomLeftGrassCorner , gridPosition , 1.0 , false };
-                m_tiles.push_back(newTile);
+                newTile = new Tile{ nullptr, mapTexture, bottomLeftGrassCorner , gridPosition , 1.0 , false, true, newNode };
                 break;
             case '2':
-                newTile = new Tile{ nullptr, mapTexture, topRightGrassCorner , gridPosition , 1.0 , false };
-                m_tiles.push_back(newTile);
+                newTile = new Tile{ nullptr, mapTexture, topRightGrassCorner , gridPosition , 1.0 , false, true, newNode };
                 break;
             case 'C':
-                newTile = new Tile{ nullptr, mapTexture, buildingRect , gridPosition , 6.0 , true, false };
+
+                childTile = new Tile{ nullptr, mapTexture, buildingRect , gridPosition , 6.0 , true, false };
                 gridPosition.x += 210;
-                m_tiles.push_back(new Tile{ newTile, mapTexture, doorRect , gridPosition , 2.0 , true, false });
+                newTile = new Tile{ childTile, mapTexture, doorRect , gridPosition , 2.0 , true, false, newNode };
                 break;
             case 'S':
-                newTile = new Tile{ nullptr, mapTexture, rockRect , gridPosition , 1.0 , false };
-                m_tiles.push_back(newTile);
+                newTile = new Tile{ nullptr, mapTexture, rockRect , gridPosition , 1.0 , false, false, newNode };
                 break;
             case 'W':
                 childTile = new Tile{ nullptr, mapTexture, wellRect, gridPosition, 3.0, true, false };
-                newTile = new Tile{ childTile, mapTexture, rockRect, gridPosition, 1.0, false, false };
-                m_tiles.push_back(newTile);
+                newTile = new Tile{ childTile, mapTexture, rockRect, gridPosition, 1.0, false, false, newNode };
                 break;
             case 'J':
                 childTile = new Tile{ nullptr, mapTexture, stockRect, gridPosition, 3.0, true, false };
-                newTile = new Tile{ childTile, mapTexture, rockRect, gridPosition, 1.0, false, false };
-                m_tiles.push_back(newTile);
+                newTile = new Tile{ childTile, mapTexture, rockRect, gridPosition, 1.0, false, false, newNode };
                 break;
             case 'V':
                 childTile = new Tile{ nullptr, mapTexture, boardRect, gridPosition, 1.2, false, false };
-                newTile = new Tile{ childTile, mapTexture, rockRect, gridPosition, 1.0, false, false };
-                m_tiles.push_back(newTile);
+                newTile = new Tile{ childTile, mapTexture, rockRect, gridPosition, 1.0, false, false, newNode };
                 break;
             default:
                 printf("Unexpected symbol %c at (%d, %d)", tile, x, y);
                 break;
             }
+            m_tiles.push_back(newTile);
+            walkableTileNodes.push_back(newNode);
+            label++;
         }
     }
+}
+
+void Level::sortTiles() {
 
     /// resizing tile so that they are not stretched to tile dimension(especially if scale is more than 1)
     for (auto& tile : m_tiles) {
@@ -193,17 +185,12 @@ void Level::loadMap(const int& tileSizeX, const int& tileSizeY, const char* file
         if (tile->child) {
             tile->child->resizeTile();
         }
-        if (tile->tileNode != nullptr) {
-            walkableTileNodes.emplace_back(tile->tileNode);
-        }
     }
 
     std::sort(m_tiles.begin(), m_tiles.end(), [](const Tile* tile1, const Tile* tile2) {
         return tile1->child < tile2->child;
-    });
-
+        });
 }
-
 
 void Level::clear() {
     for (auto& tile : m_tiles) {
@@ -212,11 +199,7 @@ void Level::clear() {
         }
         delete tile;
     }
-    for (auto& nodes : walkableTileNodes) {
-        delete nodes;
-    }
     m_tiles.clear();
-    walkableTileNodes.clear();
 }
 
 void Level::drawTiles()
