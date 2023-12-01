@@ -6,12 +6,13 @@
 #include "SDL_image.h"
 #include "SpriteSheet.h"
 #include "Vector.h"
+#include "Interfaces.h"
 
 class Scene;
 class Character;
 
 using namespace MATH;
-class Turret
+class Turret : I_HasUI
 {
 	friend class Scene1;
 private:
@@ -22,6 +23,8 @@ private:
 
 	
 	int tIndex;
+	float maxHP;
+	float curHP;
 	float range;
 	float angle;
 	float lerpT;
@@ -42,10 +45,10 @@ public:
 	bool HasTarget() { return (target == nullptr) ? false : true; }
 	void Update(float deltaTime, std::vector<Character*>& targets, std::vector <Turret*>& turrets);
 	void RenderBullet();
-	const int GetTIndex() { return tIndex; }
 	void RemoveTarget();
 	static void ResetTargets(std::vector<Character*>& targets, std::vector <Turret*>& turrets, int index);
+	const int GetTIndex() { return tIndex; }
 	void render();
-		
+	void RenderUI() override;
 };
 

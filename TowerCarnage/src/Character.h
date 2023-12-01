@@ -32,8 +32,6 @@ private:
 
 	float maxHP;
 	float curHP;
-
-	
 public:
 	Character() :sourceRect{}
 	{

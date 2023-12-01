@@ -33,7 +33,9 @@ Turret::Turret(const char* filename, Scene* scene, Vec3 pos_, SDL_Rect destCoord
 	target(nullptr),
 	range(5.0f),
 	bulletScale(0.02f),
-	destCoords(destCoords_)
+	destCoords(destCoords_),
+	maxHP(10.0f),
+	curHP(maxHP)
 {
 	SDL_Surface* turretSurface = IMG_Load(filename);
 	if (turretSurface == nullptr) {
@@ -87,7 +89,6 @@ void Turret::Update(float deltaTime, std::vector<Character*>& targets, std::vect
 		// check finished
 		if (lerpT >= 1.0f) {
 			// finished, damage target then remove target
-			
 			target->TakeDamage(2.0f);
 			RemoveTarget();
 
@@ -156,6 +157,39 @@ void Turret::render() {
 
 	SDL_RenderCopyEx(renderer, m_turretTexture, &turretUV, &destCoords,
 		angle, nullptr, SDL_FLIP_NONE);
+	RenderUI();
+}
+
+void Turret::RenderUI()
+{
+	SDL_Renderer* renderer = scene->game->getRenderer();
+	Matrix4 projectionMatrix = scene->getProjectionMatrix();
+
+	SDL_Rect HPoutline;
+	SDL_Rect HPfill;
+	Vec3 screenCoords;
+	float w, h;
+
+	// notice use of "body" in the following
+
+	w = static_cast<int>(destCoords.w);
+	h = static_cast<int>(destCoords.h / 4.0f);
+	screenCoords = projectionMatrix * pos;
+
+	HPoutline.y = static_cast<int>(screenCoords.y - h) - 20.0f;
+	HPoutline.x = static_cast<int>(screenCoords.x - w);
+	HPoutline.w = w;
+	HPoutline.h = h;
+
+	HPfill = HPoutline;
+	HPfill.w = curHP / maxHP * w;
+	// red for fill
+	SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+	SDL_RenderFillRect(renderer, &HPfill);
+
+
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_RenderDrawRect(renderer, &HPoutline);
 }
 
 void Turret::RenderBullet()

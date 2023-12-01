@@ -22,8 +22,7 @@ Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_) :
 	game = game_;
 }
 
-Scene1::~Scene1(){
-}
+Scene1::~Scene1(){}
 
 bool Scene1::OnCreate() {
 	int w, h;
@@ -75,7 +74,6 @@ bool Scene1::OnCreate() {
 		}
 	}
 #undef ADD_CONNECTION_IF_WALKABLE
-
 
 	endNode = graph->GetNode(graph->NumNodes() - 1);
 
@@ -208,6 +206,7 @@ void Scene1::placeTurret()
 
 			Turret* turret = new Turret("assets/sprites/tiles_packed.png", this, position, tile->destCoords);
 			turrets.push_back(turret);
+			tile->letter = 'T';
 		}
 	}
 }
@@ -228,12 +227,9 @@ void Scene1::HandleTheGUI() {
 		ImGuiWindowFlags_NoScrollWithMouse	  |		ImGuiWindowFlags_NoScrollbar  |
 		ImGuiWindowFlags_NoNavInputs		  |     ImGuiHoveredFlags_AnyWindow)) {
 
-		
 		if (ImGui::Button("pause", ImVec2(50, 30))) {
 			paused = !paused;
 		}
-		
-
 	}
 	if (ImGui::IsWindowHovered()) {
 		usingUI = true;
