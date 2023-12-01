@@ -7,7 +7,11 @@
 #include "Turret.h"
 
 Level::Level(const std::string& fileName, Scene* scene)
-    :scene(scene), mousePosX(0), mousePosY(0), topTile(nullptr)
+    :scene(scene), 
+    mousePosX(0), 
+    mousePosY(0), 
+    topTile(nullptr),
+    mapTexture(nullptr)
 {
     std::ifstream file;
     file.open(fileName);
@@ -23,12 +27,9 @@ Level::Level(const std::string& fileName, Scene* scene)
         m_levelData.push_back(temp);
     }
     file.close();
-
 }
 
-Level::~Level() {
-   
-}
+Level::~Level() {}
 
 void Level::loadMap(const int& tileSizeX, const int& tileSizeY, const char* filename)
 {
@@ -101,12 +102,13 @@ void Level::loadMap(const int& tileSizeX, const int& tileSizeY, const char* file
             Tile* childTile = nullptr;
             Node* newNode = nullptr;
 
+            /// Node position is the centre of that tile that is within the orthographic dimensions
+            positionX = static_cast<float>((gridPosition.x + gridPosition.w) * scene->getxAxis()) / scene->game->getWindowWidth();
+            positionY = scene->getyAxis() - (static_cast<float>((gridPosition.y + 0.5 * gridPosition.h) * scene->getyAxis()) / scene->game->getWindowHeight());
+            position = { positionX, positionY, 0.0f };
+
             switch (tile) {
             case 'P':
-                /// Node position is the centre of that tile that is within the orthographic dimensions
-                positionX = static_cast<float>((gridPosition.x + gridPosition.w) * scene->getxAxis()) / scene->game->getWindowWidth();
-                positionY = scene->getyAxis() - (static_cast<float>((gridPosition.y + 0.5 * gridPosition.h) * scene->getyAxis()) / scene->game->getWindowHeight());
-                position = { positionX, positionY, 0.0f };
                 newNode = new Node{ label, position };
                 newTile = new Tile{ nullptr, mapTexture, pathRect , gridPosition , 1.0 , false, true, newNode };
                 m_tiles.push_back(newTile);
@@ -124,13 +126,11 @@ void Level::loadMap(const int& tileSizeX, const int& tileSizeY, const char* file
                 childTile = new Tile{ nullptr, mapTexture, greenTreeRect, gridPosition, 1.2, true, false };
                 newTile = new Tile{ childTile, mapTexture, grassRect, gridPosition, 1.0, false, false };
                 m_tiles.push_back(newTile);
-                m_tiles.push_back(childTile);
                 break;
             case 'O':
                 childTile = new Tile{ nullptr, mapTexture, orangeTreeRect, gridPosition, 2.0, true, false };
                 newTile = new Tile{ childTile, mapTexture, grassRect, gridPosition, 1.0, false, false };
                 m_tiles.push_back(newTile);
-                m_tiles.push_back(childTile);
                 break;
             case 'R':
                 newTile = new Tile{ nullptr, mapTexture, rightGrassRect , gridPosition , 1.0 , false };
@@ -158,7 +158,6 @@ void Level::loadMap(const int& tileSizeX, const int& tileSizeY, const char* file
                 break;
             case 'C':
                 newTile = new Tile{ nullptr, mapTexture, buildingRect , gridPosition , 6.0 , true, false };
-                m_tiles.push_back(newTile);
                 gridPosition.x += 210;
                 m_tiles.push_back(new Tile{ newTile, mapTexture, doorRect , gridPosition , 2.0 , true, false });
                 break;
@@ -170,19 +169,16 @@ void Level::loadMap(const int& tileSizeX, const int& tileSizeY, const char* file
                 childTile = new Tile{ nullptr, mapTexture, wellRect, gridPosition, 3.0, true, false };
                 newTile = new Tile{ childTile, mapTexture, rockRect, gridPosition, 1.0, false, false };
                 m_tiles.push_back(newTile);
-                m_tiles.push_back(childTile);
                 break;
             case 'J':
                 childTile = new Tile{ nullptr, mapTexture, stockRect, gridPosition, 3.0, true, false };
                 newTile = new Tile{ childTile, mapTexture, rockRect, gridPosition, 1.0, false, false };
                 m_tiles.push_back(newTile);
-                m_tiles.push_back(childTile);
                 break;
             case 'V':
                 childTile = new Tile{ nullptr, mapTexture, boardRect, gridPosition, 1.2, false, false };
                 newTile = new Tile{ childTile, mapTexture, rockRect, gridPosition, 1.0, false, false };
                 m_tiles.push_back(newTile);
-                m_tiles.push_back(childTile);
                 break;
             default:
                 printf("Unexpected symbol %c at (%d, %d)", tile, x, y);
@@ -194,20 +190,26 @@ void Level::loadMap(const int& tileSizeX, const int& tileSizeY, const char* file
     /// resizing tile so that they are not stretched to tile dimension(especially if scale is more than 1)
     for (auto& tile : m_tiles) {
         tile->resizeTile();
+        if (tile->child) {
+            tile->child->resizeTile();
+        }
         if (tile->tileNode != nullptr) {
             walkableTileNodes.emplace_back(tile->tileNode);
         }
     }
 
     std::sort(m_tiles.begin(), m_tiles.end(), [](const Tile* tile1, const Tile* tile2) {
-        return tile1->scale < tile2->scale;
+        return tile1->child < tile2->child;
     });
-
 
 }
 
+
 void Level::clear() {
     for (auto& tile : m_tiles) {
+        if (tile->child) {
+            delete tile->child;
+        }
         delete tile;
     }
     for (auto& nodes : walkableTileNodes) {
@@ -215,8 +217,6 @@ void Level::clear() {
     }
     m_tiles.clear();
     walkableTileNodes.clear();
-
-   
 }
 
 void Level::drawTiles()
@@ -225,6 +225,11 @@ void Level::drawTiles()
 
     for (size_t i = 0; i < m_tiles.size(); ++i) {
         SpriteSheet::draw(scene->game->getRenderer(), m_tiles[i]->tileTexture, m_tiles[i]->uvCoords, m_tiles[i]->destCoords, m_tiles[i]->scale, m_tiles[i]->needsResizing);
+        if (m_tiles[i]->child) {
+            SpriteSheet::draw(scene->game->getRenderer(), m_tiles[i]->child->tileTexture,
+                m_tiles[i]->child->uvCoords, m_tiles[i]->child->destCoords, m_tiles[i]->child->scale,
+                m_tiles[i]->child->needsResizing);
+        }
     }
     drawTopTileOutline();
 }
@@ -277,13 +282,11 @@ bool Level::canPlaceEntity() {
 void Level::drawTopTileOutline() {
     Tile* drawTile = nullptr;
 
-    // iterating backwards to make fewer iterations because biggest scaled tiles are at the back of the vector
     for (auto it = m_tiles.rbegin(); it != m_tiles.rend(); ++it) {
         Tile* currentTile = *it;
-        if (isMouseOverTile(*it)) {
-            if (drawTile == nullptr || currentTile->scale > drawTile->scale)
-            drawTile = *it;
-            topTile = *it;
+        if (isMouseOverTile(currentTile)) {
+            drawTile = currentTile->child ? currentTile->child : currentTile;
+            topTile = drawTile;
             break;  // Break because no other tile can be above this one
         }
     }

@@ -128,11 +128,36 @@ void Turret::RemoveTarget()
 void Turret::ResetTargets(std::vector<Character*>& targets, std::vector<Turret*>& turrets, int index)
 {
 	for (const auto& t : turrets) {
-		
 		t->RemoveTarget();
-		
 	}
+}
 
+void Turret::render() {
+	SDL_Renderer* renderer = scene->game->getRenderer();
+	Matrix4 projectionMatrix = scene->game->getProjectionMatrix();
+
+	// square represents the position and dimensions for where to draw the image
+	SDL_Rect square;
+	Vec3 screenCoords;
+	int    w, h;
+
+	SDL_QueryTexture(m_turretTexture, nullptr, nullptr, &w, &h);
+	// convert the position from game coords to screen coords
+
+	w = static_cast<int>(w * pos.x);
+	h = static_cast<int>(h * pos.y);
+	screenCoords = projectionMatrix * lerpPos;
+	square.x = static_cast<int>(screenCoords.x - 0.5 * w);
+	square.y = static_cast<int>(screenCoords.y - 0.5 * h);
+	square.w = w;
+	square.h = h;
+
+	Vec3 dir = targetScaledPos - lerpPos;
+	float orientationDegrees = std::atan2(dir.x, dir.y) * 180.0f / M_PI + 180;
+
+
+	SDL_RenderCopyEx(renderer, bulletTex, nullptr, &square,
+		orientationDegrees, nullptr, SDL_FLIP_NONE);
 }
 
 void Turret::RenderBullet()

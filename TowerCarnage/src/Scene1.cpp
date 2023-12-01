@@ -6,15 +6,20 @@
 #include <Vector.h>
 #include "imgui.h"
 
-Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
-	window = sdlWindow_;
-    game = game_;
-	renderer = SDL_GetRenderer(window);
-	xAxis = 25.0f;
-	yAxis = 15.0f;
-	graph = nullptr;
-	blinky = nullptr;
-	
+Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_) : 
+	window(sdlWindow_),
+	renderer(SDL_GetRenderer(sdlWindow_)),
+	xAxis(25.0f),
+	yAxis(15.0f),
+	graph(nullptr),
+	blinky(nullptr),
+	endNode(nullptr), 
+	level(nullptr), 
+	placeActor(false),
+	usingUI(false), 
+	paused(false)
+{
+	game = game_;
 }
 
 Scene1::~Scene1(){
@@ -73,7 +78,6 @@ void Scene1::OnDestroy() {
 }
 
 void Scene1::Update(const float deltaTime) {
-	//HandleTheGUI();
 	if (paused) {
 		return;
 	}
@@ -81,7 +85,6 @@ void Scene1::Update(const float deltaTime) {
 	// Calculate and apply any steering for npc's
 	for (const auto& turret : turrets) {
 		turret->Update(deltaTime, characters, turrets);
-		//turret->GetTarget(characters);
 
 	}
 	for (uint32_t i = 0; i < characters.size(); i++) {
@@ -94,7 +97,6 @@ void Scene1::Update(const float deltaTime) {
 			
 		}
 	}
-	//game->getPlayer()->Update(deltaTime);
 }
 
 void Scene1::Render() {
@@ -118,12 +120,6 @@ void Scene1::Render() {
 		}
 	}
 
-
-	
-
-	// render the player
-	//game->RenderPlayer(0.10f);
-	//SDL_RenderPresent(renderer);
 	HandleTheGUI();
 }
 
@@ -181,12 +177,12 @@ void Scene1::placeTurret()
 
 	// place turret
 	for (const auto& tile : level->getTiles()) {
-		if (level->canPlaceEntity() && level->isMouseOverTile(tile)) {
-
+		if (level->canPlaceEntity() && level->isMouseOverTile(tile) && tile->letter == 'G') {
+		
 			Vec3 position = {
-							static_cast<float>((tile->destCoords.x + tile->destCoords.w) * getxAxis()) / game->getWindowWidth(),
-							getyAxis() - (static_cast<float>((tile->destCoords.y + 0.5 * tile->destCoords.h) * getyAxis()) / game->getWindowHeight()),
-							0.0f
+					static_cast<float>((tile->destCoords.x + tile->destCoords.w) * getxAxis()) / game->getWindowWidth(),
+					getyAxis() - (static_cast<float>((tile->destCoords.y + 0.5 * tile->destCoords.h) * getyAxis()) / game->getWindowHeight()),
+					0.0f
 			};
 
 			Turret* turret = new Turret("assets/sprites/tiles_packed.png", Vec2(6, 7), this, position);
@@ -195,13 +191,21 @@ void Scene1::placeTurret()
 			turret->turretUV = turretUV;
 
 			turrets.push_back(turret);
-			tile->tileTexture = turret->m_turretTexture;
-			tile->letter = 'M';
-					turret->m_turretTexture,
+			tile->child = new Tile{
+				nullptr, // child of the child node
+				turret->m_turretTexture, // Texture
+				turretUV, // UV's of the texture
+				tile->destCoords, // Where to put on the level
+				1.0f, // scale
+				true, // if needs to be resized
+				false, // Is walkable?
+				nullptr, // Node of the tile
+				' ' // letter
+			};
+			tile->child->resizeTile();
 			placeActor = false;
 		}
 	}
-
 }
 
 Node* Scene1::findNode() {
@@ -232,9 +236,5 @@ void Scene1::HandleTheGUI() {
 		usingUI = false;
 	}
 
-
-
 	ImGui::End();
-
-
 }

@@ -55,6 +55,8 @@ public:
 	void RemoveTarget();
 
 	static void ResetTargets(std::vector<Character*>& targets, std::vector <Turret*>& turrets, int index);
+
+	void render();
 		
 };
 
