@@ -197,7 +197,7 @@ void Scene1::placeTurret()
 			turrets.push_back(turret);
 			tile->tileTexture = turret->m_turretTexture;
 			tile->letter = 'M';
-			tile->uvCoords = turretUV;
+					turret->m_turretTexture,
 			placeActor = false;
 		}
 	}
