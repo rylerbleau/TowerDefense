@@ -154,6 +154,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Desicion.cpp" />
+    <ClCompile Include="src\Action.cpp" />
+    <ClCompile Include="src\DesicionTreeNode.cpp" />
     <ClCompile Include="src\Body.cpp" />
     <ClCompile Include="src\Character.cpp" />
     <ClCompile Include="src\Flee.cpp" />
@@ -191,6 +194,9 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Desicion.h" />
+    <ClInclude Include="src\Action.h" />
+    <ClInclude Include="src\DesicionTreeNode.h" />
     <ClInclude Include="src\Interfaces.h" />
     <ClInclude Include="src\Body.h" />
     <ClInclude Include="src\Character.h" />

@@ -36,6 +36,9 @@
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\Turret.cpp" />
     <ClCompile Include="src\Window.cpp" />
+    <ClCompile Include="src\DesicionTreeNode.cpp" />
+    <ClCompile Include="src\Action.cpp" />
+    <ClCompile Include="src\Desicion.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Body.h" />
@@ -77,5 +80,8 @@
     <ClInclude Include="src\Turret.h" />
     <ClInclude Include="src\Window.h" />
     <ClInclude Include="src\Interfaces.h" />
+    <ClInclude Include="src\DesicionTreeNode.h" />
+    <ClInclude Include="src\Action.h" />
+    <ClInclude Include="src\Desicion.h" />
   </ItemGroup>
 </Project>

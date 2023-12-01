@@ -8,7 +8,7 @@
 
 using namespace std;
 
-
+class Turret;
 
 enum class Direction {
 	RIGHT,
@@ -30,6 +30,10 @@ private:
 	Node* endNode;
 	Node* startNode;
 
+	class DesicionTreeNode* desicionTree;
+	std::vector<Turret*>* turrets;
+	Turret* closestTurret;
+
 	float maxHP;
 	float curHP;
 public:
@@ -41,25 +45,21 @@ public:
 
 	~Character();
 
-	bool OnCreate(Scene* scene_, Graph* graph, Vec3 pos = Vec3(15.0f, 10.0f, 0.0f));
+	bool OnCreate(Scene* scene_, Graph* graph_, Vec3 pos, std::vector<Turret*>* turrets_);
 	void OnDestroy() { /*delete body;*/ scene = nullptr; };
 	bool setTextureWith(string file);
 	void Update(float deltaTime, std::vector<Character* > characters, int index);
 	void updatePath(Node* endNode);
 	Node* findNearestWalkableNode();
-	void HandleEvents(const SDL_Event& event);
 	void render();
-	void SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody*> staticBodies, float threshhold, int index);
+	void SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<Character*> characters, float threshhold, int index);
+	void SteerToArrive(KinematicSteeringOutput& steering);
 	StaticBody* getBody() { return body; }
-
-
-
-
 
 	void TakeDamage(float dmg) { curHP -= dmg; };
 	bool isDead(){ return (curHP <= 0) ? true : false; }
 	void RenderUI();
-
+	bool readDesicionTreeFromFile(const char* filename);
 };
 
 #endif

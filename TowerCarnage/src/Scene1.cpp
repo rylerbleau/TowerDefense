@@ -180,9 +180,13 @@ void Scene1::createNewCharacter() {
 			Vec3 position = { posX, posY, 0.0f };
 
 			Character* character = new Character();
-			character->OnCreate(this, graph, position);
+			character->OnCreate(this, graph, position, &turrets);
 			character->updatePath(endNode);
 			character->setTextureWith("assets/sprites/hero.png");
+			if (!character->readDesicionTreeFromFile("HERO")) {
+				throw std::runtime_error("Failed to read behaviour tree from file");
+			}
+
 			characters.push_back(character);
 		}
 	}

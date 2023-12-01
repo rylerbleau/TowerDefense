@@ -21,21 +21,18 @@ double mapToRange(double degrees) {
 
 
 Turret::Turret(const char* filename, Scene* scene, Vec3 pos_, SDL_Rect destCoords_, Vec2 uvCoords_ /*= Vec2(6, 7)*/)
-	: 
+	:
 	scene(scene),
-	pos(pos_),
-	angle(0.0f),
 	lerpT(0.0f),
 	lerpPos(Vec3()),
 	shooting(false),
 	tIndex(0),
-	orientaton(Vec3(0.0f, -1.0f, 0.0f)),
 	target(nullptr),
-	range(5.0f),
 	bulletScale(0.02f),
 	destCoords(destCoords_),
 	maxHP(10.0f),
-	curHP(maxHP)
+	curHP(maxHP),
+	body(StaticBody(pos_, 0.0f, 0.0f, 0.0f))
 {
 	SDL_Surface* turretSurface = IMG_Load(filename);
 	if (turretSurface == nullptr) {
@@ -64,9 +61,9 @@ void Turret::GetTarget(const std::vector<Character*>& targets) {
 
 	for (int i = 0; i < targets.size(); i++) {
 		Vec3 targetPos = targets[i]->getBody()->getPos();
-		float dist = VMath::distance(pos, targetPos);
+		float dist = VMath::distance(body.getPos(), targetPos);
 
-		if (dist > range) {
+		if (dist > 5.0f) {
 			// target out of range
 		}
 		else if (dist < leastDist) {
@@ -79,7 +76,7 @@ void Turret::GetTarget(const std::vector<Character*>& targets) {
 }
 
 void Turret::Update(float deltaTime, std::vector<Character*>& targets, std::vector <Turret*>& turrets) {
-	float ratio = pos.x / turretUV.x;
+	float ratio = body.getPos().x / turretUV.x;
 	Vec3 offset(-0.2f * turretUV.w * ratio, -0.05f * turretUV.h * ratio, 0);
 	
 	if (shooting) {
@@ -108,7 +105,7 @@ void Turret::Update(float deltaTime, std::vector<Character*>& targets, std::vect
 		lerpT = 0.0f;
 		
 		// values to offset bullet 
-		scaledPos = pos + offset;
+		scaledPos = body.getPos() + offset;
 		lerpPos = scaledPos;
 	}
 	else {
@@ -146,8 +143,8 @@ void Turret::render() {
 
 	if (target) {
 		targetOrientaton = Vec3{ target->getBody()->getPos().x -
-			pos.x, target->getBody()->getPos().y -
-			pos.y, 0.0f };
+			body.getPos().x, target->getBody()->getPos().y -
+			body.getPos().y, 0.0f };
 	}
 
 	orientaton = VMath::lerp(orientaton, targetOrientaton, 0.025f);
@@ -174,7 +171,7 @@ void Turret::RenderUI()
 
 	w = static_cast<int>(destCoords.w);
 	h = static_cast<int>(destCoords.h / 4.0f);
-	screenCoords = projectionMatrix * pos;
+	screenCoords = projectionMatrix * body.getPos();
 
 	HPoutline.y = static_cast<int>(screenCoords.y - h) - 20.0f;
 	HPoutline.x = static_cast<int>(screenCoords.x - w);

@@ -53,9 +53,7 @@ bool Scene3::OnCreate() {
 
     // Set up characters
     blinky = new Character();
-    if (!blinky->OnCreate(this, {}) || !blinky->setTextureWith("Blinky.png")) {
-        return false;
-    }
+  
 
     float orientation_ = 0.0f;
     float maxSpeed_ = 5.0f;

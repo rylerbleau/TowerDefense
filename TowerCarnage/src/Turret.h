@@ -7,12 +7,13 @@
 #include "SpriteSheet.h"
 #include "Vector.h"
 #include "Interfaces.h"
+#include "StaticBody.h"
 
 class Scene;
 class Character;
 
 using namespace MATH;
-class Turret : I_HasUI
+class Turret : public I_HasUI
 {
 	friend class Scene1;
 private:
@@ -25,12 +26,11 @@ private:
 	int tIndex;
 	float maxHP;
 	float curHP;
-	float range;
 	float angle;
 	float lerpT;
 	float bulletScale;
 	bool shooting;
-	Vec3 pos;
+	StaticBody body;
 	Vec3 lerpPos;
 	Vec3 orientaton;
 	Vec3 scaledPos;
@@ -50,5 +50,6 @@ public:
 	const int GetTIndex() { return tIndex; }
 	void render();
 	void RenderUI() override;
+	StaticBody* getBody() { return &body; }
 };
 

@@ -3,10 +3,12 @@
 #include "StaticBody.h"
 #include "KinematicSeek.h"
 #include "KinematicSeperation.h"
-#include "KinematicArrive.h"
+#include "KinematicSeek.h"
 #include "FollowAPath.h"
 #include <random>
-
+#include "Action.h"
+#include "Desicion.h"
+#include "Turret.h"
 
 static std::mt19937 randomEngine(time(nullptr));
 static std::uniform_real_distribution<float> scaleGenerator(0.8f, 1.0f);
@@ -15,15 +17,14 @@ Character::~Character()
 {
 }
 
-bool Character::OnCreate(Scene* scene_, Graph* graph_, Vec3 pos /*= Vec3(5.0f, 5.0f, 0.0f)*/)
+bool Character::OnCreate(Scene* scene_, Graph* graph_, Vec3 pos, std::vector<Turret*>* turrets_)
 {
 	scene = scene_;
 	scale = scaleGenerator(randomEngine);
-	// Configure and instantiate the body to use for the demo
-
 	maxHP = 8.0f;
 	curHP = maxHP;
 
+	turrets = turrets_;
 
 	if (!body)
 	{
@@ -42,6 +43,8 @@ bool Character::OnCreate(Scene* scene_, Graph* graph_, Vec3 pos /*= Vec3(5.0f, 5
 	{
 		return false;
 	}
+
+
 	graph = graph_;
 
 	return true;
@@ -69,17 +72,27 @@ bool Character::setTextureWith(string file)
 
 void Character::Update(float deltaTime, std::vector<Character*> characters, int index)
 {
-	//printf("pos: %f, %f\n", body->getPos().x, body->getPos().y);
-	std::vector<StaticBody* > staticBodies;
-	staticBodies.resize(characters.size());
-	for (uint32_t i = 0; i < characters.size(); i++) {
-		staticBodies[i] = characters[i]->body;
-	}
+	
 	// create a new overall steering output
 	KinematicSteeringOutput* steering = new KinematicSteeringOutput();
-	// This creates the separation plus seek behaviour(might switch to arrive)
-	SeekAndSeparationSteering(*steering, staticBodies, 1.5f, index);
+
+	Action* action = static_cast<Action*>(desicionTree->makeDecision());
+	switch (action->getLabel()) {
+	case ACTION_SET::FIND_PATH:
+		// This creates the separation plus seek behaviour(might switch to arrive)
+		SeekAndSeparationSteering(*steering, characters, 1.5f, index);
+		break;
+	case ACTION_SET::ARRIVE:
+		SteerToArrive(*steering);
+		break;
+	case ACTION_SET::DO_NOTHING:
+		break;
+	default:
+		break;
+	}
+
 	body->Update(deltaTime, steering);
+
 	delete steering;
 }
 
@@ -119,11 +132,16 @@ void Character::updatePath(Node* endNode_)
 	}
 }
 
-void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<StaticBody* > staticBodies, float threshhold, int index)
+void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<Character*> characters, float threshhold, int index)
 {
-	std::vector<KinematicSteeringOutput*> steering_outputs;
 
-	
+	std::vector<StaticBody* > staticBodies;
+	staticBodies.resize(characters.size());
+	for (uint32_t i = 0; i < characters.size(); i++) {
+		staticBodies[i] = characters[i]->body;
+	}
+
+	std::vector<KinematicSteeringOutput*> steering_outputs;
 	// using the target, calculate and set values in the overall steering output
 	FollowAPath* steering_algorithm = steering_algorithm = new FollowAPath(body, path);
 	steering_outputs.push_back(steering_algorithm->getSteering());
@@ -145,6 +163,26 @@ void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std
 	}
 }
 
+void Character::SteerToArrive(KinematicSteeringOutput& steering) {
+	
+	float leastDist = 1000000.0f;
+	for (int i = 0; i < turrets->size(); i++) {
+		float dist = VMath::distance(body->getPos(), (*turrets)[i]->getBody()->getPos());
+		if (dist < leastDist) {
+			// get the closest target
+			leastDist = dist;
+			closestTurret = (*turrets)[i];
+		}
+	}
+
+	KinematicSeek* steering_algorithm = new KinematicSeek(body, closestTurret->getBody());
+
+	steering += *steering_algorithm->GetSteering();
+
+	if (steering_algorithm) {
+		delete steering_algorithm;
+	}
+}
 
 
 void Character::RenderUI()
@@ -179,10 +217,17 @@ void Character::RenderUI()
 	SDL_RenderDrawRect(renderer, &HPoutline);
 }
 
-
-void Character::HandleEvents(const SDL_Event& event)
+bool Character::readDesicionTreeFromFile(const char* filename)
 {
-
+	if (filename == "HERO") {
+		// if player is within range of turret, attack turret
+		// otherwise, find path to end node
+		Action* trueNode = new Action(ACTION_SET::ARRIVE);
+		Action* falseNode = new Action(ACTION_SET::FIND_PATH);
+		desicionTree = new TurretInRange(trueNode, falseNode, this, turrets);
+		return true;
+	}
+	return false;
 }
 
 void Character::render()
@@ -205,7 +250,6 @@ void Character::render()
 	square.h = h;
 
 	// Convert character orientation from radians to degrees.
-	float orientation = body->getOrientation() * 180.0f / M_PI;
 
 	int numFrames = 0;
 	int FRAME_SPEED = 50;
