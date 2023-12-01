@@ -152,7 +152,7 @@ void Level::loadMap(const int& tileSizeX, const int& tileSizeY, const char* file
                 newTile = new Tile{ childTile, mapTexture, doorRect , gridPosition , 2.0 , true, false, newNode };
                 break;
             case 'S':
-                newTile = new Tile{ nullptr, mapTexture, rockRect , gridPosition , 1.0 , false, false, newNode };
+                newTile = new Tile{ nullptr, mapTexture, rockRect , gridPosition , 1.0 , false, true, newNode };
                 break;
             case 'W':
                 childTile = new Tile{ nullptr, mapTexture, wellRect, gridPosition, 3.0, true, false };

@@ -49,36 +49,33 @@ bool Scene1::OnCreate() {
 	int tileWidth = level->getTiles()[0]->destCoords.w;
 	int tileHeight = level->getTiles()[0]->destCoords.h;
 
+#define ADD_CONNECTION_IF_WALKABLE(x_check, y_check, weight) \
+    if (level->getTile(x_check, y_check)->isWalkable) { \
+        int to = level->getTile(x_check, y_check)->tileNode->GetLabel(); \
+        graph->AddWeightedConnection(from, to, weight); \
+    }
+
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
 			Node* fromNode = level->getTile(j, i)->tileNode;
 			int from = fromNode->GetLabel();
+
 			if (j > 0) {
-				if (level->getTile(j - 1, i)->isWalkable) {
-					int to = level->getTile(j - 1, i)->tileNode->GetLabel();
-					graph->AddWeightedConnection(from, to, tileWidth);
-				}
+				ADD_CONNECTION_IF_WALKABLE(j - 1, i, tileWidth);
 			}
 			if (j < cols - 1) {
-				if (level->getTile(j + 1, i)->isWalkable) {
-					int to = level->getTile(j + 1, i)->tileNode->GetLabel();
-					graph->AddWeightedConnection(from, to, tileWidth);
-				}
+				ADD_CONNECTION_IF_WALKABLE(j + 1, i, tileWidth);
 			}
 			if (i > 0) {
-				if (level->getTile(j, i - 1)->isWalkable) {
-					int to = level->getTile(j, i - 1)->tileNode->GetLabel();
-					graph->AddWeightedConnection(from, to, tileHeight);
-				}
+				ADD_CONNECTION_IF_WALKABLE(j, i - 1, tileHeight);
 			}
 			if (i < rows - 1) {
-				if (level->getTile(j, i + 1)->isWalkable) {
-					int to = level->getTile(j, i + 1)->tileNode->GetLabel();
-					graph->AddWeightedConnection(from, to, tileHeight);
-				}
+				ADD_CONNECTION_IF_WALKABLE(j, i + 1, tileHeight);
 			}
 		}
 	}
+#undef ADD_CONNECTION_IF_WALKABLE
+
 
 	endNode = graph->GetNode(graph->NumNodes() - 1);
 
