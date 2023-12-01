@@ -114,7 +114,7 @@ void Level::loadMap(const int& tileSizeX, const int& tileSizeY, const char* file
                 newTile = new Tile{ nullptr, mapTexture, pathRect , gridPosition , 1.0 , false, true, newNode };
                 break;
             case 'G':
-                newTile = new Tile{ nullptr, mapTexture, grassRect , gridPosition , 1.0 , false, false, newNode, tile};
+                newTile = new Tile{ nullptr, mapTexture, grassRect , gridPosition , 1.0 , false, true, newNode, tile};
                 break;
             case 'F':
                 newTile = new Tile{ nullptr, mapTexture, flowerRect , gridPosition , 1.0 , false, true, newNode };

@@ -6,8 +6,34 @@
 #include "StaticBody.h"
 #include <limits>
 
-Turret::Turret(const char* filename, Vec2 _uvCoords, Scene* scene, Vec3 pos_)
-	: uvCoords(_uvCoords), scene(scene)
+
+double mapToRange(double degrees) {
+
+	double r = fmod(degrees, 360.0);
+
+	if (r < -180.0)
+		r += 360.0;
+	if (r >= 180.0)
+		r -= 360.0;
+	return r;
+
+}
+
+
+Turret::Turret(const char* filename, Scene* scene, Vec3 pos_, SDL_Rect destCoords_, Vec2 uvCoords_ /*= Vec2(6, 7)*/)
+	: 
+	scene(scene),
+	pos(pos_),
+	angle(0.0f),
+	lerpT(0.0f),
+	lerpPos(Vec3()),
+	shooting(false),
+	tIndex(0),
+	orientaton(Vec3(0.0f, -1.0f, 0.0f)),
+	target(nullptr),
+	range(5.0f),
+	bulletScale(0.02f),
+	destCoords(destCoords_)
 {
 	SDL_Surface* turretSurface = IMG_Load(filename);
 	if (turretSurface == nullptr) {
@@ -17,10 +43,6 @@ Turret::Turret(const char* filename, Vec2 _uvCoords, Scene* scene, Vec3 pos_)
 	if (m_turretTexture == nullptr) {
 		throw std::runtime_error("Turret Texture was not created!");
 	}
-
-
-	pos = pos_;
-	printf("pos: %f, %f\n", pos.x, pos.y);	
 	SDL_FreeSurface(turretSurface);
 
 	SDL_Surface* bulletSurface = IMG_Load("assets/sprites/tomato.png");
@@ -30,21 +52,13 @@ Turret::Turret(const char* filename, Vec2 _uvCoords, Scene* scene, Vec3 pos_)
 	bulletTex = SDL_CreateTextureFromSurface(scene->game->getRenderer(), bulletSurface);
 	SDL_FreeSurface(bulletSurface);
 
-	bulletScale = 0.02f;
-
-	curCharge = 0.0f;
-	chargeTime = 5.0f;
-	range = 5.0f;
-	target = nullptr;
-
-
+	SpriteSheet::QuerySpriteSheet(12, 10, m_turretTexture);
+	turretUV = SpriteSheet::GetUVTile(uvCoords_.x, uvCoords_.y);
 }
 
 void Turret::GetTarget(const std::vector<Character*>& targets) {
 	
 	float leastDist = std::numeric_limits<float>::max();
-	//target = nullptr;
-
 
 	for (int i = 0; i < targets.size(); i++) {
 		Vec3 targetPos = targets[i]->getBody()->getPos();
@@ -52,23 +66,19 @@ void Turret::GetTarget(const std::vector<Character*>& targets) {
 
 		if (dist > range) {
 			// target out of range
-
 		}
 		else if (dist < leastDist) {
 			// get the closest target
 			leastDist = dist;
 			target = targets[i];
 			tIndex = i;
-
 		}
 	}
-	
 }
 
 void Turret::Update(float deltaTime, std::vector<Character*>& targets, std::vector <Turret*>& turrets) {
 	float ratio = pos.x / turretUV.x;
 	Vec3 offset(-0.2f * turretUV.w * ratio, -0.05f * turretUV.h * ratio, 0);
-
 	
 	if (shooting) {
 		if (!target) {
@@ -85,7 +95,6 @@ void Turret::Update(float deltaTime, std::vector<Character*>& targets, std::vect
 		else {
 			// continue lerping
 			targetScaledPos = target->getBody()->getPos() + offset;
-
 			lerpT += 0.02f;
 			lerpPos = VMath::lerp(scaledPos, targetScaledPos, lerpT);
 		}
@@ -97,15 +106,10 @@ void Turret::Update(float deltaTime, std::vector<Character*>& targets, std::vect
 		shooting = true;
 		lerpT = 0.0f;
 		
-		
 		// values to offset bullet 
-		
-
 		scaledPos = pos + offset;
 		lerpPos = scaledPos;
-
 	}
-
 	else {
 		// no target, not shooting. try to find suitable target.
 		GetTarget(targets);
@@ -133,31 +137,25 @@ void Turret::ResetTargets(std::vector<Character*>& targets, std::vector<Turret*>
 }
 
 void Turret::render() {
+
 	SDL_Renderer* renderer = scene->game->getRenderer();
 	Matrix4 projectionMatrix = scene->game->getProjectionMatrix();
+	
+	Vec3 targetOrientaton = Vec3{ 0.0f,-1.0f,0.0f };
 
-	// square represents the position and dimensions for where to draw the image
-	SDL_Rect square;
-	Vec3 screenCoords;
-	int    w, h;
+	if (target) {
+		targetOrientaton = Vec3{ target->getBody()->getPos().x -
+			pos.x, target->getBody()->getPos().y -
+			pos.y, 0.0f };
+	}
 
-	SDL_QueryTexture(m_turretTexture, nullptr, nullptr, &w, &h);
-	// convert the position from game coords to screen coords
+	orientaton = VMath::lerp(orientaton, targetOrientaton, 0.025f);
+	angle = std::atan2(orientaton.x, orientaton.y) * 180.0f / M_PI + 180;
+	angle = mapToRange(angle);
+	
 
-	w = static_cast<int>(w * pos.x);
-	h = static_cast<int>(h * pos.y);
-	screenCoords = projectionMatrix * lerpPos;
-	square.x = static_cast<int>(screenCoords.x - 0.5 * w);
-	square.y = static_cast<int>(screenCoords.y - 0.5 * h);
-	square.w = w;
-	square.h = h;
-
-	Vec3 dir = targetScaledPos - lerpPos;
-	float orientationDegrees = std::atan2(dir.x, dir.y) * 180.0f / M_PI + 180;
-
-
-	SDL_RenderCopyEx(renderer, bulletTex, nullptr, &square,
-		orientationDegrees, nullptr, SDL_FLIP_NONE);
+	SDL_RenderCopyEx(renderer, m_turretTexture, &turretUV, &destCoords,
+		angle, nullptr, SDL_FLIP_NONE);
 }
 
 void Turret::RenderBullet()
@@ -184,13 +182,9 @@ void Turret::RenderBullet()
 	Vec3 dir = targetScaledPos - lerpPos;
 	float orientationDegrees = std::atan2(dir.x, dir.y) * 180.0f / M_PI + 180;
 
-
 	SDL_RenderCopyEx(renderer, bulletTex, nullptr, &square,
 		orientationDegrees, nullptr, SDL_FLIP_NONE);
-
 }
-
-
 
 Turret::~Turret()
 {

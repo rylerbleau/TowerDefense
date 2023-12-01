@@ -135,6 +135,7 @@ void Scene1::Render() {
 	}
 
 	for (auto& t : turrets) {
+		t->render();
 		if (t->HasTarget()) {
 			t->RenderBullet();
 		}
@@ -198,32 +199,15 @@ void Scene1::placeTurret()
 	// place turret
 	for (const auto& tile : level->getTiles()) {
 		if (level->canPlaceEntity() && level->isMouseOverTile(tile) && tile->letter == 'G') {
-		
+
 			Vec3 position = {
 					static_cast<float>((tile->destCoords.x + tile->destCoords.w) * getxAxis()) / game->getWindowWidth(),
 					getyAxis() - (static_cast<float>((tile->destCoords.y + 0.5 * tile->destCoords.h) * getyAxis()) / game->getWindowHeight()),
 					0.0f
 			};
 
-			Turret* turret = new Turret("assets/sprites/tiles_packed.png", Vec2(6, 7), this, position);
-			SpriteSheet::QuerySpriteSheet(12, 10, turret->m_turretTexture);
-			SDL_Rect turretUV = SpriteSheet::GetUVTile(turret->uvCoords.x, turret->uvCoords.y);
-			turret->turretUV = turretUV;
-
+			Turret* turret = new Turret("assets/sprites/tiles_packed.png", this, position, tile->destCoords);
 			turrets.push_back(turret);
-			tile->child = new Tile{
-				nullptr, // child of the child node
-				turret->m_turretTexture, // Texture
-				turretUV, // UV's of the texture
-				tile->destCoords, // Where to put on the level
-				1.0f, // scale
-				true, // if needs to be resized
-				false, // Is walkable?
-				nullptr, // Node of the tile
-				' ' // letter
-			};
-			tile->child->resizeTile();
-			placeActor = false;
 		}
 	}
 }
