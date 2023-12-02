@@ -30,6 +30,7 @@ Turret::Turret(const char* filename, Scene* scene, Vec3 pos_, SDL_Rect destCoord
 	target(nullptr),
 	bulletScale(0.02f),
 	destCoords(destCoords_),
+	orientaton(Vec3(0.0f, -1.0f, 0.0f)),
 	maxHP(10.0f),
 	curHP(maxHP),
 	body(StaticBody(pos_, 0.0f, 0.0f, 0.0f))
