@@ -31,7 +31,6 @@ private:
 	Node* startNode;
 
 	class DesicionTreeNode* desicionTree;
-	std::vector<Turret*>* turrets;
 	Turret* closestTurret;
 
 	float maxHP;
@@ -45,7 +44,7 @@ public:
 
 	~Character();
 
-	bool OnCreate(Scene* scene_, Graph* graph_, Vec3 pos, std::vector<Turret*>* turrets_);
+	bool OnCreate(Scene* scene_, Graph* graph_, Vec3 pos);
 	void OnDestroy() { /*delete body;*/ scene = nullptr; };
 	bool setTextureWith(string file);
 	void Update(float deltaTime, std::vector<Character* > characters, int index);
@@ -59,7 +58,7 @@ public:
 	void TakeDamage(float dmg) { curHP -= dmg; };
 	bool isDead(){ return (curHP <= 0) ? true : false; }
 	void RenderUI();
-	bool readDesicionTreeFromFile(const char* filename);
+	bool readDesicionTreeFromFile(const char* filename, std::vector<Turret*>& turrets);
 };
 
 #endif

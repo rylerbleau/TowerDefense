@@ -17,14 +17,12 @@ Character::~Character()
 {
 }
 
-bool Character::OnCreate(Scene* scene_, Graph* graph_, Vec3 pos, std::vector<Turret*>* turrets_)
+bool Character::OnCreate(Scene* scene_, Graph* graph_, Vec3 pos)
 {
 	scene = scene_;
 	scale = scaleGenerator(randomEngine);
 	maxHP = 8.0f;
 	curHP = maxHP;
-
-	turrets = turrets_;
 
 	if (!body)
 	{
@@ -83,6 +81,9 @@ void Character::Update(float deltaTime, std::vector<Character*> characters, int 
 		break;
 	case ACTION_SET::ARRIVE:
 		SteerToArrive(steering);
+		if (closestTurret && VMath::distance(body->getPos(), closestTurret->getBody()->getPos()) < closestTurret->getBody()->getRadius()) {
+			closestTurret->TakeDamage(0.02f);
+		}
 		break;
 	case ACTION_SET::DO_NOTHING:
 		break;
@@ -167,7 +168,6 @@ void Character::SteerToArrive(KinematicSteeringOutput*& steering) {
 
 	KinematicArrive* steering_algorithm = new KinematicArrive(body, closestTurret->getBody());
 	steering = steering_algorithm->getSteering();
-
 	delete steering_algorithm;
 }
 
@@ -204,14 +204,14 @@ void Character::RenderUI()
 	SDL_RenderDrawRect(renderer, &HPoutline);
 }
 
-bool Character::readDesicionTreeFromFile(const char* filename)
+bool Character::readDesicionTreeFromFile(const char* filename, std::vector<Turret*>& turrets /*= nullptr*/)
 {
 	if (filename == "HERO") {
 		// if player is within range of turret, attack turret
 		// otherwise, find path to end node
 		Action* trueNode = new Action(ACTION_SET::ARRIVE);
 		Action* falseNode = new Action(ACTION_SET::FIND_PATH);
-		desicionTree = new TurretInRange(trueNode, falseNode, this, turrets, &closestTurret);
+		desicionTree = new TurretInRange(trueNode, falseNode, this, &turrets, &closestTurret);
 		return true;
 	}
 	return false;

@@ -101,9 +101,12 @@ void Scene1::Update(const float deltaTime) {
 	}
 
 	// Calculate and apply any steering for npc's
-	for (const auto& turret : turrets) {
-		turret->Update(deltaTime, characters, turrets);
-
+	for (uint32_t i = 0; i < turrets.size(); i++) {
+		turrets[i]->Update(deltaTime, characters, turrets);
+		if (turrets[i]->isDead()) {
+			delete turrets[i];
+			turrets.erase(turrets.begin() + i);
+		}
 	}
 	for (uint32_t i = 0; i < characters.size(); i++) {
 		characters[i]->Update(deltaTime, characters, i);
@@ -111,7 +114,7 @@ void Scene1::Update(const float deltaTime) {
 
 			Turret::ResetTargets(characters, turrets, i);
 			delete characters[i];
-			characters.erase(characters.begin()+i);
+			characters.erase(characters.begin() + i);
 			
 		}
 	}
@@ -180,13 +183,12 @@ void Scene1::createNewCharacter() {
 			Vec3 position = { posX, posY, 0.0f };
 
 			Character* character = new Character();
-			character->OnCreate(this, graph, position, &turrets);
+			character->OnCreate(this, graph, position);
 			character->updatePath(endNode);
 			character->setTextureWith("assets/sprites/hero.png");
-			if (!character->readDesicionTreeFromFile("HERO")) {
-				throw std::runtime_error("Failed to read behaviour tree from file");
+			if (!character->readDesicionTreeFromFile("HERO", turrets)) {
+				std::cout << "Failed to read desicion tree from file" << std::endl;
 			}
-
 			characters.push_back(character);
 		}
 	}
@@ -200,7 +202,7 @@ void Scene1::placeTurret()
 
 	// place turret
 	for (const auto& tile : level->getTiles()) {
-		if (level->canPlaceEntity() && level->isMouseOverTile(tile) && tile->letter == 'G') {
+		if (level->isMouseOverTile(tile) && tile->letter == 'G') {
 
 			Vec3 position = {
 					static_cast<float>((tile->destCoords.x + tile->destCoords.w) * getxAxis()) / game->getWindowWidth(),

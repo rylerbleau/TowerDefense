@@ -220,7 +220,7 @@ void Turret::RenderBullet()
 
 Turret::~Turret()
 {
-	delete m_turretTexture;
-	delete bulletTex;
+	//delete m_turretTexture;
+//	delete bulletTex;
 }
 

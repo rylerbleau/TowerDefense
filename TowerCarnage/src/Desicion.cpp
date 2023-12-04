@@ -34,11 +34,9 @@ DesicionTreeNode* Desicion::getBranch()
 
 bool TurretInRange::testValue()
 {
-	if (turrets->empty())
-	{
+	if (turrets->empty()) {
 		return false;
 	}
-
 	// find the closest turret
 	float leastDist = 1000000.0f;
 	for (int i = 0; i < turrets->size(); i++) {
@@ -51,11 +49,7 @@ bool TurretInRange::testValue()
 	}
 
 	// find the magnitude of the vector from player to turret
-	if(VMath::mag(player->getBody()->getPos() - (*closestTurret)->getBody()->getPos()) < 5.0f)
-	{
-		return true;
-	}
-	return false;
+	return (VMath::mag(player->getBody()->getPos() - (*closestTurret)->getBody()->getPos()) < 5.0f);
 }
 
 

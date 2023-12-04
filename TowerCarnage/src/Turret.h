@@ -20,7 +20,7 @@ private:
 	SDL_Rect turretUV;
 	SDL_Rect destCoords;
 	SDL_Texture* m_turretTexture;
-	std::unique_ptr<Scene> scene;
+	Scene* scene;
 
 	
 	int tIndex;
@@ -51,5 +51,7 @@ public:
 	void render();
 	void RenderUI() override;
 	StaticBody* getBody() { return &body; }
+	void TakeDamage(float dmg) { curHP -= dmg; };
+	bool isDead() { return (curHP <= 0) ? true : false; }
 };
 
