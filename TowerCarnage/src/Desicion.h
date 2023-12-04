@@ -27,17 +27,15 @@ class TurretInRange:
 	public:
 	TurretInRange() {}
 	TurretInRange(DesicionTreeNode* trueNode_,
-			DesicionTreeNode* falseNode_, 
-			Character* player_,
-			std::vector<Turret*>* turrets_) :
-		Desicion(trueNode_, falseNode_),
-		player(player_), 
-		turrets(turrets_) {}
-	~TurretInRange() {}
+		DesicionTreeNode* falseNode_, 
+		Character* player_,
+		std::vector<Turret*>* turrets_,
+		Turret** closestTurret_) :
+		Desicion(trueNode_, falseNode_), player(player_), turrets(turrets_), closestTurret(closestTurret_) {}
 
 	bool testValue() override;
 private: 
 	std::vector<Turret*>* turrets;
-	Turret* closestTurret;
+	Turret** closestTurret;
 	Character* player;
 };

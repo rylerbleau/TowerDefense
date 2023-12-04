@@ -14,7 +14,7 @@ KinematicSteeringOutput* KinematicArrive::getSteering()
 {
 	result = new KinematicSteeringOutput();
 	result->velocity = target->getPos() - character->getPos();
-	float velocityLength = VMath::mag(result->velocity) - target->getRadius();
+	float velocityLength = VMath::mag(result->velocity);
 
 	if (velocityLength < target->getRadius()) { 
 		return nullptr;

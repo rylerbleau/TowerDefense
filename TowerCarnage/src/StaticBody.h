@@ -33,7 +33,7 @@ public:
 
 	void Update(float deltaTime, KinematicSteeringOutput* steering);
 	// change to KinematicSteeringOutput
-	void NewOrientation();
+	void newOrientation();
 };
 
 #endif

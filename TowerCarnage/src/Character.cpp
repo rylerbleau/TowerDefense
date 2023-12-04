@@ -44,7 +44,6 @@ bool Character::OnCreate(Scene* scene_, Graph* graph_, Vec3 pos, std::vector<Tur
 		return false;
 	}
 
-
 	graph = graph_;
 
 	return true;
@@ -74,16 +73,16 @@ void Character::Update(float deltaTime, std::vector<Character*> characters, int 
 {
 	
 	// create a new overall steering output
-	KinematicSteeringOutput* steering = new KinematicSteeringOutput();
+	KinematicSteeringOutput* steering = nullptr;
 
 	Action* action = static_cast<Action*>(desicionTree->makeDecision());
 	switch (action->getLabel()) {
 	case ACTION_SET::FIND_PATH:
 		// This creates the separation plus seek behaviour(might switch to arrive)
-		SeekAndSeparationSteering(*steering, characters, 1.5f, index);
+		SeekAndSeparationSteering(steering, characters, 1.5f, index);
 		break;
 	case ACTION_SET::ARRIVE:
-		SteerToArrive(*steering);
+		SteerToArrive(steering);
 		break;
 	case ACTION_SET::DO_NOTHING:
 		break;
@@ -132,8 +131,9 @@ void Character::updatePath(Node* endNode_)
 	}
 }
 
-void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<Character*> characters, float threshhold, int index)
+void Character::SeekAndSeparationSteering(KinematicSteeringOutput*& steering, std::vector<Character*> characters, float threshhold, int index)
 {
+	steering = new KinematicSteeringOutput();
 
 	std::vector<StaticBody* > staticBodies;
 	staticBodies.resize(characters.size());
@@ -151,7 +151,7 @@ void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std
 	
 	for (int i = 0; i < steering_outputs.size(); i++) {
 		if (steering_outputs[i]) {
-			steering += *steering_outputs[i];
+			*steering += *steering_outputs[i];
 		}
 		delete steering_outputs[i];
 	}
@@ -163,25 +163,12 @@ void Character::SeekAndSeparationSteering(KinematicSteeringOutput& steering, std
 	}
 }
 
-void Character::SteerToArrive(KinematicSteeringOutput& steering) {
-	
-	float leastDist = 1000000.0f;
-	for (int i = 0; i < turrets->size(); i++) {
-		float dist = VMath::distance(body->getPos(), (*turrets)[i]->getBody()->getPos());
-		if (dist < leastDist) {
-			// get the closest target
-			leastDist = dist;
-			closestTurret = (*turrets)[i];
-		}
-	}
+void Character::SteerToArrive(KinematicSteeringOutput*& steering) {
 
-	KinematicSeek* steering_algorithm = new KinematicSeek(body, closestTurret->getBody());
+	KinematicArrive* steering_algorithm = new KinematicArrive(body, closestTurret->getBody());
+	steering = steering_algorithm->getSteering();
 
-	steering += *steering_algorithm->GetSteering();
-
-	if (steering_algorithm) {
-		delete steering_algorithm;
-	}
+	delete steering_algorithm;
 }
 
 
@@ -224,7 +211,7 @@ bool Character::readDesicionTreeFromFile(const char* filename)
 		// otherwise, find path to end node
 		Action* trueNode = new Action(ACTION_SET::ARRIVE);
 		Action* falseNode = new Action(ACTION_SET::FIND_PATH);
-		desicionTree = new TurretInRange(trueNode, falseNode, this, turrets);
+		desicionTree = new TurretInRange(trueNode, falseNode, this, turrets, &closestTurret);
 		return true;
 	}
 	return false;

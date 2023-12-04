@@ -52,8 +52,8 @@ public:
 	void updatePath(Node* endNode);
 	Node* findNearestWalkableNode();
 	void render();
-	void SeekAndSeparationSteering(KinematicSteeringOutput& steering, std::vector<Character*> characters, float threshhold, int index);
-	void SteerToArrive(KinematicSteeringOutput& steering);
+	void SeekAndSeparationSteering(KinematicSteeringOutput*& steering, std::vector<Character*> characters, float threshhold, int index);
+	void SteerToArrive(KinematicSteeringOutput*& steering);
 	StaticBody* getBody() { return body; }
 
 	void TakeDamage(float dmg) { curHP -= dmg; };
