@@ -147,13 +147,11 @@ void Scene1::Render() {
 
 void Scene1::HandleEvents(const SDL_Event& event)
 {
-	if (paused) {
+	if (paused || usingUI) {
 		return;
 	}
 	level->levelHandleEvents(event);
-	if (usingUI) {
-		return;
-	}
+	
 	switch (event.type) {
 	case SDL_MOUSEBUTTONDOWN:
 		if (event.button.button == SDL_BUTTON_RIGHT) {
@@ -227,22 +225,56 @@ Node* Scene1::findNode() {
 
 void Scene1::HandleTheGUI() {
 	
-	if (ImGui::Begin("Test", NULL, 
-		ImGuiWindowFlags_NoResize			  |		ImGuiWindowFlags_NoCollapse   | 
-		ImGuiWindowFlags_NoTitleBar			  |		ImGuiWindowFlags_NoBackground |
-		ImGuiWindowFlags_NoScrollWithMouse	  |		ImGuiWindowFlags_NoScrollbar  |
-		ImGuiWindowFlags_NoNavInputs		  |     ImGuiHoveredFlags_AnyWindow)) {
+	if (!paused) {
+		// screen ui
 
-		if (ImGui::Button("pause", ImVec2(50, 30))) {
-			paused = !paused;
+		if (ImGui::Begin("Test", NULL, 
+			ImGuiWindowFlags_NoResize			  |		ImGuiWindowFlags_NoCollapse   | 
+			ImGuiWindowFlags_NoTitleBar			  |		
+			ImGuiWindowFlags_NoScrollWithMouse	  |		ImGuiWindowFlags_NoScrollbar  |
+			ImGuiWindowFlags_NoNavInputs		  |     ImGuiHoveredFlags_AnyWindow)) {
+
+			if (ImGui::Button("Start", ImVec2(65, 30))) {
+				paused = false;
+				// begin spawning of enemies
+			}
+			if (ImGui::Button("Pause", ImVec2(65, 30))) {
+				paused = !paused;
+			}
+
 		}
-	}
-	if (ImGui::IsWindowHovered()) {
-		usingUI = true;
-	}
-	else {
-		usingUI = false;
+		if (ImGui::IsWindowHovered()) {
+			usingUI = true;
+		}
+		else {
+			usingUI = false;
+		}
+
+		ImGui::End();
 	}
 
-	ImGui::End();
+	else {
+		// pause menu
+		if (ImGui::Begin("Pause", NULL, 
+			ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
+			ImGuiWindowFlags_NoTitleBar |
+			ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar |
+			ImGuiWindowFlags_NoNavInputs | ImGuiHoveredFlags_AnyWindow)) {
+			if (ImGui::Button("Resume", ImVec2(185, 50))) {
+				paused = false;
+				// begin spawning of enemies
+			}
+			if (ImGui::Button("Quit", ImVec2(185, 50))) {
+				SDL_Event e;
+				e.type = SDL_EventType::SDL_QUIT;
+				SDL_PushEvent(&e);
+				//paused = !paused;
+			}
+
+		}
+		ImGui::End();
+
+	}
+
+
 }
