@@ -264,11 +264,11 @@ void Scene1::HandleTheGUI() {
 				paused = false;
 				// begin spawning of enemies
 			}
-			if (ImGui::Button("Quit", ImVec2(185, 50))) {
+			if (ImGui::Button("Main Menu", ImVec2(185, 50))) {
 				SDL_Event e;
-				e.type = SDL_EventType::SDL_QUIT;
+				e.type = SDL_EventType::SDL_USEREVENT;
+				e.user.code = 3;
 				SDL_PushEvent(&e);
-				//paused = !paused;
 			}
 
 		}
