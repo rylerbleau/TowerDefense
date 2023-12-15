@@ -26,6 +26,7 @@ In TowerCarnage, players defend their towers against AI-controlled enemies. Thes
    All necessary libraries are pre-built and included in the repository.
 
 ## Usage
+
 - **Game Controls:**
   - **Left Mouse Button:** Use this to place characters. Note that characters can only be placed along the path tiles.
   - **Right Mouse Button:** This button is used to place turrets. Turrets can only be spawned on grass tiles.
@@ -34,24 +35,24 @@ In TowerCarnage, players defend their towers against AI-controlled enemies. Thes
 - **Customizing Maps:**
   - For those interested in customizing the game maps, navigate to the `assets/levels` folder. Here, you can alter or create a new layout of the maps.
   - <details>
-<summary>## Tile Agenda for Characters (Click to Expand/Collapse)</summary>
+    <summary>Tile Agenda for Characters (Click to Expand/Collapse)</summary>
 
-- 'P': Path Tile
-- 'G': Grass Tile
-- 'F': Flower Tile
-- 'T': Green Tree on Grass Tile
-- 'O': Orange Tree on Grass Tile
-- 'R': Right Grass Tile
-- 'L': Left Grass Tile
-- 'B': Bottom Grass Tile
-- 'N': Top Grass Tile
-- '1': Bottom Left Grass Corner Tile
-- '2': Top Right Grass Corner Tile
-- 'C': Building with Door Tile
-- 'S': Rock Tile
-- 'W': Well on Rock Tile
-- 'J': Stock on Rock Tile
-- 'V': Board on Rock Tile
+    - 'P': Path Tile
+    - 'G': Grass Tile
+    - 'F': Flower Tile
+    - 'T': Green Tree on Grass Tile
+    - 'O': Orange Tree on Grass Tile
+    - 'R': Right Grass Tile
+    - 'L': Left Grass Tile
+    - 'B': Bottom Grass Tile
+    - 'N': Top Grass Tile
+    - '1': Bottom Left Grass Corner Tile
+    - '2': Top Right Grass Corner Tile
+    - 'C': Building with Door Tile
+    - 'S': Rock Tile
+    - 'W': Well on Rock Tile
+    - 'J': Stock on Rock Tile
+    - 'V': Board on Rock Tile
 
-</details>
+    </details>
 
