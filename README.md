@@ -1,7 +1,7 @@
 <p align="center">
 <img src="https://github.com/rylerbleau/TowerDefense/blob/main/TowerCarnage/branding/TowerCarnage_Logo.png" width="500">
    </p>
-# TowerCarnage
+## TowerCarnage
 
 This project is a tower defense game with a focus on AI algorithms such as steering behaviors, decision-making logic, and pathfinding algorithms, all coming together to intelligent enemy behavior.
 
@@ -40,6 +40,7 @@ In TowerCarnage, players defend their towers against AI-controlled enemies. Thes
   - <details>
     <summary>Tile Agenda for Characters (Click to Expand/Collapse)</summary>
 
+
     - 'P': Path Tile
     - 'G': Grass Tile
     - 'F': Flower Tile
@@ -56,6 +57,11 @@ In TowerCarnage, players defend their towers against AI-controlled enemies. Thes
     - 'W': Well on Rock Tile
     - 'J': Stock on Rock Tile
     - 'V': Board on Rock Tile
-
     </details>
 
+## Acknowledgements
+Special thanks to the following resources:
+
+- **SDL (Simple DirectMedia Layer):** [SDL GitHub Repository](https://github.com/libsdl-org/SDL)
+- **Scott Fiedler's Math Library:** [Scott's Math Library](https://github.com/ScottFielder?tab=repositories)
+- **AI for Games by Ian Millington:** [Amazon's page](https://a.co/d/23Xzi8p)
