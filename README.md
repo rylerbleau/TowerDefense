@@ -1,4 +1,6 @@
-# TowerDefense
+![TowerDefense Logo](https://github.com/rylerbleau/TowerDefense/branding/TowerCarnage_Logo.png)
+
+# TowerCarnage
 
 This project is a tower defense game with a focus on AI algorithms such as steering behaviors, decision-making logic, and pathfinding algorithms, all coming together to intelligent enemy behavior.
 
