@@ -1,4 +1,4 @@
-![TowerDefense Logo](https://github.com/rylerbleau/TowerDefense/branding/TowerCarnage_Logo.png)
+![TowerDefense Logo](TowerCarnage/branding/TowerCarnage_Logo.png)
 
 # TowerCarnage
 
