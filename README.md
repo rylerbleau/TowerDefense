@@ -3,7 +3,7 @@
    </p>
    
 ## TowerCarnage
-This project is a tower defense game with a focus on AI algorithms such as steering behaviors, decision-making logic, and pathfinding algorithms, all coming together to intelligent enemy behavior.
+This project is a tower defense game with a focus on AI algorithms such as steering behaviors, decision-making logic, and pathfinding algorithms which all come together to simulate intelligent enemy behavior.
 
 ## Description
 In TowerCarnage, players defend their towers against AI-controlled enemies. These enemies use a mix of algorithms to move around the game world. The player must carefully observe the enemy AI patterns and strategically place turrets to protect the towers. This game aims to demonstrate how different AI techniques can be incorporated into a game to create a fun and dynamic experience.
