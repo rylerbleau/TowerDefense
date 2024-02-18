@@ -1,4 +1,4 @@
-<p align="left">
+<p align="center">
 <img src="https://github.com/rylerbleau/TowerDefense/blob/main/TowerCarnage/branding/TowerCarnage_Logo.png" width="500">
    </p>
    
@@ -13,8 +13,8 @@ In TowerCarnage, players defend their towers against AI-controlled enemies. Thes
 - **Decision Making:** At the core of AI's intelligence is a behavior tree-based system. This allows the AI to make decisions based on their surrounding environment.
 - **Pathfinding:** Implemented Dijkstra's algorithm to ensure that the AI can target the end goal towers. This enables the AI to find the shortest routes towards the player's defenses, posing a continuous strategic challenge.
 
-<p align="left">
-  <img src="/TowerCarnage/branding/TowerCarnage.gif" alt="InfernoEngine Logo" width = "65%" />
+<p align="center">
+  <img src="/TowerCarnage/branding/TowerCarnage.gif" alt="InfernoEngine Logo" width = "55%" />
 </p>
 
 ## Getting Started
