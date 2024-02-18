@@ -10,9 +10,9 @@ class Desicion :
 		trueNode(trueNode_), falseNode(falseNode_) {}
 	~Desicion() {}
 
-	virtual DesicionTreeNode* makeDecision();
+	DesicionTreeNode* makeDecision();
 	virtual bool testValue();
-	virtual DesicionTreeNode* getBranch();
+	DesicionTreeNode* getBranch();
 private:
 	DesicionTreeNode* trueNode;
 	DesicionTreeNode* falseNode;
